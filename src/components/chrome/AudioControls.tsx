@@ -37,7 +37,7 @@ export function AudioControls({
           setMasterVolume(next);
         }}
         aria-label="Ambient sound volume"
-        className="w-20 accent-[var(--accent)] disabled:opacity-40"
+        className="w-20 rounded accent-[var(--accent)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] disabled:opacity-40"
       />
     </div>
   );

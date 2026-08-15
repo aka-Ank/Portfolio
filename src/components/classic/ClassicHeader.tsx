@@ -15,7 +15,10 @@ const SECTIONS = [
 export function ClassicHeader() {
   return (
     <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--paper)]/90 px-6 py-3 backdrop-blur-sm">
-      <a href="#entrance" className="font-[family-name:var(--font-display)] text-lg text-[var(--ink)]">
+      <a
+        href="#entrance"
+        className="rounded font-[family-name:var(--font-display)] text-lg text-[var(--ink)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+      >
         {about.name}
       </a>
       <nav aria-label="Sections" className="flex flex-wrap gap-4 text-sm">
@@ -23,7 +26,7 @@ export function ClassicHeader() {
           <a
             key={section.id}
             href={`#${section.id}`}
-            className="text-[var(--muted-foreground)] hover:text-[var(--ink)]"
+            className="rounded text-[var(--muted-foreground)] outline-offset-2 hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
           >
             {section.label}
           </a>

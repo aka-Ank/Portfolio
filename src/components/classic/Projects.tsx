@@ -16,7 +16,7 @@ export function Projects() {
             key={project.slug}
             className="group rounded-lg border border-[var(--border)] p-5 open:bg-[var(--secondary)]"
           >
-            <summary className="cursor-pointer list-none">
+            <summary className="cursor-pointer list-none rounded outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]">
               <div className="flex items-center justify-between gap-4">
                 <span className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
                   {project.title}

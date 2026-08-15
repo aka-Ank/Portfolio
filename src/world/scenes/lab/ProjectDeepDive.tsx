@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { motion } from "motion/react";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { getProject } from "@/content/projects";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 /**
  * The Lab's deep-dive panel — architecture, outcome, visuals, per
@@ -14,6 +15,7 @@ import { getProject } from "@/content/projects";
 export function ProjectDeepDive({ slug }: { slug: string }) {
   const closeDeepDive = useWorldStore((s) => s.closeDeepDive);
   const project = getProject(slug);
+  const containerRef = useModalFocusTrap<HTMLDivElement>();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -28,6 +30,8 @@ export function ProjectDeepDive({ slug }: { slug: string }) {
   return (
     <div className="pointer-events-auto fixed inset-0 z-40 flex items-center justify-center bg-black/50 px-6">
       <motion.div
+        ref={containerRef}
+        tabIndex={-1}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 12 }}
@@ -35,7 +39,7 @@ export function ProjectDeepDive({ slug }: { slug: string }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="deep-dive-title"
-        className="max-h-[80vh] w-full max-w-xl overflow-y-auto rounded-lg bg-[var(--paper)] p-8 text-[var(--ink)] shadow-2xl"
+        className="max-h-[80vh] w-full max-w-xl overflow-y-auto rounded-lg bg-[var(--paper)] p-8 text-[var(--ink)] shadow-2xl outline-none"
       >
         <div className="flex items-start justify-between gap-4">
           <h2 id="deep-dive-title" className="font-[family-name:var(--font-display)] text-3xl">
@@ -83,7 +87,7 @@ export function ProjectDeepDive({ slug }: { slug: string }) {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-[var(--primary)] underline-offset-4 hover:underline"
+                className="rounded text-sm text-[var(--primary)] underline-offset-4 outline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
               >
                 {link.label}
               </a>

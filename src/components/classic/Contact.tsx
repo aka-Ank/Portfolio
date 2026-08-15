@@ -24,14 +24,14 @@ export function Contact() {
             <a
               key={link.label}
               href={link.href}
-              className="text-[var(--ink)] underline-offset-4 hover:underline"
+              className="text-[var(--ink)] underline-offset-4 outline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
             >
               {link.label}
             </a>
           ))}
           <a
             href="/api/resume"
-            className="text-[var(--ink)] underline-offset-4 hover:underline"
+            className="text-[var(--ink)] underline-offset-4 outline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
           >
             Résumé (PDF)
           </a>

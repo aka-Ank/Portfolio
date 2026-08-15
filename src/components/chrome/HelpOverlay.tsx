@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 const SHORTCUTS = [
   { key: "G", label: "Go to a chapter" },
@@ -14,9 +15,13 @@ const SHORTCUTS = [
 /** Accessible keyboard-shortcut reference — docs/08-roadmap.md Phase 4:
  * "visible hints and an accessible help overlay." */
 export function HelpOverlay({ onClose }: { onClose: () => void }) {
+  const containerRef = useModalFocusTrap<HTMLDivElement>();
+
   return (
     <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6">
       <motion.div
+        ref={containerRef}
+        tabIndex={-1}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
@@ -24,7 +29,7 @@ export function HelpOverlay({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="help-title"
-        className="w-full max-w-sm rounded-lg bg-[var(--paper)] p-6 text-[var(--ink)] shadow-2xl"
+        className="w-full max-w-sm rounded-lg bg-[var(--paper)] p-6 text-[var(--ink)] shadow-2xl outline-none"
       >
         <div className="flex items-center justify-between">
           <h2 id="help-title" className="font-[family-name:var(--font-display)] text-2xl">

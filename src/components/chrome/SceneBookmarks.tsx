@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { CHAPTER_ORDER, type ChapterId } from "@/types/world";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { scrollToChapter } from "@/world/systems/scroll-camera/scrollToChapter";
+import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 const CHAPTER_LABELS: Record<ChapterId, string> = {
   entrance: "Entrance",
@@ -21,10 +22,13 @@ const CHAPTER_LABELS: Record<ChapterId, string> = {
 export function SceneBookmarks({ onClose }: { onClose: () => void }) {
   const currentChapter = useWorldStore((s) => s.currentChapter);
   const viewedChapters = useWorldStore((s) => s.viewedChapters);
+  const containerRef = useModalFocusTrap<HTMLDivElement>();
 
   return (
     <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6">
       <motion.div
+        ref={containerRef}
+        tabIndex={-1}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
@@ -32,7 +36,7 @@ export function SceneBookmarks({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="bookmarks-title"
-        className="w-full max-w-sm rounded-lg bg-[var(--paper)] p-6 text-[var(--ink)] shadow-2xl"
+        className="w-full max-w-sm rounded-lg bg-[var(--paper)] p-6 text-[var(--ink)] shadow-2xl outline-none"
       >
         <div className="flex items-center justify-between">
           <h2 id="bookmarks-title" className="font-[family-name:var(--font-display)] text-2xl">
