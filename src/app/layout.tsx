@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import { AppProviders } from "@/components/chrome/AppProviders";
+import { about } from "@/content/about";
+import { SITE_URL } from "@/lib/site";
+import { buildPersonSchema } from "@/lib/person-schema";
 import "./globals.css";
 
 // Typography system — see docs/01-design-specification.md §2. The serif is
@@ -27,10 +30,27 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const title = `${about.name} — an enchanted forest where AI and nature meet`;
+const description =
+  "A cinematic, narrative portfolio — an explorable journey through an enchanted forest where AI and nature coexist gently.";
+
 export const metadata: Metadata = {
-  title: "Portfolio — an enchanted forest where AI and nature meet",
-  description:
-    "A cinematic, narrative portfolio — an explorable journey through an enchanted forest where AI and nature coexist gently.",
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    title,
+    description,
+    url: SITE_URL,
+    siteName: `${about.name} — Portfolio`,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -40,6 +60,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${instrumentSerif.variable} ${instrumentSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
+        {/* Site-wide identity, not page-specific — see src/lib/person-schema.ts */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildPersonSchema()) }}
+        />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-[var(--paper)] focus:px-4 focus:py-2 focus:text-[var(--ink)] focus:outline focus:outline-2 focus:outline-[var(--focus-ring)]"

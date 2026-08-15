@@ -6,10 +6,18 @@ import { Skills } from "@/components/classic/Skills";
 import { Projects } from "@/components/classic/Projects";
 import { Achievements } from "@/components/classic/Achievements";
 import { Contact } from "@/components/classic/Contact";
+import { about } from "@/content/about";
+import { SITE_URL } from "@/lib/site";
+
+const title = `${about.name} — Portfolio (Classic)`;
+const description = "The lightweight, fast-by-default version of the portfolio.";
 
 export const metadata: Metadata = {
-  title: "Portfolio — Classic",
-  description: "The lightweight, fast-by-default version of the portfolio.",
+  title,
+  description,
+  alternates: { canonical: `${SITE_URL}/classic` },
+  openGraph: { title, description, url: `${SITE_URL}/classic`, type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 // The classic route — semantic HTML, minimal JS, same content as the
