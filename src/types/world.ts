@@ -11,32 +11,49 @@ export const TIME_OF_DAY_ANCHOR_VALUE: Record<TimeOfDayAnchor, number> = {
   night: 0.75,
 };
 
+/**
+ * The six biomes. Restructured from the original seven chapters to match the
+ * biome map: Clearing folded into the Valley (its bio/themes copy is that
+ * biome's opening beat, not a separate place), and the single Lab split in
+ * two so the SDE and AI/ML tracks are distinct *places*, not two lists in one
+ * room — the split is the point a visitor should leave with.
+ */
 export type ChapterId =
   | "entrance"
-  | "clearing"
-  | "river"
-  | "sanctuary"
-  | "lab"
+  | "valley"
+  | "grove"
+  | "jungle"
   | "observatory"
   | "campfire";
 
 export const CHAPTER_ORDER: ChapterId[] = [
   "entrance",
-  "clearing",
-  "river",
-  "sanctuary",
-  "lab",
+  "valley",
+  "grove",
+  "jungle",
   "observatory",
   "campfire",
 ];
 
-/** Each chapter's default time-of-day anchor — see docs/03-scene-graph.md. */
+/** Human-facing biome names — the world's own vocabulary, kept out of the
+ * ids so renaming a label never means touching layout or state. */
+export const CHAPTER_LABELS: Record<ChapterId, string> = {
+  entrance: "Entrance Meadow",
+  valley: "Moss River Valley",
+  grove: "Ancient Grove",
+  jungle: "Mechanical Jungle",
+  observatory: "Moonlit Observatory",
+  campfire: "Campfire Terminal",
+};
+
+/** Each chapter's default time-of-day anchor — see docs/03-scene-graph.md.
+ * Still a dawn→night progression across the journey, now over six steps:
+ * the organic half sits in daylight, the mechanical half after sundown. */
 export const CHAPTER_TIME_OF_DAY: Record<ChapterId, TimeOfDayAnchor> = {
   entrance: "dawn",
-  clearing: "dawn",
-  river: "day",
-  sanctuary: "day",
-  lab: "sunset",
+  valley: "day",
+  grove: "day",
+  jungle: "sunset",
   observatory: "night",
   campfire: "night",
 };

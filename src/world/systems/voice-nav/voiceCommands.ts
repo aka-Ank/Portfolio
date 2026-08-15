@@ -14,13 +14,15 @@ export type VoiceIntent =
 // not a general-purpose assistant (that's the chatbot's job). See
 // ENGINEER_NOTES.md "Voice navigation intent mapping."
 const CHAPTER_ALIASES: Record<ChapterId, string[]> = {
-  entrance: ["entrance", "start", "beginning", "go home", "home"],
-  clearing: ["clearing"],
-  river: ["river", "knowledge river"],
-  sanctuary: ["sanctuary", "animal sanctuary", "animals"],
-  lab: ["lab", "projects", "project lab"],
-  observatory: ["observatory", "achievements", "certifications"],
-  campfire: ["campfire", "contact", "the end"],
+  entrance: ["entrance", "meadow", "entrance meadow", "start", "beginning", "go home", "home"],
+  valley: ["valley", "river", "moss river", "moss river valley", "about", "learning"],
+  // "projects" alone is ambiguous now that the tracks are separate places,
+  // so it deliberately isn't an alias for either — the brief's own examples
+  // ("show SDE projects", "open AIML biome") name the track.
+  grove: ["grove", "ancient grove", "sde", "software", "software engineering"],
+  jungle: ["jungle", "mechanical jungle", "ai", "aiml", "ai ml", "machine learning"],
+  observatory: ["observatory", "moonlit observatory", "achievements", "certifications"],
+  campfire: ["campfire", "campfire terminal", "contact", "the end"],
 };
 
 /**

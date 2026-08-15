@@ -6,7 +6,7 @@ import { ClearingBackground } from "./Background";
 import { LoreObject } from "@/world/shared/LoreObject";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { mid } = chapterRange("clearing");
+const { mid } = chapterRange("grove");
 
 // Clearing — about, human scale, unhurried. See docs/03-scene-graph.md §2.
 export function ClearingScene() {

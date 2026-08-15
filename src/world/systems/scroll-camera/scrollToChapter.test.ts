@@ -15,25 +15,25 @@ describe("scrollToChapter", () => {
   });
 
   it("sets the requested chapter as authoritative", () => {
-    scrollToChapter("sanctuary");
-    expect(useWorldStore.getState().currentChapter).toBe("sanctuary");
+    scrollToChapter("grove");
+    expect(useWorldStore.getState().currentChapter).toBe("grove");
   });
 
   it("targets the chapter's own progress segment, not a neighbour's", () => {
-    scrollToChapter("sanctuary"); // index 3 of 7
+    scrollToChapter("grove"); // index 2 of 6
 
     // Lands *on* the segment's lower bound, not past it: the landing point
     // is the chapter's entry waypoint, which is the framing cameraPath.ts
     // authored for its opening beat. (Landing mid-segment instead put the
     // Entrance camera beyond the torii archway and lost the hero shot.)
     const target = useWorldStore.getState().targetJourneyProgress;
-    expect(target).toBeGreaterThanOrEqual(3 / 7);
-    expect(target).toBeLessThan(4 / 7);
-    expect(target).toBe(progressForChapter("sanctuary"));
+    expect(target).toBeGreaterThanOrEqual(2 / 6);
+    expect(target).toBeLessThan(3 / 6);
+    expect(target).toBe(progressForChapter("grove"));
   });
 
   it("puts the Entrance at the very start of the path, framing the archway", () => {
-    scrollToChapter("clearing");
+    scrollToChapter("grove");
     scrollToChapter("entrance");
     expect(useWorldStore.getState().targetJourneyProgress).toBe(0);
   });
@@ -44,10 +44,10 @@ describe("scrollToChapter", () => {
   });
 
   it("is a no-op when already on the requested chapter", () => {
-    scrollToChapter("river");
+    scrollToChapter("valley");
     useWorldStore.setState({ phase: "active" });
 
-    scrollToChapter("river");
+    scrollToChapter("valley");
     // Still "active" — a repeat request must not re-enter a transition and
     // replay the arrival beat (the navigator and voice nav can both fire a
     // jump to the chapter you're already on).

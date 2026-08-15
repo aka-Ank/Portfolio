@@ -5,7 +5,7 @@ import { education, experience } from "@/content/resume";
 // years, internship, expected graduation) — no invented "formative incident"
 // beats, which is what used to live here.
 export const riverContent = {
-  heading: "Knowledge River",
+  heading: "Moss River Valley",
   intro:
     "Learning has never been a straight line — more like a current: constant, occasionally rough, always moving somewhere.",
   education,

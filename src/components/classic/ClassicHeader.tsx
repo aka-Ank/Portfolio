@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { about } from "@/content/about";
 
+// Anchors match the immersive biome ids wherever a biome exists, so the
+// mode switch (/classic#<currentChapter>) lands on the matching content.
+// Learning and Skills are sub-sections of the Valley biome, so they carry
+// in-page-only ids — the Valley's own anchor is About.
 const SECTIONS = [
-  { id: "clearing", label: "About" },
-  { id: "river", label: "Learning" },
-  { id: "sanctuary", label: "Skills" },
-  { id: "lab", label: "Projects" },
+  { id: "valley", label: "About" },
+  { id: "learning", label: "Learning" },
+  { id: "skills", label: "Skills" },
+  { id: "grove", label: "SDE" },
+  { id: "jungle", label: "AI / ML" },
   { id: "observatory", label: "Achievements" },
   { id: "campfire", label: "Contact" },
 ];

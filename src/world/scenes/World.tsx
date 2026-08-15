@@ -15,19 +15,18 @@ import { ObservatoryScene } from "./observatory";
 import { CampfireScene } from "./campfire";
 
 const SEGMENT = 1 / CHAPTER_ORDER.length;
-// A full segment of scroll progress before Lab is ever needed — Lighthouse
-// profiling (Phase 5) found mounting all 7 chapters' geometry at once cost
+// A full segment of progress before the Jungle is ever needed — Lighthouse
+// profiling (Phase 5) found mounting every biome's geometry at once cost
 // ~2.8s of main-thread script evaluation on the very first commit, delaying
 // paint of content that doesn't even depend on it (the Preloader's
 // headline, fully opaque on top of the canvas). journeyProgress only ever
 // advances via Lenis's eased scrollTo (scroll, bookmarks, voice nav all go
-// through it — see scrollToChapter.ts), never instantly, so a full segment
-// of lead time is generous headroom, not a race.
-const FAR_CHAPTERS_MOUNT_AT = SEGMENT * (CHAPTER_ORDER.indexOf("lab") - 1);
+// through it), never instantly, so a full segment of lead time is generous
+// headroom, not a race.
+const FAR_CHAPTERS_MOUNT_AT = SEGMENT * (CHAPTER_ORDER.indexOf("jungle") - 1);
 
-// The real world root, mounted at "/" — one continuous scene, not seven
-// isolated stages (see worldLayout.ts). All seven chapters present — see
-// docs/08-roadmap.md Phase 3. Lab/Observatory/Campfire mount a segment
+// The real world root, mounted at "/" — one continuous scene, not six
+// isolated stages (see worldLayout.ts). Jungle/Observatory/Campfire mount a segment
 // ahead of the camera rather than at t=0 (see FAR_CHAPTERS_MOUNT_AT) — a
 // first-paint cost cut, not per-chapter lazy loading in the pop-in sense
 // the non-negotiables forbid: everything is still built well before the
@@ -53,9 +52,12 @@ export function World() {
       <CameraRig path={WORLD_CAMERA_PATH} />
       <Ground />
       <EntranceScene />
-      <ClearingScene />
+      {/* Moss River Valley layers both vocabularies: the river's milestones
+          and the creatures carrying the skill set. */}
       <RiverScene />
       <SanctuaryScene />
+      {/* Ancient Grove — the organic, tree-filled half of the project split. */}
+      <ClearingScene />
       {farChaptersReady && (
         <>
           <LabScene />

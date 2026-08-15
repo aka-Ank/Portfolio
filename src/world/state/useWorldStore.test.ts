@@ -9,9 +9,9 @@ beforeEach(() => {
 
 describe("navigation slice", () => {
   it("goToChapter sets the chapter, enters transitioning, and resets chapterProgress", () => {
-    useWorldStore.getState().goToChapter("lab");
+    useWorldStore.getState().goToChapter("jungle");
     const state = useWorldStore.getState();
-    expect(state.currentChapter).toBe("lab");
+    expect(state.currentChapter).toBe("jungle");
     expect(state.phase).toBe("transitioning");
     expect(state.chapterProgress).toBe(0);
   });
@@ -20,7 +20,7 @@ describe("navigation slice", () => {
     useWorldStore.getState().goToChapter("observatory");
     expect(useWorldStore.getState().targetAnchor).toBe("night");
 
-    useWorldStore.getState().goToChapter("river");
+    useWorldStore.getState().goToChapter("valley");
     expect(useWorldStore.getState().targetAnchor).toBe("day");
   });
 
@@ -38,10 +38,10 @@ describe("navigation slice", () => {
 describe("progress slice", () => {
   it("markChapterViewed is additive across chapters", () => {
     useWorldStore.getState().markChapterViewed("entrance");
-    useWorldStore.getState().markChapterViewed("clearing");
+    useWorldStore.getState().markChapterViewed("grove");
     expect(useWorldStore.getState().viewedChapters).toEqual({
       entrance: true,
-      clearing: true,
+      grove: true,
     });
   });
 

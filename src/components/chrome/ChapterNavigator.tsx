@@ -2,19 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CHAPTER_ORDER, type ChapterId } from "@/types/world";
+import { CHAPTER_ORDER, CHAPTER_LABELS } from "@/types/world";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { scrollToChapter } from "@/world/systems/scroll-camera/scrollToChapter";
-
-const CHAPTER_LABELS: Record<ChapterId, string> = {
-  entrance: "Entrance",
-  clearing: "Clearing",
-  river: "Knowledge River",
-  sanctuary: "Sanctuary",
-  lab: "The Lab",
-  observatory: "Observatory",
-  campfire: "Campfire",
-};
 
 /** Long enough to read where you are after arriving, short enough that the
  * rail isn't competing with the world for attention. */

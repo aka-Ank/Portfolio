@@ -3,14 +3,26 @@ import { matchVoiceCommand } from "./voiceCommands";
 
 describe("matchVoiceCommand", () => {
   it("matches chapter aliases, including multi-word ones", () => {
-    expect(matchVoiceCommand("go to the lab")).toEqual({ type: "goToChapter", chapter: "lab" });
-    expect(matchVoiceCommand("take me to the animal sanctuary")).toEqual({
+    expect(matchVoiceCommand("open the mechanical jungle")).toEqual({
       type: "goToChapter",
-      chapter: "sanctuary",
+      chapter: "jungle",
     });
-    expect(matchVoiceCommand("show me the knowledge river")).toEqual({
+    expect(matchVoiceCommand("take me to the ancient grove")).toEqual({
       type: "goToChapter",
-      chapter: "river",
+      chapter: "grove",
+    });
+    expect(matchVoiceCommand("show me the moss river valley")).toEqual({
+      type: "goToChapter",
+      chapter: "valley",
+    });
+    // The brief's own example phrasings for the two tracks.
+    expect(matchVoiceCommand("show sde projects")).toEqual({
+      type: "goToChapter",
+      chapter: "grove",
+    });
+    expect(matchVoiceCommand("open aiml biome")).toEqual({
+      type: "goToChapter",
+      chapter: "jungle",
     });
   });
 

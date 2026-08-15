@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { mid } = chapterRange("clearing");
+const { mid } = chapterRange("grove");
 
 // Forest wall enclosing the clearing — denser than Entrance's tree line
 // since this is meant to read as a bounded, held space.

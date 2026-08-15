@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { start, end } = chapterRange("clearing");
+const { start, end } = chapterRange("grove");
 const mid = (start + end) / 2;
 
 // Low grass/wildflower scatter — minimal parallax per docs/03 §2.

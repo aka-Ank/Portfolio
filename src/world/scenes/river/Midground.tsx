@@ -8,8 +8,13 @@ import { DistanceFadeHtml } from "@/world/shared/DistanceFadeHtml";
 import { chapterRange } from "@/world/scenes/worldLayout";
 import { riverContent } from "./content";
 
-const { start, end } = chapterRange("river");
-const length = start - end;
+const { start, end } = chapterRange("valley");
+// The Valley is double-depth and hosts two vocabularies. The river's
+// milestones take its first half and the creatures the second, rather than
+// both spreading over the whole biome — interleaved, they crowded each other,
+// and the last milestone sat so close to the Grove boundary that its label
+// was still legible from inside the next biome.
+const length = (start - end) / 2;
 const mid = (start + end) / 2;
 
 /**

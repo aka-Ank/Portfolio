@@ -6,7 +6,7 @@ import { LabBackground } from "./Background";
 import { LoreObject } from "@/world/shared/LoreObject";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { start, end } = chapterRange("lab");
+const { start, end } = chapterRange("jungle");
 
 // Lab / Project Chamber — projects as artifacts. See docs/03-scene-graph.md §5.
 export function LabScene() {

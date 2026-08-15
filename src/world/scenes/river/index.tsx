@@ -6,7 +6,7 @@ import { RiverBackground } from "./Background";
 import { LoreObject } from "@/world/shared/LoreObject";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { start, end } = chapterRange("river");
+const { start, end } = chapterRange("valley");
 
 // Knowledge River — learning, iteration, growth. See docs/03-scene-graph.md §3.
 export function RiverScene() {

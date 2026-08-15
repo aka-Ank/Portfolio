@@ -77,7 +77,7 @@ describe("VoiceNavControl", () => {
     const scrollIntoView = vi.fn();
     pathname = "/classic";
     const lab = document.createElement("div");
-    lab.id = "lab";
+    lab.id = "jungle";
     lab.scrollIntoView = scrollIntoView;
     document.body.appendChild(lab);
 
@@ -85,10 +85,10 @@ describe("VoiceNavControl", () => {
     render(<VoiceNavControl />);
     await user.click(screen.getByRole("button", { name: "Start voice navigation" }));
 
-    latestRecognitionInstance()?.emit("go to the lab");
+    latestRecognitionInstance()?.emit("open the mechanical jungle");
 
     await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
-    expect(screen.getByRole("status")).toHaveTextContent(/heading to lab/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/heading to jungle/i);
   });
 
   it("toggles reduced motion on the matching voice command", async () => {

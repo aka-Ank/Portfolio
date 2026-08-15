@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { mid } = chapterRange("sanctuary");
+const { mid } = chapterRange("valley");
 
 // Undergrowth the creatures move through — see docs/03-scene-graph.md §4.
 export function SanctuaryForeground() {

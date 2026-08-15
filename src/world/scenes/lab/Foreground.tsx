@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { start, end } = chapterRange("lab");
+const { start, end } = chapterRange("jungle");
 
 // Chamber architecture framing the shot — structural pillars, not foliage.
 export function LabForeground() {

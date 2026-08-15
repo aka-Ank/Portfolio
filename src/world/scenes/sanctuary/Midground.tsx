@@ -5,8 +5,11 @@ import { chapterRange } from "@/world/scenes/worldLayout";
 import { sanctuaryContent } from "./content";
 import type { SkillDomain } from "@/content/schema";
 
-const { start, end } = chapterRange("sanctuary");
-const length = start - end;
+const valley = chapterRange("valley");
+// Second half of the Valley — see river/Midground.tsx for why the biome is
+// split between the two vocabularies rather than shared across all of it.
+const length = (valley.start - valley.end) / 2;
+const start = valley.start - length;
 
 // Four domain clusters spread along the chapter's depth, two creatures each
 // (see content.ts / src/content/skills.ts) — spatial grouping by domain

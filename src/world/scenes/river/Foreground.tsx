@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { mid } = chapterRange("river");
+const { mid } = chapterRange("valley");
 
 export function RiverForeground() {
   return (

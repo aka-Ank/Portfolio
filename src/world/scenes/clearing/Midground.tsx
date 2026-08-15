@@ -2,7 +2,7 @@
 
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { mid } = chapterRange("clearing");
+const { mid } = chapterRange("grove");
 
 /**
  * The story-stone — the "about" text reads as though it belongs to this

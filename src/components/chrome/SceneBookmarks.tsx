@@ -1,20 +1,10 @@
 "use client";
 
 import { motion } from "motion/react";
-import { CHAPTER_ORDER, type ChapterId } from "@/types/world";
+import { CHAPTER_ORDER, CHAPTER_LABELS } from "@/types/world";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { scrollToChapter } from "@/world/systems/scroll-camera/scrollToChapter";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
-
-const CHAPTER_LABELS: Record<ChapterId, string> = {
-  entrance: "Entrance",
-  clearing: "Clearing",
-  river: "Knowledge River",
-  sanctuary: "Animal Sanctuary",
-  lab: "Lab",
-  observatory: "Observatory",
-  campfire: "Campfire",
-};
 
 /** Scene bookmarks — jump to a chapter without breaking the story feel
  * (docs/03-scene-graph.md "bookmark jumps"): scrollToChapter always eases

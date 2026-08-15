@@ -2,7 +2,7 @@ import { riverContent } from "@/world/scenes/river/content";
 
 export function LearningJourney() {
   return (
-    <section id="river" aria-label="Learning journey" className="mx-auto max-w-2xl px-6 py-24">
+    <section id="learning" aria-label="Learning journey" className="mx-auto max-w-2xl px-6 py-24">
       <h2 className="font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]">
         {riverContent.heading}
       </h2>

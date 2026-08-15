@@ -3,7 +3,7 @@
 import { InstancedFoliage } from "@/world/shared/InstancedFoliage";
 import { chapterRange } from "@/world/scenes/worldLayout";
 
-const { start, end, mid } = chapterRange("lab");
+const { start, end, mid } = chapterRange("jungle");
 
 // The chamber recedes into structured dark — sparse pillars instead of trees,
 // this is the first chapter that reads as built rather than grown (see

@@ -7,7 +7,7 @@ import { EntranceOverlay } from "@/world/scenes/entrance/EntranceOverlay";
 import { ClearingOverlay } from "@/world/scenes/clearing/ClearingOverlay";
 import { RiverOverlay } from "@/world/scenes/river/RiverOverlay";
 import { SanctuaryOverlay } from "@/world/scenes/sanctuary/SanctuaryOverlay";
-import { LabOverlay } from "@/world/scenes/lab/LabOverlay";
+import { GroveOverlay, JungleOverlay } from "@/world/scenes/lab/LabOverlay";
 import { ObservatoryOverlay } from "@/world/scenes/observatory/ObservatoryOverlay";
 import { CampfireOverlay } from "@/world/scenes/campfire/CampfireOverlay";
 
@@ -16,12 +16,25 @@ import { CampfireOverlay } from "@/world/scenes/campfire/CampfireOverlay";
 // time). Crossfade only; no position/scale motion on the swap itself, since
 // that's the transition system's job (docs/06-animation-bible.md "Scene
 // transition"), not the overlay's.
+// The Valley carries what used to be three separate chapters' worth of
+// copy — who I am (Clearing), the learning story (River), and the skills
+// (Sanctuary) — because the biome map treats them as one place: "About,
+// education, internship, learning story".
+function ValleyOverlay() {
+  return (
+    <>
+      <ClearingOverlay />
+      <RiverOverlay />
+      <SanctuaryOverlay />
+    </>
+  );
+}
+
 const OVERLAYS: Partial<Record<ChapterId, React.ComponentType>> = {
   entrance: EntranceOverlay,
-  clearing: ClearingOverlay,
-  river: RiverOverlay,
-  sanctuary: SanctuaryOverlay,
-  lab: LabOverlay,
+  valley: ValleyOverlay,
+  grove: GroveOverlay,
+  jungle: JungleOverlay,
   observatory: ObservatoryOverlay,
   campfire: CampfireOverlay,
 };

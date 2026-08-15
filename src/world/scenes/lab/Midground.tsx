@@ -9,7 +9,7 @@ import { useWorldStore } from "@/world/state/useWorldStore";
 import { chapterRange } from "@/world/scenes/worldLayout";
 import { labContent } from "./content";
 
-const { start, end } = chapterRange("lab");
+const { start, end } = chapterRange("jungle");
 const length = start - end;
 
 function ProjectConsole({

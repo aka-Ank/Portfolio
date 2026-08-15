@@ -2,7 +2,7 @@ import { clearingContent } from "@/world/scenes/clearing/content";
 
 export function About() {
   return (
-    <section id="clearing" aria-label="About" className="mx-auto max-w-2xl px-6 py-24">
+    <section id="valley" aria-label="About" className="mx-auto max-w-2xl px-6 py-24">
       <h2 className="font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]">
         {clearingContent.heading}
       </h2>
