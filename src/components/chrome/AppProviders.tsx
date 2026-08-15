@@ -7,6 +7,7 @@ import { ScrollProvider } from "@/world/systems/scroll-camera/ScrollProvider";
 import { TransitionController } from "@/world/systems/transitions/TransitionController";
 import { EasterEggController } from "@/world/systems/easter-egg/EasterEggController";
 import { ChatWidget } from "./ChatWidget";
+import { VoiceNavControl } from "./VoiceNavControl";
 
 /**
  * Root-mounted, once. Wires the always-on global systems (reduced-motion
@@ -22,6 +23,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <TransitionController />
       <EasterEggController />
       <ChatWidget />
+      <VoiceNavControl />
       {children}
     </ScrollProvider>
   );
