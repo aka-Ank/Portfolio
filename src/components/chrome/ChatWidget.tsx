@@ -163,7 +163,10 @@ export function ChatWidget() {
               ref={listRef}
               role="log"
               aria-label="Conversation"
-              className="flex-1 space-y-3 overflow-y-auto px-4 py-3"
+              // Scrolls but contains only text, so without tabIndex a keyboard
+              // user can't scroll back through the transcript at all.
+              tabIndex={0}
+              className="flex-1 space-y-3 overflow-y-auto px-4 py-3 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
             >
               {messages.length === 0 && (
                 <p className="text-sm text-[var(--muted-foreground)]">

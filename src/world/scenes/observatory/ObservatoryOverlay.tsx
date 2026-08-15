@@ -30,7 +30,10 @@ export function ObservatoryOverlay() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.6 }}
-        className="pointer-events-auto max-h-[70vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm"
+        tabIndex={0}
+        role="region"
+        aria-label="Achievements"
+        className="pointer-events-auto max-h-[70vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
       >
         {/* Cert plaques reveal issuer/significance on 3D hover only — this
             list is the always-present DOM equivalent, same reasoning as

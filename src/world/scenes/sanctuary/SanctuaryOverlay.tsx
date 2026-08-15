@@ -35,7 +35,15 @@ export function SanctuaryOverlay() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.6 }}
-        className="pointer-events-auto max-h-[60vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm"
+        // tabIndex/role/label: this panel scrolls but holds only text, so a
+        // keyboard user had no way to scroll it and no way to reach the
+        // skills below the fold. axe flagged it as scrollable-region-focusable
+        // (serious) at the Sanctuary chapter. Panels whose children are
+        // already focusable (LabOverlay's project buttons) don't need this.
+        tabIndex={0}
+        role="region"
+        aria-label="Skills"
+        className="pointer-events-auto max-h-[60vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
       >
         <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
           Skills
