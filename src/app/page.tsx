@@ -15,6 +15,7 @@ import { TimeOfDayToggle } from "@/components/chrome/TimeOfDayToggle";
 import { ReducedMotionToggle } from "@/components/chrome/ReducedMotionToggle";
 import { ModeToggle } from "@/components/chrome/ModeToggle";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
+import { ChapterNavigator } from "@/components/chrome/ChapterNavigator";
 import { WebGLErrorBoundary } from "@/components/chrome/WebGLErrorBoundary";
 import { WebGLFallback } from "@/components/chrome/WebGLFallback";
 import { useWebGLSupport } from "@/hooks/useWebGLSupport";
@@ -103,6 +104,7 @@ export default function Home() {
         <ChapterOverlay />
         <DeepDiveLayer />
         <KeyboardShortcuts audioEnabled={audioEnabled} onToggleMute={toggleMute} />
+        <ChapterNavigator />
 
         <div
           id="scene-transition-veil"
