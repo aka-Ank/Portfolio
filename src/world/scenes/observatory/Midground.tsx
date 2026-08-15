@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Html } from "@react-three/drei";
 import { useAetherMaterialRef } from "@/world/shared/useAetherMaterial";
+import { DistanceFadeHtml } from "@/world/shared/DistanceFadeHtml";
 import { chapterRange } from "@/world/scenes/worldLayout";
 import { observatoryContent } from "./content";
 
@@ -47,7 +47,7 @@ function CertPlaque({
         <boxGeometry args={[0.02, 1.2, 0.7]} />
         <meshStandardMaterial ref={trimRef} color="#020202" emissive="#4fd3ef" emissiveIntensity={0.7} />
       </mesh>
-      <Html position={[0, 1.7, 0]} center occlude>
+      <DistanceFadeHtml position={[0, 1.7, 0]} center>
         <div
           className={`pointer-events-none rounded-md bg-[var(--scrim)] px-3 py-2 text-center text-[var(--ink-inverse)] backdrop-blur-sm transition-[width] ${hovered ? "w-64" : "w-32"}`}
         >
@@ -60,7 +60,7 @@ function CertPlaque({
             </>
           )}
         </div>
-      </Html>
+      </DistanceFadeHtml>
     </group>
   );
 }

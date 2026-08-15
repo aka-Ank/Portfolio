@@ -11,4 +11,12 @@ describe("ObservatoryOverlay", () => {
       expect(screen.getByText(new RegExp(post.title))).toBeInTheDocument();
     }
   });
+
+  it("lists every certification's title, issuer, and significance — the plaques only reveal this on 3D pointer hover", () => {
+    render(<ObservatoryOverlay />);
+    for (const cert of observatoryContent.certifications) {
+      expect(screen.getByText(new RegExp(cert.title))).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(cert.issuer))).toBeInTheDocument();
+    }
+  });
 });

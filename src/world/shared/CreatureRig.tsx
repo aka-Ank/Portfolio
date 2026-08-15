@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { Html } from "@react-three/drei";
 import { damp } from "maath/easing";
+import { DistanceFadeHtml } from "./DistanceFadeHtml";
 import { useAetherMaterialRef } from "./useAetherMaterial";
 import type { Skill } from "@/content/schema";
 
@@ -96,12 +96,12 @@ export function CreatureRig({
 
       {/* No distanceFactor — see the equivalent note in river/Midground.tsx. */}
       {hovered && (
-        <Html position={[0, 1, 0]} center occlude>
+        <DistanceFadeHtml position={[0, 1, 0]} center>
           <div className="pointer-events-none w-56 rounded-md bg-[var(--scrim)] px-3 py-2 text-[var(--ink-inverse)] backdrop-blur-sm">
             <div className="text-sm font-semibold">{skill.name}</div>
             <div className="mt-1 text-xs opacity-80">{skill.description}</div>
           </div>
-        </Html>
+        </DistanceFadeHtml>
       )}
     </group>
   );

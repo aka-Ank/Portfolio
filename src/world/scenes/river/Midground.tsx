@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { Html } from "@react-three/drei";
 import { useAetherMaterialRef } from "@/world/shared/useAetherMaterial";
+import { DistanceFadeHtml } from "@/world/shared/DistanceFadeHtml";
 import { chapterRange } from "@/world/scenes/worldLayout";
 import { riverContent } from "./content";
 
@@ -57,12 +57,12 @@ export function RiverMidground() {
             {/* No distanceFactor: these read as UI annotations, not
                 physical objects, so they stay a constant, legible size
                 instead of ballooning when the camera passes close by. */}
-            <Html position={[0, 0.8, 0]} center occlude>
+            <DistanceFadeHtml position={[0, 0.8, 0]} center>
               <div className="pointer-events-none w-48 rounded-md bg-[var(--scrim)] px-3 py-2 text-center text-[var(--ink-inverse)] backdrop-blur-sm">
                 <div className="text-xs tracking-wide opacity-70">{milestone.year}</div>
                 <div className="text-sm">{milestone.label}</div>
               </div>
-            </Html>
+            </DistanceFadeHtml>
           </group>
         );
       })}

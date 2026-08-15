@@ -10,6 +10,7 @@ import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
 import { Preloader } from "@/components/chrome/Preloader";
 import { AudioControls } from "@/components/chrome/AudioControls";
 import { TimeOfDayToggle } from "@/components/chrome/TimeOfDayToggle";
+import { ReducedMotionToggle } from "@/components/chrome/ReducedMotionToggle";
 import { ModeToggle } from "@/components/chrome/ModeToggle";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
 import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
@@ -90,6 +91,7 @@ export default function Home() {
 
       <div className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]">
         <TimeOfDayToggle />
+        <ReducedMotionToggle />
         {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}
         <ModeToggle />
 

@@ -3,8 +3,8 @@
 import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { Html } from "@react-three/drei";
 import { useAetherMaterialRef } from "@/world/shared/useAetherMaterial";
+import { DistanceFadeHtml } from "@/world/shared/DistanceFadeHtml";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { chapterRange } from "@/world/scenes/worldLayout";
 import { labContent } from "./content";
@@ -67,11 +67,11 @@ function ProjectConsole({
         <meshBasicMaterial color="#4bb8b0" transparent opacity={0.6} />
       </mesh>
       {hovered && (
-        <Html position={[0, 2.2, 0]} center occlude>
+        <DistanceFadeHtml position={[0, 2.2, 0]} center>
           <div className="pointer-events-none rounded-md bg-[var(--scrim)] px-3 py-1.5 text-sm text-[var(--ink-inverse)] backdrop-blur-sm">
             {title} — click to open
           </div>
-        </Html>
+        </DistanceFadeHtml>
       )}
     </group>
   );

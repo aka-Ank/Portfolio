@@ -30,21 +30,44 @@ export function ObservatoryOverlay() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.6 }}
-        className="pointer-events-auto max-w-sm rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm"
+        className="pointer-events-auto max-h-[70vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm"
       >
+        {/* Cert plaques reveal issuer/significance on 3D hover only — this
+            list is the always-present DOM equivalent, same reasoning as
+            Sanctuary/Lab's overlay additions (see ENGINEER_NOTES.md). */}
         <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
-          Latest writing
+          Certifications
         </div>
         <ul className="mt-2 flex flex-col gap-2">
-          {observatoryContent.blogPosts.map((post) => (
-            <li key={post.slug} className="text-sm text-[var(--ink-inverse)]">
+          {observatoryContent.certifications.map((cert) => (
+            <li key={cert.id} className="text-sm text-[var(--ink-inverse)]">
               <span className="font-[family-name:var(--font-mono)] text-xs opacity-60">
-                {post.date}
+                {new Date(cert.date).getFullYear()}
               </span>{" "}
-              — {post.title}
+              — {cert.title}
+              <span className="mt-0.5 block text-xs text-[var(--ink-inverse)]/70">
+                {cert.issuer} — {cert.significance}
+              </span>
             </li>
           ))}
         </ul>
+
+        <div className="mt-4 border-t border-white/15 pt-3">
+          <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
+            Latest writing
+          </div>
+          <ul className="mt-2 flex flex-col gap-2">
+            {observatoryContent.blogPosts.map((post) => (
+              <li key={post.slug} className="text-sm text-[var(--ink-inverse)]">
+                <span className="font-[family-name:var(--font-mono)] text-xs opacity-60">
+                  {post.date}
+                </span>{" "}
+                — {post.title}
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="mt-4 border-t border-white/15 pt-3">
           <LiveStats tone="dark" />
         </div>
