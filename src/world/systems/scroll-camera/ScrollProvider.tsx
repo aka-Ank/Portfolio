@@ -5,6 +5,7 @@ import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getWorldState } from "@/world/state/useWorldStore";
+import { setLenisInstance } from "./lenisInstance";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,6 +32,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useLenis((lenis) => {
+    setLenisInstance(lenis);
     ScrollTrigger.update();
     getWorldState().setJourneyProgress(lenis.progress);
   });

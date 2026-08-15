@@ -48,6 +48,12 @@ export function CampfireOverlay() {
               {link.label}
             </a>
           ))}
+          <a
+            href="/api/resume"
+            className="underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+          >
+            Résumé (PDF)
+          </a>
         </div>
       </motion.div>
     </div>

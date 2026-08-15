@@ -7,9 +7,13 @@ import { registerWorldTransitions } from "@/world/scenes/transitions";
 import { ChapterWatcher } from "@/world/systems/navigation/ChapterWatcher";
 import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
 import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
+import { Preloader } from "@/components/chrome/Preloader";
+import { AudioControls } from "@/components/chrome/AudioControls";
+import { TimeOfDayToggle } from "@/components/chrome/TimeOfDayToggle";
+import { ModeToggle } from "@/components/chrome/ModeToggle";
+import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
 import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
 import { initAudio, setMuted } from "@/world/systems/audio/audioManager";
-import { about } from "@/content/about";
 import type { DeviceTier, TimeOfDayAnchor } from "@/types/world";
 
 // R3F/WebGL isn't SSR-safe — standard Next.js pattern for canvas content.
@@ -67,6 +71,7 @@ export default function Home() {
       <AmbientAudioBridge enabled={audioEnabled} />
       <ChapterOverlay />
       <DeepDiveLayer />
+      <KeyboardShortcuts audioEnabled={audioEnabled} onToggleMute={toggleMute} />
 
       <div
         id="scene-transition-veil"
@@ -81,24 +86,13 @@ export default function Home() {
         </WorldCanvas>
       </div>
 
-      {phase === "preloading" && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[var(--paper)] text-center">
-          <h1 className="font-[family-name:var(--font-display)] text-5xl text-[var(--ink)]">
-            An enchanted forest
-          </h1>
-          <p className="max-w-md text-[var(--ink)]/70">
-            A journey through the work of {about.name} — best experienced with sound on.
-          </p>
-          <button
-            onClick={enter}
-            className="rounded-md bg-[var(--primary)] px-6 py-3 text-[var(--primary-foreground)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-          >
-            Enter (enables sound)
-          </button>
-        </div>
-      )}
+      {phase === "preloading" && <Preloader onEnter={enter} />}
 
       <div className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]">
+        <TimeOfDayToggle />
+        {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}
+        <ModeToggle />
+
         <button
           onClick={() => setDebugOpen((v) => !v)}
           className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
@@ -150,22 +144,13 @@ export default function Home() {
               Reduced motion: {reducedMotion ? "on" : "off"}
               {manualReducedMotion !== null ? " (manual)" : ""}
             </button>
-
-            {audioEnabled && (
-              <button
-                onClick={toggleMute}
-                aria-pressed={muted}
-                className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-              >
-                {muted ? "Unmute" : "Mute"}
-              </button>
-            )}
           </>
         )}
 
         <div className="ml-auto pointer-events-none opacity-80">
           {currentChapter} · {Math.round(journeyProgress * 100)}% · phase: {phase}
           {loreFound.length > 0 ? ` · lore found: ${loreFound.length}` : ""}
+          <span className="ml-2 opacity-60">· press / for shortcuts</span>
         </div>
       </div>
 

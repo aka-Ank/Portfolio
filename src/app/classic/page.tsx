@@ -1,24 +1,31 @@
 import type { Metadata } from "next";
+import { Hero } from "@/components/classic/Hero";
+import { About } from "@/components/classic/About";
+import { LearningJourney } from "@/components/classic/LearningJourney";
+import { Skills } from "@/components/classic/Skills";
+import { Projects } from "@/components/classic/Projects";
+import { Achievements } from "@/components/classic/Achievements";
+import { Contact } from "@/components/classic/Contact";
 
-// Placeholder — the real classic experience (semantic HTML/CSS, minimal JS,
-// same content as the immersive route) is built in Phase 4. See
-// docs/08-roadmap.md and docs/02-architecture.md `app/classic/`.
 export const metadata: Metadata = {
   title: "Portfolio — Classic",
   description: "The lightweight, fast-by-default version of the portfolio.",
 };
 
+// The classic route — semantic HTML, minimal JS, same content as the
+// immersive site (every section imports from the same content/ and
+// world/scenes/*/content.ts modules the 3D scenes read from). See
+// docs/08-roadmap.md Phase 4 and docs/02-architecture.md.
 export default function ClassicPage() {
   return (
-    <main id="main-content" className="mx-auto max-w-2xl px-6 py-24">
-      <h1 className="font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]">
-        Classic mode
-      </h1>
-      <p className="mt-4 text-[var(--muted-foreground)]">
-        This route is a placeholder scaffolded in Phase 2. The full semantic, fast-by-default
-        classic experience — reading from the same content layer as the immersive site — is
-        built in Phase 4.
-      </p>
+    <main id="main-content">
+      <Hero />
+      <About />
+      <LearningJourney />
+      <Skills />
+      <Projects />
+      <Achievements />
+      <Contact />
     </main>
   );
 }
