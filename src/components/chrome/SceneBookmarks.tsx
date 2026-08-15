@@ -56,7 +56,9 @@ export function SceneBookmarks({ onClose }: { onClose: () => void }) {
                 }}
                 aria-current={currentChapter === chapter}
                 className={`flex w-full items-center justify-between rounded px-3 py-2 text-left outline-offset-2 hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                  currentChapter === chapter ? "text-[var(--accent)]" : "text-[var(--ink)]"
+                  // --primary, not --accent — see LearningJourney.tsx's
+                  // comment (--accent on --paper is 2.2:1, fails AA).
+                  currentChapter === chapter ? "text-[var(--primary)]" : "text-[var(--ink)]"
                 }`}
               >
                 {CHAPTER_LABELS[chapter]}

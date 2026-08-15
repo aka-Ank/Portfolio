@@ -33,6 +33,11 @@ export function VoiceNavControl() {
   const currentChapter = useWorldStore((s) => s.currentChapter);
   const reducedMotion = useWorldStore((s) => s.reducedMotion);
   const setManualReducedMotion = useWorldStore((s) => s.setManualReducedMotion);
+  const phase = useWorldStore((s) => s.phase);
+  // Same reasoning as ChatWidget: the immersive route's Preloader is a
+  // full-screen opaque overlay this control is visually hidden behind
+  // while showing — without `inert`, a Tab press could still reach it.
+  const hiddenBehindPreloader = !isClassic && phase === "preloading";
 
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
@@ -112,7 +117,7 @@ export function VoiceNavControl() {
   if (!supported) return null;
 
   return (
-    <>
+    <div inert={hiddenBehindPreloader}>
       <button
         onClick={() => (listening ? stop() : start())}
         aria-pressed={listening}
@@ -174,6 +179,6 @@ export function VoiceNavControl() {
           </div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }

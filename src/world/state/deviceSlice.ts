@@ -21,7 +21,16 @@ export const createDeviceSlice: StateCreator<
   [],
   DeviceSlice
 > = (set, get) => ({
-  tier: "mid",
+  // Start conservative (no shadows, dpr 1 — see QUALITY_BY_TIER), not "mid".
+  // useDeviceTier's heuristic corrects this within one effect tick on every
+  // device, and PerformanceGovernor fine-tunes it further from real frame
+  // timing — but both of those run *after* first mount, while this literal
+  // default is what the very first Canvas commit (and therefore LCP/TBT/TTI)
+  // pays for. Defaulting to "mid" meant every visitor — including ones on
+  // hardware that gets corrected down to "low" moments later — paid for
+  // shadow-map setup on the single most performance-critical frame. See
+  // ENGINEER_NOTES.md "Lighthouse performance audit."
+  tier: "low",
   reducedMotion: false,
   systemReducedMotion: false,
   manualReducedMotion: null,

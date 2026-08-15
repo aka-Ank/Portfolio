@@ -102,7 +102,16 @@ export default function Home() {
 
       {phase === "preloading" && <Preloader onEnter={enter} />}
 
-      <div className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]">
+      {/* inert while the (opaque, full-screen, z-50) Preloader is showing —
+          this bar sits at z-30, fully hidden behind it, but without inert a
+          keyboard/screen-reader visitor can still Tab into completely
+          invisible controls (caught by a real Tab-sequence test, not just
+          Lighthouse's contrast audit — see ENGINEER_NOTES.md "Lighthouse
+          performance audit"). */}
+      <div
+        inert={phase === "preloading"}
+        className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]"
+      >
         <TimeOfDayToggle />
         <ReducedMotionToggle />
         {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}

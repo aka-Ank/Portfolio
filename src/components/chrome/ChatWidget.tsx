@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { about } from "@/content/about";
+import { useWorldStore } from "@/world/state/useWorldStore";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -28,6 +30,16 @@ export function ChatWidget() {
   const [notConfigured, setNotConfigured] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const pathname = usePathname();
+  const phase = useWorldStore((s) => s.phase);
+  // The immersive route's Preloader is a full-screen, opaque, z-50 overlay
+  // that visually hides this widget (also z-50, but earlier in DOM order —
+  // see page.tsx) without blocking keyboard focus by itself. Without this,
+  // a Tab press can land on a completely invisible launcher button — a real
+  // bug a Tab-sequence test caught, not just a contrast-checker false
+  // positive. Classic mode has no Preloader/phase concept, so this only
+  // ever applies on "/".
+  const hiddenBehindPreloader = pathname === "/" && phase === "preloading";
 
   useEffect(() => {
     if (open) inputRef.current?.focus();
@@ -117,7 +129,7 @@ export function ChatWidget() {
   }
 
   return (
-    <>
+    <div inert={hiddenBehindPreloader}>
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -206,6 +218,6 @@ export function ChatWidget() {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }

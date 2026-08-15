@@ -105,6 +105,19 @@ describe("UI chrome token contrast — fixed pairs actually used in the codebase
       );
     });
 
+    it(`${themeName}: --primary as standalone text on --paper (year labels, metric values, active-state indicators)`, () => {
+      // A real Lighthouse/axe-core run caught this class of bug live:
+      // --accent used as a bare text color (no explicit bg- in the same
+      // className) inherits the ambient --paper background and fails badly
+      // (2.2:1) — this audit's original fixed-pairs list only checked
+      // explicit bg-[var(--x)] + text-[var(--y)] combinations in one
+      // className, so a standalone text-[var(--accent)] slipped through.
+      // Fixed by switching every such site to --primary (same hue, built
+      // for exactly this). Asserting it here protects that fix and covers
+      // the failure mode going forward.
+      expect(contrast(tokens.primary, tokens.paper)).toBeGreaterThanOrEqual(AA_BODY_TEXT);
+    });
+
     it(`${themeName}: --secondary-foreground on --secondary (assistant chat bubbles)`, () => {
       expect(
         contrast(tokens["secondary-foreground"], tokens.secondary),

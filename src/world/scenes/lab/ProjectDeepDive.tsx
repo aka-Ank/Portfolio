@@ -67,7 +67,10 @@ export function ProjectDeepDive({ slug }: { slug: string }) {
           {project.metrics.map((metric) => (
             <div key={metric.label}>
               <dt className="text-xs text-[var(--muted-foreground)]">{metric.label}</dt>
-              <dd className="font-[family-name:var(--font-mono)] text-xl text-[var(--accent)]">
+              {/* --primary, not --accent — see LearningJourney.tsx's comment
+                  (same fix, same root cause: --accent on --paper is 2.2:1,
+                  fails AA). */}
+              <dd className="font-[family-name:var(--font-mono)] text-xl text-[var(--primary)]">
                 {metric.value}
               </dd>
             </div>

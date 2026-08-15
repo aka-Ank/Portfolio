@@ -94,7 +94,9 @@ export function SkillTree() {
             onMouseEnter={() => setActiveDomain(domain)}
             onMouseLeave={() => setActiveDomain(null)}
           >
-            <dt className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--accent)] uppercase">
+            {/* --primary, not --accent — see LearningJourney.tsx's comment
+                (--accent on --paper is 2.2:1, fails AA). */}
+            <dt className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--primary)] uppercase">
               {DOMAIN_LABELS[domain]}
             </dt>
             {skills
