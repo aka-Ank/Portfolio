@@ -13,6 +13,9 @@ import { TimeOfDayToggle } from "@/components/chrome/TimeOfDayToggle";
 import { ReducedMotionToggle } from "@/components/chrome/ReducedMotionToggle";
 import { ModeToggle } from "@/components/chrome/ModeToggle";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
+import { WebGLErrorBoundary } from "@/components/chrome/WebGLErrorBoundary";
+import { WebGLFallback } from "@/components/chrome/WebGLFallback";
+import { useWebGLSupport } from "@/hooks/useWebGLSupport";
 import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
 import { initAudio, setMuted } from "@/world/systems/audio/audioManager";
 import type { DeviceTier, TimeOfDayAnchor } from "@/types/world";
@@ -46,6 +49,7 @@ export default function Home() {
   const setManualReducedMotion = useWorldStore((s) => s.setManualReducedMotion);
   const goToChapter = useWorldStore((s) => s.goToChapter);
   const setPhase = useWorldStore((s) => s.setPhase);
+  const webglSupported = useWebGLSupport();
 
   useEffect(() => {
     registerWorldTransitions();
@@ -66,6 +70,13 @@ export default function Home() {
     setMuted(next);
   }
 
+  // No point mounting any of the scroll/chapter/3D machinery if WebGL
+  // isn't there to drive it — offer classic mode directly instead of a
+  // blank or broken canvas.
+  if (!webglSupported) {
+    return <WebGLFallback />;
+  }
+
   return (
     <main id="main-content" className="relative">
       <ChapterWatcher />
@@ -82,9 +93,11 @@ export default function Home() {
       />
 
       <div className="fixed inset-0 z-0">
-        <WorldCanvas>
-          <World />
-        </WorldCanvas>
+        <WebGLErrorBoundary>
+          <WorldCanvas>
+            <World />
+          </WorldCanvas>
+        </WebGLErrorBoundary>
       </div>
 
       {phase === "preloading" && <Preloader onEnter={enter} />}
