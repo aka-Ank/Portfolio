@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { damp3, dampLookAt } from "maath/easing";
@@ -16,54 +16,50 @@ export interface CameraWaypoint {
 const SMOOTH_TIME_POSITION = 1.1;
 const SMOOTH_TIME_LOOKAT = 1.4;
 
-const scratchA = new THREE.Vector3();
-const scratchB = new THREE.Vector3();
-
-function computePathPoint(
-  path: CameraWaypoint[],
-  t: number,
-  outPos: THREE.Vector3,
-  outLookAt: THREE.Vector3,
-) {
-  const segments = path.length - 1;
-  if (segments <= 0) {
-    outPos.set(...path[0].position);
-    outLookAt.set(...path[0].lookAt);
-    return;
-  }
-  const clamped = THREE.MathUtils.clamp(t, 0, 1);
-  const scaled = clamped * segments;
-  const index = Math.min(Math.floor(scaled), segments - 1);
-  const localT = scaled - index;
-  const a = path[index];
-  const b = path[index + 1];
-
-  outPos.set(...a.position);
-  scratchA.set(...b.position);
-  outPos.lerp(scratchA, localT);
-
-  outLookAt.set(...a.lookAt);
-  scratchB.set(...b.lookAt);
-  outLookAt.lerp(scratchB, localT);
-}
-
 /**
  * Reads scroll-driven journey progress directly from the store (no
  * subscription — a plain getState() read inside useFrame, per
  * docs/00-research-and-stack.md §1 "never pushed through React state") and
- * damps the camera toward the corresponding point on a waypoint path. In
- * reduced-motion mode the camera snaps directly to the target instead of
- * pursuing it — see docs/06-animation-bible.md "Reduced motion".
+ * damps the camera toward the corresponding point on a Catmull-Rom spline
+ * through the waypoint path. Splines were chosen over hand-tuned piecewise
+ * lerp (see ENGINEER_NOTES.md) because `getPointAt` walks the curve at
+ * constant arc-length speed — the camera doesn't lurch through
+ * closely-spaced waypoints or crawl through widely-spaced ones the way
+ * naive per-segment lerp does. In reduced-motion mode the camera snaps
+ * directly to the target instead of pursuing it — see
+ * docs/06-animation-bible.md "Reduced motion".
  */
 export function CameraRig({ path }: { path: CameraWaypoint[] }) {
   const targetPos = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
 
+  const { positionCurve, lookAtCurve } = useMemo(() => {
+    const positionCurve = new THREE.CatmullRomCurve3(
+      path.map((wp) => new THREE.Vector3(...wp.position)),
+      false,
+      "catmullrom",
+      0.5,
+    );
+    const lookAtCurve = new THREE.CatmullRomCurve3(
+      path.map((wp) => new THREE.Vector3(...wp.lookAt)),
+      false,
+      "catmullrom",
+      0.5,
+    );
+    // Pre-computes the internal arc-length lookup table once, up front,
+    // instead of lazily on the first getPointAt call mid-scroll.
+    positionCurve.getLengths(200);
+    lookAtCurve.getLengths(200);
+    return { positionCurve, lookAtCurve };
+  }, [path]);
+
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1);
     const { journeyProgress, reducedMotion } = getWorldState();
+    const t = THREE.MathUtils.clamp(journeyProgress, 0, 1);
 
-    computePathPoint(path, journeyProgress, targetPos.current, targetLookAt.current);
+    positionCurve.getPointAt(t, targetPos.current);
+    lookAtCurve.getPointAt(t, targetLookAt.current);
 
     if (reducedMotion) {
       state.camera.position.copy(targetPos.current);

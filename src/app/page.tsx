@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useWorldStore } from "@/world/state/useWorldStore";
-import { registerTestTransitions } from "@/world/scenes/_test/testTransitions";
-import { TestChapterWatcher } from "@/world/scenes/_test/TestChapterWatcher";
+import { registerWorldTransitions } from "@/world/scenes/transitions";
+import { ChapterWatcher } from "@/world/systems/navigation/ChapterWatcher";
+import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
 import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
 import { initAudio, setMuted } from "@/world/systems/audio/audioManager";
+import { about } from "@/content/about";
 import type { DeviceTier, TimeOfDayAnchor } from "@/types/world";
 
 // R3F/WebGL isn't SSR-safe — standard Next.js pattern for canvas content.
@@ -14,10 +16,9 @@ const WorldCanvas = dynamic(
   () => import("@/world/engine/WorldCanvas").then((m) => m.WorldCanvas),
   { ssr: false },
 );
-const TestScene = dynamic(
-  () => import("@/world/scenes/_test/TestScene").then((m) => m.TestScene),
-  { ssr: false },
-);
+const World = dynamic(() => import("@/world/scenes/World").then((m) => m.World), {
+  ssr: false,
+});
 
 const ANCHORS: TimeOfDayAnchor[] = ["dawn", "day", "sunset", "night"];
 const TIERS: DeviceTier[] = ["low", "mid", "high"];
@@ -25,6 +26,7 @@ const TIERS: DeviceTier[] = ["low", "mid", "high"];
 export default function Home() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [muted, setMutedState] = useState(false);
+  const [debugOpen, setDebugOpen] = useState(false);
   const phase = useWorldStore((s) => s.phase);
   const currentChapter = useWorldStore((s) => s.currentChapter);
   const journeyProgress = useWorldStore((s) => s.journeyProgress);
@@ -40,7 +42,7 @@ export default function Home() {
   const setPhase = useWorldStore((s) => s.setPhase);
 
   useEffect(() => {
-    registerTestTransitions();
+    registerWorldTransitions();
   }, []);
 
   function enter() {
@@ -48,7 +50,7 @@ export default function Home() {
     setMuted(false);
     setAudioEnabled(true);
     setMutedState(false);
-    goToChapter(currentChapter);
+    goToChapter("entrance");
     setPhase("active");
   }
 
@@ -60,31 +62,30 @@ export default function Home() {
 
   return (
     <main id="main-content" className="relative">
-      <TestChapterWatcher />
+      <ChapterWatcher />
       <AmbientAudioBridge enabled={audioEnabled} />
+      <ChapterOverlay />
 
       <div
         id="test-transition-veil"
         style={{ opacity: 0 }}
-        className="pointer-events-none fixed inset-0 z-40 bg-black"
+        className="pointer-events-none fixed inset-0 z-40 bg-white"
         aria-hidden
       />
 
       <div className="fixed inset-0 z-0">
         <WorldCanvas>
-          <TestScene />
+          <World />
         </WorldCanvas>
       </div>
 
       {phase === "preloading" && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-[var(--paper)] text-center">
           <h1 className="font-[family-name:var(--font-display)] text-5xl text-[var(--ink)]">
-            Phase 2 — Engine Proof
+            An enchanted forest
           </h1>
           <p className="max-w-md text-[var(--ink)]/70">
-            Minimal test scene exercising the world engine: scroll-driven camera, damped
-            time-of-day lighting, GSAP scene transitions, ambient audio, and the performance
-            governor. Real story scenes arrive in Phase 3.
+            A journey through the work of {about.name} — best experienced with sound on.
           </p>
           <button
             onClick={enter}
@@ -96,57 +97,68 @@ export default function Home() {
       )}
 
       <div className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]">
-        <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-          <span className="opacity-70">Time of day:</span>
-          {ANCHORS.map((anchor) => (
-            <button
-              key={anchor}
-              onClick={() => setTargetAnchor(anchor)}
-              aria-pressed={targetAnchor === anchor}
-              className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                targetAnchor === anchor ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-              }`}
-            >
-              {anchor}
-            </button>
-          ))}
-        </div>
-
-        <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-          <span className="opacity-70">Device tier:</span>
-          {TIERS.map((t) => (
-            <button
-              key={t}
-              onClick={() => setTier(t)}
-              aria-pressed={tier === t}
-              className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                tier === t ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-
         <button
-          onClick={() =>
-            setManualReducedMotion(manualReducedMotion === null ? !reducedMotion : null)
-          }
-          aria-pressed={reducedMotion}
+          onClick={() => setDebugOpen((v) => !v)}
           className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
         >
-          Reduced motion: {reducedMotion ? "on" : "off"}
-          {manualReducedMotion !== null ? " (manual)" : ""}
+          Dev tools {debugOpen ? "▲" : "▼"}
         </button>
 
-        {audioEnabled && (
-          <button
-            onClick={toggleMute}
-            aria-pressed={muted}
-            className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-          >
-            {muted ? "Unmute" : "Mute"}
-          </button>
+        {debugOpen && (
+          <>
+            <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+              <span className="opacity-70">Time of day:</span>
+              {ANCHORS.map((anchor) => (
+                <button
+                  key={anchor}
+                  onClick={() => setTargetAnchor(anchor)}
+                  aria-pressed={targetAnchor === anchor}
+                  className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
+                    targetAnchor === anchor ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
+                  }`}
+                >
+                  {anchor}
+                </button>
+              ))}
+            </div>
+
+            <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+              <span className="opacity-70">Device tier:</span>
+              {TIERS.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTier(t)}
+                  aria-pressed={tier === t}
+                  className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
+                    tier === t ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() =>
+                setManualReducedMotion(manualReducedMotion === null ? !reducedMotion : null)
+              }
+              aria-pressed={reducedMotion}
+              className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+            >
+              Reduced motion: {reducedMotion ? "on" : "off"}
+              {manualReducedMotion !== null ? " (manual)" : ""}
+            </button>
+
+            {audioEnabled && (
+              <button
+                onClick={toggleMute}
+                aria-pressed={muted}
+                className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+              >
+                {muted ? "Unmute" : "Mute"}
+              </button>
+            )}
+          </>
         )}
 
         <div className="ml-auto pointer-events-none opacity-80">
@@ -156,9 +168,9 @@ export default function Home() {
       </div>
 
       {/* Tall scroll spacer — Lenis + GSAP ScrollTrigger drive journeyProgress
-          off this. Real Phase 3 chapters replace this with per-chapter
-          sections; see docs/02-architecture.md `world/scenes/`. */}
-      <div className="pointer-events-none" style={{ height: "300vh" }} aria-hidden />
+          off this; 100vh per chapter. See docs/02-architecture.md
+          `world/scenes/`. */}
+      <div className="pointer-events-none" style={{ height: "700vh" }} aria-hidden />
     </main>
   );
 }

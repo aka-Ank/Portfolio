@@ -21,7 +21,7 @@ export function WorldCanvas({ children }: { children: ReactNode }) {
     <Canvas
       frameloop="demand"
       dpr={dpr}
-      shadows={shadowsEnabled}
+      shadows={shadowsEnabled ? "soft" : false}
       gl={{ antialias: true, powerPreference: "high-performance" }}
       camera={{ fov: 50, near: 0.1, far: 2000, position: [0, 1.6, 6] }}
     >
