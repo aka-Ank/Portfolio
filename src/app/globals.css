@@ -106,8 +106,17 @@
 .dark {
   --ink: oklch(0.97 0.005 90);
   --paper: oklch(0.16 0.012 260);
-  --ink-inverse: oklch(0.16 0.01 260);
-  --scrim: oklch(0.05 0.02 260 / 55%);
+  /* --ink-inverse and --scrim are NOT part of the light/dark UI theme pair
+     — every real usage (grep for both) is chrome text sitting over the
+     immersive 3D world, which is never a controlled dark UI surface. The
+     mechanical light/dark inversion shadcn's scaffold applied to every
+     token broke this pair specifically: dark ink-inverse text composited
+     over a translucent dark scrim, sitting on top of a bright world
+     background, fails WCAG AA badly (contrast-audit.test.ts caught ratios
+     as low as ~1.0). Kept identical to :root's values, which the audit
+     verifies pass at every time-of-day anchor. */
+  --ink-inverse: oklch(0.97 0.005 90);
+  --scrim: oklch(0.1 0.02 260 / 55%);
   --focus-ring: oklch(0.78 0.18 205);
 
   --background: var(--paper);
