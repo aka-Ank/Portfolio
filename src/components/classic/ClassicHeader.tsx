@@ -29,8 +29,15 @@ export function ClassicHeader() {
           </a>
         ))}
       </nav>
+      {/* prefetch={false}: this Link sits in the initial viewport, so Next's
+          default viewport-triggered prefetch was silently downloading the
+          entire Three.js/R3F bundle for "/" in the background on every
+          /classic visit — a real, measured Lighthouse LCP regression (it
+          competes with /classic's own critical-path requests on a throttled
+          connection), not just a lab artifact. */}
       <Link
         href="/"
+        prefetch={false}
         className="rounded-md border border-[var(--border)] px-3 py-1.5 text-sm text-[var(--ink)] outline-offset-2 hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
       >
         Enter immersive mode

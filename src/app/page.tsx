@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { registerWorldTransitions } from "@/world/scenes/transitions";
+import { ScrollProvider } from "@/world/systems/scroll-camera/ScrollProvider";
+import { TransitionController } from "@/world/systems/transitions/TransitionController";
+import { EasterEggController } from "@/world/systems/easter-egg/EasterEggController";
 import { ChapterWatcher } from "@/world/systems/navigation/ChapterWatcher";
 import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
 import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
@@ -78,110 +81,118 @@ export default function Home() {
   }
 
   return (
-    <main id="main-content" className="relative">
-      <ChapterWatcher />
-      <AmbientAudioBridge enabled={audioEnabled} />
-      <ChapterOverlay />
-      <DeepDiveLayer />
-      <KeyboardShortcuts audioEnabled={audioEnabled} onToggleMute={toggleMute} />
+    // ScrollProvider (Lenis) + TransitionController + EasterEggController
+    // live here, not in the shared root AppProviders — they're immersive-
+    // route-only and were previously shipping GSAP/Lenis to /classic's
+    // bundle for no benefit (see AppProviders.tsx's comment).
+    <ScrollProvider>
+      <TransitionController />
+      <EasterEggController />
+      <main id="main-content" className="relative">
+        <ChapterWatcher />
+        <AmbientAudioBridge enabled={audioEnabled} />
+        <ChapterOverlay />
+        <DeepDiveLayer />
+        <KeyboardShortcuts audioEnabled={audioEnabled} onToggleMute={toggleMute} />
 
-      <div
-        id="scene-transition-veil"
-        style={{ opacity: 0 }}
-        className="pointer-events-none fixed inset-0 z-40 bg-white"
-        aria-hidden
-      />
+        <div
+          id="scene-transition-veil"
+          style={{ opacity: 0 }}
+          className="pointer-events-none fixed inset-0 z-40 bg-white"
+          aria-hidden
+        />
 
-      <div className="fixed inset-0 z-0">
-        <WebGLErrorBoundary>
-          <WorldCanvas>
-            <World />
-          </WorldCanvas>
-        </WebGLErrorBoundary>
-      </div>
-
-      {phase === "preloading" && <Preloader onEnter={enter} />}
-
-      {/* inert while the (opaque, full-screen, z-50) Preloader is showing —
-          this bar sits at z-30, fully hidden behind it, but without inert a
-          keyboard/screen-reader visitor can still Tab into completely
-          invisible controls (caught by a real Tab-sequence test, not just
-          Lighthouse's contrast audit — see ENGINEER_NOTES.md "Lighthouse
-          performance audit"). */}
-      <div
-        inert={phase === "preloading"}
-        className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]"
-      >
-        <TimeOfDayToggle />
-        <ReducedMotionToggle />
-        {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}
-        <ModeToggle />
-
-        <button
-          onClick={() => setDebugOpen((v) => !v)}
-          className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-        >
-          Dev tools {debugOpen ? "▲" : "▼"}
-        </button>
-
-        {debugOpen && (
-          <>
-            <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-              <span className="opacity-70">Time of day:</span>
-              {ANCHORS.map((anchor) => (
-                <button
-                  key={anchor}
-                  onClick={() => setTargetAnchor(anchor)}
-                  aria-pressed={targetAnchor === anchor}
-                  className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                    targetAnchor === anchor ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-                  }`}
-                >
-                  {anchor}
-                </button>
-              ))}
-            </div>
-
-            <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-              <span className="opacity-70">Device tier:</span>
-              {TIERS.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTier(t)}
-                  aria-pressed={tier === t}
-                  className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                    tier === t ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() =>
-                setManualReducedMotion(manualReducedMotion === null ? !reducedMotion : null)
-              }
-              aria-pressed={reducedMotion}
-              className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-            >
-              Reduced motion: {reducedMotion ? "on" : "off"}
-              {manualReducedMotion !== null ? " (manual)" : ""}
-            </button>
-          </>
-        )}
-
-        <div className="ml-auto pointer-events-none opacity-80">
-          {currentChapter} · {Math.round(journeyProgress * 100)}% · phase: {phase}
-          {loreFound.length > 0 ? ` · lore found: ${loreFound.length}` : ""}
-          <span className="ml-2 opacity-60">· press / for shortcuts</span>
+        <div className="fixed inset-0 z-0">
+          <WebGLErrorBoundary>
+            <WorldCanvas>
+              <World />
+            </WorldCanvas>
+          </WebGLErrorBoundary>
         </div>
-      </div>
 
-      {/* Tall scroll spacer — Lenis + GSAP ScrollTrigger drive journeyProgress
-          off this; 100vh per chapter. See docs/02-architecture.md
-          `world/scenes/`. */}
-      <div className="pointer-events-none" style={{ height: "700vh" }} aria-hidden />
-    </main>
+        {phase === "preloading" && <Preloader onEnter={enter} />}
+
+        {/* inert while the (opaque, full-screen, z-50) Preloader is showing —
+            this bar sits at z-30, fully hidden behind it, but without inert a
+            keyboard/screen-reader visitor can still Tab into completely
+            invisible controls (caught by a real Tab-sequence test, not just
+            Lighthouse's contrast audit — see ENGINEER_NOTES.md "Lighthouse
+            performance audit"). */}
+        <div
+          inert={phase === "preloading"}
+          className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]"
+        >
+          <TimeOfDayToggle />
+          <ReducedMotionToggle />
+          {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}
+          <ModeToggle />
+
+          <button
+            onClick={() => setDebugOpen((v) => !v)}
+            className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+          >
+            Dev tools {debugOpen ? "▲" : "▼"}
+          </button>
+
+          {debugOpen && (
+            <>
+              <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+                <span className="opacity-70">Time of day:</span>
+                {ANCHORS.map((anchor) => (
+                  <button
+                    key={anchor}
+                    onClick={() => setTargetAnchor(anchor)}
+                    aria-pressed={targetAnchor === anchor}
+                    className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
+                      targetAnchor === anchor ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
+                    }`}
+                  >
+                    {anchor}
+                  </button>
+                ))}
+              </div>
+
+              <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+                <span className="opacity-70">Device tier:</span>
+                {TIERS.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTier(t)}
+                    aria-pressed={tier === t}
+                    className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
+                      tier === t ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() =>
+                  setManualReducedMotion(manualReducedMotion === null ? !reducedMotion : null)
+                }
+                aria-pressed={reducedMotion}
+                className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+              >
+                Reduced motion: {reducedMotion ? "on" : "off"}
+                {manualReducedMotion !== null ? " (manual)" : ""}
+              </button>
+            </>
+          )}
+
+          <div className="ml-auto pointer-events-none opacity-80">
+            {currentChapter} · {Math.round(journeyProgress * 100)}% · phase: {phase}
+            {loreFound.length > 0 ? ` · lore found: ${loreFound.length}` : ""}
+            <span className="ml-2 opacity-60">· press / for shortcuts</span>
+          </div>
+        </div>
+
+        {/* Tall scroll spacer — Lenis + GSAP ScrollTrigger drive journeyProgress
+            off this; 100vh per chapter. See docs/02-architecture.md
+            `world/scenes/`. */}
+        <div className="pointer-events-none" style={{ height: "700vh" }} aria-hidden />
+      </main>
+    </ScrollProvider>
   );
 }

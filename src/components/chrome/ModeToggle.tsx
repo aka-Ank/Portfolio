@@ -11,6 +11,7 @@ export function ModeToggle() {
   return (
     <Link
       href={`/classic#${currentChapter}`}
+      prefetch={false}
       className="pointer-events-auto rounded px-2 py-1 text-sm outline-offset-2 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
     >
       Classic mode
