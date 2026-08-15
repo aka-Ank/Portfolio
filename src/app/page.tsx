@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { registerWorldTransitions } from "@/world/scenes/transitions";
-import { ScrollProvider } from "@/world/systems/scroll-camera/ScrollProvider";
 import { TransitionController } from "@/world/systems/transitions/TransitionController";
 import { EasterEggController } from "@/world/systems/easter-egg/EasterEggController";
-import { ChapterWatcher } from "@/world/systems/navigation/ChapterWatcher";
+import { useChapterNavigation } from "@/world/systems/navigation/useChapterNavigation";
 import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
 import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
 import { Preloader } from "@/components/chrome/Preloader";
@@ -54,6 +53,11 @@ export default function Home() {
   const setPhase = useWorldStore((s) => s.setPhase);
   const webglSupported = useWebGLSupport();
 
+  // Wheel / swipe / arrow keys step one chapter at a time. Disabled until
+  // the visitor has entered, so a stray scroll behind the Preloader can't
+  // move the world before they've seen it.
+  useChapterNavigation(webglSupported && phase !== "preloading");
+
   useEffect(() => {
     registerWorldTransitions();
   }, []);
@@ -81,15 +85,20 @@ export default function Home() {
   }
 
   return (
-    // ScrollProvider (Lenis) + TransitionController + EasterEggController
-    // live here, not in the shared root AppProviders — they're immersive-
-    // route-only and were previously shipping GSAP/Lenis to /classic's
-    // bundle for no benefit (see AppProviders.tsx's comment).
-    <ScrollProvider>
+    // TransitionController + EasterEggController live here, not in the
+    // shared root AppProviders — they're immersive-route-only and were
+    // previously shipping GSAP to /classic's bundle for no benefit (see
+    // AppProviders.tsx's comment).
+    //
+    // There is no ScrollProvider and no scroll spacer any more: direct
+    // chapter switching means the immersive route is a fixed viewport driven
+    // by discrete navigation events, not a tall scrollable document.
+    // ChapterWatcher is gone with it — it derived currentChapter *from*
+    // scroll progress, and that relationship is now inverted.
+    <>
       <TransitionController />
       <EasterEggController />
-      <main id="main-content" className="relative">
-        <ChapterWatcher />
+      <main id="main-content" className="relative h-dvh overflow-hidden">
         <AmbientAudioBridge enabled={audioEnabled} />
         <ChapterOverlay />
         <DeepDiveLayer />
@@ -188,11 +197,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tall scroll spacer — Lenis + GSAP ScrollTrigger drive journeyProgress
-            off this; 100vh per chapter. See docs/02-architecture.md
-            `world/scenes/`. */}
-        <div className="pointer-events-none" style={{ height: "700vh" }} aria-hidden />
       </main>
-    </ScrollProvider>
+    </>
   );
 }

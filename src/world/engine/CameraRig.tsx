@@ -32,6 +32,7 @@ const SMOOTH_TIME_LOOKAT = 1.4;
 export function CameraRig({ path }: { path: CameraWaypoint[] }) {
   const targetPos = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
+  const lastSnapNonce = useRef(0);
   const invalidate = useThree((s) => s.invalidate);
 
   // Wake the render loop whenever journeyProgress changes.
@@ -77,11 +78,22 @@ export function CameraRig({ path }: { path: CameraWaypoint[] }) {
 
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1);
-    const { journeyProgress, reducedMotion } = getWorldState();
+    const { journeyProgress, reducedMotion, cameraSnapNonce } = getWorldState();
     const t = THREE.MathUtils.clamp(journeyProgress, 0, 1);
 
     positionCurve.getPointAt(t, targetPos.current);
     lookAtCurve.getPointAt(t, targetLookAt.current);
+
+    // A dissolve teleported progress while the screen is covered; damping
+    // from the old position would then glide the camera across the whole
+    // world in plain view once the veil lifts. Cut instead — it's hidden.
+    if (cameraSnapNonce !== lastSnapNonce.current) {
+      lastSnapNonce.current = cameraSnapNonce;
+      state.camera.position.copy(targetPos.current);
+      state.camera.lookAt(targetLookAt.current);
+      state.invalidate();
+      return;
+    }
 
     if (reducedMotion) {
       state.camera.position.copy(targetPos.current);

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useWorldStore } from "@/world/state/useWorldStore";
 import { playTransition } from "./timeline";
-import type { ChapterId } from "@/types/world";
+import { CHAPTER_ORDER, type ChapterId } from "@/types/world";
 
 /**
  * Mount once, high in the tree. Watches for the navigation state machine
@@ -20,11 +20,20 @@ export function TransitionController() {
       if (state.phase !== "transitioning" || prevState.phase === "transitioning") {
         return;
       }
-      const from = previousChapter.current;
+      // `from` comes straight off prevState rather than a ref: the ref was
+      // null on the very first navigation of a session, so the first jump
+      // always mis-classified itself as an adjacent step and skipped the
+      // dissolve (caught by an Entrance→Campfire jump flying the long way).
+      // The subscription already hands us both halves of the edge — use them.
+      const from = prevState.currentChapter;
       const to = state.currentChapter;
       previousChapter.current = to;
 
-      const id = from ? `${from}-to-${to}` : "default";
+      // Adjacent steps travel through the world; anything further dissolves
+      // instead, because the flight would otherwise cross every chapter in
+      // between in full view (see transitions.ts's "jump").
+      const distance = Math.abs(CHAPTER_ORDER.indexOf(to) - CHAPTER_ORDER.indexOf(from));
+      const id = distance > 1 ? "jump" : from !== to ? `${from}-to-${to}` : "default";
       playTransition(id, {
         onComplete: () => {
           if (useWorldStore.getState().phase === "transitioning") {

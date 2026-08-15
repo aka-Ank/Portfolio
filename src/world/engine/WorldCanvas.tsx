@@ -6,6 +6,7 @@ import { useWorldStore } from "@/world/state/useWorldStore";
 import { QUALITY_BY_TIER } from "@/types/world";
 import { PerformanceGovernor } from "./PerformanceGovernor";
 import { TimeOfDaySystem } from "@/world/systems/time-of-day/TimeOfDaySystem";
+import { ChapterTransitionDriver } from "@/world/systems/navigation/ChapterTransitionDriver";
 
 /**
  * The immersive engine's Canvas root — see docs/02-architecture.md
@@ -27,6 +28,7 @@ export function WorldCanvas({ children }: { children: ReactNode }) {
     >
       <Suspense fallback={null}>
         <PerformanceGovernor />
+        <ChapterTransitionDriver />
         <TimeOfDaySystem />
         {children}
       </Suspense>
