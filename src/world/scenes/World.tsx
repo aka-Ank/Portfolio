@@ -5,6 +5,8 @@ import { WORLD_CAMERA_PATH } from "./cameraPath";
 import { Ground } from "@/world/shared/Ground";
 import { EntranceScene } from "./entrance";
 import { ClearingScene } from "./clearing";
+import { RiverScene } from "./river";
+import { SanctuaryScene } from "./sanctuary";
 
 // The real world root, mounted at "/" — one continuous scene, not seven
 // isolated stages (see worldLayout.ts). Chapters land here one at a time
@@ -17,6 +19,8 @@ export function World() {
       <Ground />
       <EntranceScene />
       <ClearingScene />
+      <RiverScene />
+      <SanctuaryScene />
     </>
   );
 }

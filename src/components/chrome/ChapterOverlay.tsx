@@ -5,6 +5,8 @@ import { useWorldStore } from "@/world/state/useWorldStore";
 import type { ChapterId } from "@/types/world";
 import { EntranceOverlay } from "@/world/scenes/entrance/EntranceOverlay";
 import { ClearingOverlay } from "@/world/scenes/clearing/ClearingOverlay";
+import { RiverOverlay } from "@/world/scenes/river/RiverOverlay";
+import { SanctuaryOverlay } from "@/world/scenes/sanctuary/SanctuaryOverlay";
 
 // Registry of DOM overlays per chapter — chapters without a built overlay
 // yet simply render nothing (see docs/08-roadmap.md, scenes land one at a
@@ -14,6 +16,8 @@ import { ClearingOverlay } from "@/world/scenes/clearing/ClearingOverlay";
 const OVERLAYS: Partial<Record<ChapterId, React.ComponentType>> = {
   entrance: EntranceOverlay,
   clearing: ClearingOverlay,
+  river: RiverOverlay,
+  sanctuary: SanctuaryOverlay,
 };
 
 export function ChapterOverlay() {

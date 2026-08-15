@@ -22,5 +22,7 @@ export function registerWorldTransitions() {
   // whole journey (docs/03-scene-graph.md §1) — a brief bright veil reads as
   // stepping from the archway's shade into the clearing's open light.
   registerTransition("entrance-to-clearing", crossfadeVeil);
+  registerTransition("clearing-to-river", crossfadeVeil);
+  registerTransition("river-to-sanctuary", crossfadeVeil);
   registerTransition("default", crossfadeVeil);
 }
