@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import { observatoryContent } from "./content";
+import { LiveStats } from "@/components/shared/LiveStats";
 
 export function ObservatoryOverlay() {
   return (
@@ -44,6 +45,9 @@ export function ObservatoryOverlay() {
             </li>
           ))}
         </ul>
+        <div className="mt-4 border-t border-white/15 pt-3">
+          <LiveStats tone="dark" />
+        </div>
       </motion.div>
     </div>
   );

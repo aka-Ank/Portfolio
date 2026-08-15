@@ -1,4 +1,5 @@
 import { observatoryContent } from "@/world/scenes/observatory/content";
+import { LiveStats } from "@/components/shared/LiveStats";
 
 export function Achievements() {
   return (
@@ -40,6 +41,10 @@ export function Achievements() {
           </li>
         ))}
       </ul>
+
+      <div className="mt-10 border-t border-[var(--border)] pt-6">
+        <LiveStats />
+      </div>
     </section>
   );
 }
