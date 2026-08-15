@@ -8,13 +8,13 @@ import { registerTransition } from "@/world/systems/transitions/timeline";
 export function registerWorldTransitions() {
   const crossfadeVeil = {
     exit: (tl: gsap.core.Timeline) => {
-      tl.to("#test-transition-veil", { opacity: 0.5, duration: 0.7, ease: "power2.out" });
+      tl.to("#scene-transition-veil", { opacity: 0.5, duration: 0.7, ease: "power2.out" });
     },
     hold: (tl: gsap.core.Timeline) => {
       tl.to({}, { duration: 0.2 });
     },
     enter: (tl: gsap.core.Timeline) => {
-      tl.to("#test-transition-veil", { opacity: 0, duration: 1, ease: "power2.inOut" });
+      tl.to("#scene-transition-veil", { opacity: 0, duration: 1, ease: "power2.inOut" });
     },
   };
 
@@ -24,5 +24,8 @@ export function registerWorldTransitions() {
   registerTransition("entrance-to-clearing", crossfadeVeil);
   registerTransition("clearing-to-river", crossfadeVeil);
   registerTransition("river-to-sanctuary", crossfadeVeil);
+  registerTransition("sanctuary-to-lab", crossfadeVeil);
+  registerTransition("lab-to-observatory", crossfadeVeil);
+  registerTransition("observatory-to-campfire", crossfadeVeil);
   registerTransition("default", crossfadeVeil);
 }

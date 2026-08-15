@@ -6,6 +6,7 @@ import { useWorldStore } from "@/world/state/useWorldStore";
 import { registerWorldTransitions } from "@/world/scenes/transitions";
 import { ChapterWatcher } from "@/world/systems/navigation/ChapterWatcher";
 import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
+import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
 import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
 import { initAudio, setMuted } from "@/world/systems/audio/audioManager";
 import { about } from "@/content/about";
@@ -65,9 +66,10 @@ export default function Home() {
       <ChapterWatcher />
       <AmbientAudioBridge enabled={audioEnabled} />
       <ChapterOverlay />
+      <DeepDiveLayer />
 
       <div
-        id="test-transition-veil"
+        id="scene-transition-veil"
         style={{ opacity: 0 }}
         className="pointer-events-none fixed inset-0 z-40 bg-white"
         aria-hidden

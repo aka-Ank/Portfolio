@@ -9,13 +9,13 @@ import { registerTransition } from "@/world/systems/transitions/timeline";
 export function registerTestTransitions() {
   const veilFlash = {
     exit: (tl: gsap.core.Timeline) => {
-      tl.to("#test-transition-veil", { opacity: 0.45, duration: 0.6, ease: "power2.out" });
+      tl.to("#scene-transition-veil", { opacity: 0.45, duration: 0.6, ease: "power2.out" });
     },
     hold: (tl: gsap.core.Timeline) => {
       tl.to({}, { duration: 0.3 });
     },
     enter: (tl: gsap.core.Timeline) => {
-      tl.to("#test-transition-veil", { opacity: 0, duration: 0.9, ease: "power2.inOut" });
+      tl.to("#scene-transition-veil", { opacity: 0, duration: 0.9, ease: "power2.inOut" });
     },
   };
 

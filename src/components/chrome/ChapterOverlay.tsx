@@ -7,6 +7,9 @@ import { EntranceOverlay } from "@/world/scenes/entrance/EntranceOverlay";
 import { ClearingOverlay } from "@/world/scenes/clearing/ClearingOverlay";
 import { RiverOverlay } from "@/world/scenes/river/RiverOverlay";
 import { SanctuaryOverlay } from "@/world/scenes/sanctuary/SanctuaryOverlay";
+import { LabOverlay } from "@/world/scenes/lab/LabOverlay";
+import { ObservatoryOverlay } from "@/world/scenes/observatory/ObservatoryOverlay";
+import { CampfireOverlay } from "@/world/scenes/campfire/CampfireOverlay";
 
 // Registry of DOM overlays per chapter — chapters without a built overlay
 // yet simply render nothing (see docs/08-roadmap.md, scenes land one at a
@@ -18,6 +21,9 @@ const OVERLAYS: Partial<Record<ChapterId, React.ComponentType>> = {
   clearing: ClearingOverlay,
   river: RiverOverlay,
   sanctuary: SanctuaryOverlay,
+  lab: LabOverlay,
+  observatory: ObservatoryOverlay,
+  campfire: CampfireOverlay,
 };
 
 export function ChapterOverlay() {
@@ -25,7 +31,7 @@ export function ChapterOverlay() {
   const phase = useWorldStore((s) => s.phase);
   const Overlay = OVERLAYS[currentChapter];
 
-  if (phase === "preloading" || !Overlay) return null;
+  if (phase === "preloading" || phase === "deep-dive" || !Overlay) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-20">
