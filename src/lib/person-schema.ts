@@ -7,10 +7,9 @@ import { SITE_URL } from "./site";
  * schema.org Person JSON-LD, built from the same content/ modules the rest
  * of the site reads from — no separate copy to keep in sync. Emitted once,
  * site-wide, from the root layout (a Person represents site-wide identity,
- * not a single page). campfireContent's social links are still literal "#"
- * placeholders (see that file's own comment) — filtered out here so the
- * schema never ships a broken sameAs URL; real profile links will flow
- * through automatically once they're filled in, no code change needed.
+ * not a single page). The `http`-prefix filter on sameAs stays as a guard:
+ * the links are real profile URLs now, but a future in-page anchor added to
+ * campfireContent would otherwise ship as a broken sameAs entry.
  */
 export function buildPersonSchema() {
   const sameAs = campfireContent.links

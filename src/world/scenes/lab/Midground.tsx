@@ -15,16 +15,18 @@ const length = start - end;
 function ProjectConsole({
   slug,
   title,
+  side,
   index,
   total,
 }: {
   slug: string;
   title: string;
+  /** -1 = left bench (SDE), +1 = right bench (AI/ML). */
+  side: -1 | 1;
   index: number;
   total: number;
 }) {
   const z = start - ((index + 0.5) / total) * length;
-  const side = index % 2 === 0 ? -1 : 1;
   const crystalRef = useRef<THREE.Mesh>(null!);
   const trimRef = useAetherMaterialRef(2);
   const openDeepDive = useWorldStore((s) => s.openDeepDive);
@@ -79,18 +81,36 @@ function ProjectConsole({
 
 // Project consoles — click opens the deep-dive panel (chrome/DeepDiveLayer.tsx)
 // via the navigation state machine's openDeepDive, per docs/03-scene-graph.md §5.
+//
+// The two tracks occupy opposite benches rather than alternating by index:
+// walking between them, the SDE row is consistently on the left and the
+// AI/ML row consistently on the right, so the split reads spatially instead
+// of needing a caption to explain it.
 export function LabMidground() {
   return (
     <>
-      {labContent.projects.map((project, i) => (
-        <ProjectConsole
-          key={project.slug}
-          slug={project.slug}
-          title={project.title}
-          index={i}
-          total={labContent.projects.length}
-        />
-      ))}
+      {labContent.tracks.map((track, trackIndex) => {
+        const side: -1 | 1 = trackIndex === 0 ? -1 : 1;
+        return (
+          <group key={track.id}>
+            <DistanceFadeHtml position={[side * 2.4, 3.1, start - length * 0.5]} center>
+              <div className="pointer-events-none rounded-md bg-[var(--scrim)] px-3 py-1.5 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase backdrop-blur-sm">
+                {track.label}
+              </div>
+            </DistanceFadeHtml>
+            {track.projects.map((project, i) => (
+              <ProjectConsole
+                key={project.slug}
+                slug={project.slug}
+                title={project.title}
+                side={side}
+                index={i}
+                total={track.projects.length}
+              />
+            ))}
+          </group>
+        );
+      })}
     </>
   );
 }

@@ -28,13 +28,22 @@ export interface ProjectMetric {
   value: string;
 }
 
+/** The two tracks the portfolio splits projects into — software engineering
+ * vs. applied ML. Deliberately strict: a visitor should immediately see that
+ * both are real, not that one is a side interest. */
+export type ProjectTrack = "sde" | "aiml";
+
 export interface Project {
   slug: string;
   title: string;
+  track: ProjectTrack;
   summary: string;
   description: string;
   role: string;
   stack: string[];
+  /** Only facts that appear in the resume. No invented numbers — several of
+   * these projects genuinely have no published metrics yet, and an empty
+   * list is the honest representation of that. */
   metrics: ProjectMetric[];
   links: { label: string; href: string }[];
   featured: boolean;

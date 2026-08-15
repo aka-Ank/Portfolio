@@ -41,24 +41,31 @@ export function LabOverlay() {
         transition={{ delay: 0.4, duration: 0.6 }}
         className="pointer-events-auto max-h-[60vh] max-w-sm overflow-y-auto rounded-lg bg-[var(--scrim)] p-5 backdrop-blur-sm"
       >
-        <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
-          Projects
-        </div>
-        <ul className="mt-2 flex flex-col gap-1">
-          {labContent.projects.map((project) => (
-            <li key={project.slug}>
-              <button
-                onClick={() => openDeepDive(project.slug)}
-                className="w-full rounded-md px-2 py-1.5 text-left outline-offset-2 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-              >
-                <span className="text-sm text-[var(--ink-inverse)]">{project.title}</span>
-                <span className="mt-0.5 block text-xs text-[var(--ink-inverse)]/70">
-                  {project.summary}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        {/* Grouped by track, matching the two benches in the 3D scene —
+            same split, same order, so the DOM path and the spatial path
+            tell a keyboard user and a mouse user the same story. */}
+        {labContent.tracks.map((track) => (
+          <section key={track.id} className="mt-2 first:mt-0">
+            <h3 className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
+              {track.label}
+            </h3>
+            <ul className="mt-2 mb-3 flex flex-col gap-1">
+              {track.projects.map((project) => (
+                <li key={project.slug}>
+                  <button
+                    onClick={() => openDeepDive(project.slug)}
+                    className="w-full rounded-md px-2 py-1.5 text-left outline-offset-2 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+                  >
+                    <span className="text-sm text-[var(--ink-inverse)]">{project.title}</span>
+                    <span className="mt-0.5 block text-xs text-[var(--ink-inverse)]/70">
+                      {project.summary}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </motion.div>
     </div>
   );

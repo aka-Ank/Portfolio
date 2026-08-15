@@ -1,8 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { resume } from "@/content/resume";
-import { about } from "@/content/about";
+import { resume, contact, education, experience } from "@/content/resume";
 import { skills } from "@/content/skills";
-import { projects } from "@/content/projects";
+import { getProjectsByTrack } from "@/content/projects";
 import { certifications } from "@/content/certifications";
 
 // A one-page resume built entirely from the same content/ modules the site
@@ -40,6 +39,11 @@ const styles = StyleSheet.create({
   },
 });
 
+const TRACK_LABELS = [
+  { track: "sde" as const, label: "Software Engineering" },
+  { track: "aiml" as const, label: "AI / Machine Learning" },
+];
+
 export function ResumeDocument() {
   return (
     <Document title={`${resume.name} — Résumé`} author={resume.name}>
@@ -47,19 +51,52 @@ export function ResumeDocument() {
         <Text style={styles.name}>{resume.name}</Text>
         <Text style={styles.role}>{resume.role}</Text>
         <Text style={styles.contact}>
-          {resume.email} · {resume.location}
+          {resume.email} · {contact.phone} · {resume.location}
+        </Text>
+        <Text style={styles.contact}>
+          {contact.github} · {contact.linkedin}
         </Text>
         <Text style={styles.summary}>{resume.summary}</Text>
 
-        <Text style={styles.sectionTitle}>Selected Work</Text>
-        {projects.map((project) => (
-          <View key={project.slug} style={styles.item}>
-            <View style={styles.itemTitleRow}>
-              <Text style={styles.itemTitle}>{project.title}</Text>
-              <Text style={styles.itemMeta}>{project.role}</Text>
-            </View>
-            <Text style={styles.itemBody}>{project.summary}</Text>
-            <Text style={styles.itemMeta}>{project.stack.join(" · ")}</Text>
+        <Text style={styles.sectionTitle}>Education</Text>
+        <View style={styles.item}>
+          <View style={styles.itemTitleRow}>
+            <Text style={styles.itemTitle}>{education.institution}</Text>
+            <Text style={styles.itemMeta}>{education.period}</Text>
+          </View>
+          <Text style={styles.itemMeta}>
+            {education.degree} · CGPA {education.cgpa}
+          </Text>
+          <Text style={styles.itemBody}>Coursework: {education.coursework.join(", ")}</Text>
+        </View>
+
+        <Text style={styles.sectionTitle}>Experience</Text>
+        <View style={styles.item}>
+          <View style={styles.itemTitleRow}>
+            <Text style={styles.itemTitle}>{experience.company}</Text>
+            <Text style={styles.itemMeta}>{experience.period}</Text>
+          </View>
+          <Text style={styles.itemMeta}>{experience.role}</Text>
+          {experience.highlights.map((highlight) => (
+            <Text key={highlight} style={styles.itemBody}>
+              • {highlight}
+            </Text>
+          ))}
+        </View>
+
+        {TRACK_LABELS.map(({ track, label }) => (
+          <View key={track}>
+            <Text style={styles.sectionTitle}>{label}</Text>
+            {getProjectsByTrack(track).map((project) => (
+              <View key={project.slug} style={styles.item}>
+                <View style={styles.itemTitleRow}>
+                  <Text style={styles.itemTitle}>{project.title}</Text>
+                  <Text style={styles.itemMeta}>{project.role}</Text>
+                </View>
+                <Text style={styles.itemBody}>{project.summary}</Text>
+                <Text style={styles.itemMeta}>{project.stack.join(" · ")}</Text>
+              </View>
+            ))}
           </View>
         ))}
 
@@ -82,9 +119,6 @@ export function ResumeDocument() {
             <Text style={styles.itemMeta}>{cert.issuer}</Text>
           </View>
         ))}
-
-        <Text style={styles.sectionTitle}>What drives the work</Text>
-        <Text style={styles.itemBody}>{about.themes.join(" · ")}</Text>
       </Page>
     </Document>
   );

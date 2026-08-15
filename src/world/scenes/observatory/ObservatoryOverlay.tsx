@@ -52,21 +52,23 @@ export function ObservatoryOverlay() {
           ))}
         </ul>
 
-        <div className="mt-4 border-t border-white/15 pt-3">
-          <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
-            Latest writing
+        {observatoryContent.blogPosts.length > 0 && (
+          <div className="mt-4 border-t border-white/15 pt-3">
+            <div className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--ink-inverse)] uppercase opacity-70">
+              Latest writing
+            </div>
+            <ul className="mt-2 flex flex-col gap-2">
+              {observatoryContent.blogPosts.map((post) => (
+                <li key={post.slug} className="text-sm text-[var(--ink-inverse)]">
+                  <span className="font-[family-name:var(--font-mono)] text-xs opacity-60">
+                    {post.date}
+                  </span>{" "}
+                  — {post.title}
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="mt-2 flex flex-col gap-2">
-            {observatoryContent.blogPosts.map((post) => (
-              <li key={post.slug} className="text-sm text-[var(--ink-inverse)]">
-                <span className="font-[family-name:var(--font-mono)] text-xs opacity-60">
-                  {post.date}
-                </span>{" "}
-                — {post.title}
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
 
         <div className="mt-4 border-t border-white/15 pt-3">
           <LiveStats tone="dark" />

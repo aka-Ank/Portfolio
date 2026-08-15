@@ -28,19 +28,23 @@ export function Achievements() {
         ))}
       </ul>
 
-      <h3 className="mt-10 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--muted-foreground)] uppercase">
-        Latest writing
-      </h3>
-      <ul className="mt-4 flex flex-col gap-3">
-        {observatoryContent.blogPosts.map((post) => (
-          <li key={post.slug}>
-            <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--muted-foreground)]">
-              {post.date}
-            </span>{" "}
-            <span className="text-[var(--ink)]">{post.title}</span>
-          </li>
-        ))}
-      </ul>
+      {observatoryContent.blogPosts.length > 0 && (
+        <>
+          <h3 className="mt-10 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--muted-foreground)] uppercase">
+            Latest writing
+          </h3>
+          <ul className="mt-4 flex flex-col gap-3">
+            {observatoryContent.blogPosts.map((post) => (
+              <li key={post.slug}>
+                <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--muted-foreground)]">
+                  {post.date}
+                </span>{" "}
+                <span className="text-[var(--ink)]">{post.title}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <div className="mt-10 border-t border-[var(--border)] pt-6">
         <LiveStats />

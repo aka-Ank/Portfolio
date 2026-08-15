@@ -1,4 +1,4 @@
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME || "octocat";
+const GITHUB_USERNAME = process.env.GITHUB_USERNAME || "aka-Ank";
 
 interface GitHubEvent {
   type: string;
@@ -7,11 +7,9 @@ interface GitHubEvent {
 }
 
 // Live GitHub activity via the public REST API — no auth token needed for
-// public data, works for any public username. Defaults to GitHub's own
-// "octocat" test account so the feature is genuinely demonstrable before a
-// real username is configured (docs/08-roadmap.md Phase 4). Server-rendered
-// so the visitor's browser never needs to make a cross-origin request and
-// the response can be cached.
+// public data. Defaults to the real profile from the resume; GITHUB_USERNAME
+// can still override it. Server-rendered so the visitor's browser never needs
+// to make a cross-origin request and the response can be cached.
 export async function GET() {
   try {
     const [userRes, eventsRes] = await Promise.all([

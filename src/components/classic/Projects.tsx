@@ -10,8 +10,14 @@ export function Projects() {
       </h2>
       <p className="mt-3 text-[var(--muted-foreground)]">{labContent.intro}</p>
 
-      <div className="mt-8 flex flex-col gap-4">
-        {labContent.projects.map((project) => (
+      {labContent.tracks.map((track) => (
+        <div key={track.id} className="mt-10">
+          <h3 className="font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--primary)] uppercase">
+            {track.label}
+          </h3>
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">{track.blurb}</p>
+          <div className="mt-4 flex flex-col gap-4">
+            {track.projects.map((project) => (
           <details
             key={project.slug}
             className="group rounded-lg border border-[var(--border)] p-5 open:bg-[var(--secondary)]"
@@ -60,8 +66,10 @@ export function Projects() {
               </dl>
             </div>
           </details>
-        ))}
-      </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </section>
   );
 }

@@ -49,7 +49,7 @@ export function RiverMidground() {
         const z = start - t * length - mid;
         const side = i % 2 === 0 ? 1 : -1;
         return (
-          <group key={milestone.year} position={[side * 2.1, 0.4, z]}>
+          <group key={milestone.id} position={[side * 2.1, 0.4, z]}>
             <mesh castShadow receiveShadow>
               <dodecahedronGeometry args={[0.35, 0]} />
               <meshStandardMaterial color="#7a7568" roughness={1} flatShading />
