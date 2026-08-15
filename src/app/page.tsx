@@ -36,6 +36,12 @@ export default function Home() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [muted, setMutedState] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
+  // The canvas doesn't exist until the visitor enters. Mounting it behind the
+  // Preloader pre-warmed the scene, but it also meant every visitor paid for
+  // Three.js init, renderer creation and the whole scene graph *before* the
+  // page could finish painting — the dominant remaining cost in Lighthouse.
+  // Nobody sees that work, so nobody should wait for it.
+  const [worldMounted, setWorldMounted] = useState(false);
   const phase = useWorldStore((s) => s.phase);
   const currentChapter = useWorldStore((s) => s.currentChapter);
   const journeyProgress = useWorldStore((s) => s.journeyProgress);
@@ -66,7 +72,12 @@ export default function Home() {
     setAudioEnabled(true);
     setMutedState(false);
     goToChapter("entrance");
-    setPhase("active");
+    setWorldMounted(true);
+    // Deliberately does NOT flip the phase here. The Preloader stays up until
+    // the renderer reports ready (onReady below), so the reveal is a fade from
+    // preloader into a live scene rather than a white gap while Three.js
+    // initialises. A timeout backstops it in case onCreated never fires.
+    window.setTimeout(() => setPhase("active"), 2000);
   }
 
   function toggleMute() {
@@ -112,9 +123,11 @@ export default function Home() {
 
         <div className="fixed inset-0 z-0">
           <WebGLErrorBoundary>
-            <WorldCanvas>
-              <World />
-            </WorldCanvas>
+            {worldMounted && (
+              <WorldCanvas onReady={() => setPhase("active")}>
+                <World />
+              </WorldCanvas>
+            )}
           </WebGLErrorBoundary>
         </div>
 

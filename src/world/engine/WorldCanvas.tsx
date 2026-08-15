@@ -14,13 +14,16 @@ import { ChapterTransitionDriver } from "@/world/systems/navigation/ChapterTrans
  * every animating system is responsible for calling `state.invalidate()`
  * while it's still moving (see CameraRig / TimeOfDaySystem).
  */
-export function WorldCanvas({ children }: { children: ReactNode }) {
+export function WorldCanvas({ children, onReady }: { children: ReactNode; onReady?: () => void }) {
   const dpr = useWorldStore((s) => QUALITY_BY_TIER[s.tier].dpr);
   const shadowsEnabled = useWorldStore((s) => QUALITY_BY_TIER[s.tier].shadowsEnabled);
 
   return (
     <Canvas
       frameloop="demand"
+      // Fires once the renderer exists, which is the signal the Preloader
+      // waits on before dismissing — see app/page.tsx.
+      onCreated={() => onReady?.()}
       dpr={dpr}
       shadows={shadowsEnabled ? "soft" : false}
       gl={{ antialias: true, powerPreference: "high-performance" }}
