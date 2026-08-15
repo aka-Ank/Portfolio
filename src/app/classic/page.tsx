@@ -6,6 +6,7 @@ import { Skills } from "@/components/classic/Skills";
 import { Projects } from "@/components/classic/Projects";
 import { Achievements } from "@/components/classic/Achievements";
 import { Contact } from "@/components/classic/Contact";
+import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { about } from "@/content/about";
 import { SITE_URL } from "@/lib/site";
 
@@ -34,6 +35,7 @@ export default function ClassicPage() {
       <Projects />
       <Achievements />
       <Contact />
+      <CommandFooter variant="classic" />
     </main>
   );
 }

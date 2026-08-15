@@ -22,10 +22,20 @@ describe("scrollToChapter", () => {
   it("targets the chapter's own progress segment, not a neighbour's", () => {
     scrollToChapter("sanctuary"); // index 3 of 7
 
+    // Lands *on* the segment's lower bound, not past it: the landing point
+    // is the chapter's entry waypoint, which is the framing cameraPath.ts
+    // authored for its opening beat. (Landing mid-segment instead put the
+    // Entrance camera beyond the torii archway and lost the hero shot.)
     const target = useWorldStore.getState().targetJourneyProgress;
-    expect(target).toBeGreaterThan(3 / 7);
+    expect(target).toBeGreaterThanOrEqual(3 / 7);
     expect(target).toBeLessThan(4 / 7);
     expect(target).toBe(progressForChapter("sanctuary"));
+  });
+
+  it("puts the Entrance at the very start of the path, framing the archway", () => {
+    scrollToChapter("clearing");
+    scrollToChapter("entrance");
+    expect(useWorldStore.getState().targetJourneyProgress).toBe(0);
   });
 
   it("enters the transitioning phase so the driver eases rather than cuts", () => {

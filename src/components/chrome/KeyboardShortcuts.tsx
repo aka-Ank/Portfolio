@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { AnimatePresence } from "motion/react";
-import { useWorldStore } from "@/world/state/useWorldStore";
+import { getWorldState, useWorldStore } from "@/world/state/useWorldStore";
 import { scrollToChapter } from "@/world/systems/scroll-camera/scrollToChapter";
 import { HelpOverlay } from "./HelpOverlay";
 import { SceneBookmarks } from "./SceneBookmarks";
@@ -19,7 +19,8 @@ export function KeyboardShortcuts({
   audioEnabled: boolean;
   onToggleMute: () => void;
 }) {
-  const [panel, setPanel] = useState<"help" | "bookmarks" | null>(null);
+  const panel = useWorldStore((s) => s.chromePanel);
+  const setPanel = useWorldStore((s) => s.setChromePanel);
   const setManualReducedMotion = useWorldStore((s) => s.setManualReducedMotion);
   const reducedMotion = useWorldStore((s) => s.reducedMotion);
 
@@ -33,11 +34,11 @@ export function KeyboardShortcuts({
         case "/":
         case "?":
           e.preventDefault();
-          setPanel((p) => (p === "help" ? null : "help"));
+          setPanel(getWorldState().chromePanel === "help" ? null : "help");
           break;
         case "g":
         case "G":
-          setPanel((p) => (p === "bookmarks" ? null : "bookmarks"));
+          setPanel(getWorldState().chromePanel === "bookmarks" ? null : "bookmarks");
           break;
         case "c":
         case "C":
@@ -59,7 +60,7 @@ export function KeyboardShortcuts({
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [audioEnabled, onToggleMute, reducedMotion, setManualReducedMotion]);
+  }, [audioEnabled, onToggleMute, reducedMotion, setManualReducedMotion, setPanel]);
 
   return (
     <AnimatePresence>

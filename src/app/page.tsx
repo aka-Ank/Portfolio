@@ -10,12 +10,9 @@ import { useChapterNavigation } from "@/world/systems/navigation/useChapterNavig
 import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
 import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
 import { Preloader } from "@/components/chrome/Preloader";
-import { AudioControls } from "@/components/chrome/AudioControls";
-import { TimeOfDayToggle } from "@/components/chrome/TimeOfDayToggle";
-import { ReducedMotionToggle } from "@/components/chrome/ReducedMotionToggle";
-import { ModeToggle } from "@/components/chrome/ModeToggle";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
 import { ChapterNavigator } from "@/components/chrome/ChapterNavigator";
+import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { WebGLErrorBoundary } from "@/components/chrome/WebGLErrorBoundary";
 import { WebGLFallback } from "@/components/chrome/WebGLFallback";
 import { useWebGLSupport } from "@/hooks/useWebGLSupport";
@@ -133,11 +130,6 @@ export default function Home() {
           inert={phase === "preloading"}
           className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]"
         >
-          <TimeOfDayToggle />
-          <ReducedMotionToggle />
-          {audioEnabled && <AudioControls muted={muted} onToggleMute={toggleMute} />}
-          <ModeToggle />
-
           <button
             onClick={() => setDebugOpen((v) => !v)}
             className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
@@ -199,6 +191,10 @@ export default function Home() {
           </div>
         </div>
 
+        <CommandFooter
+          variant="immersive"
+          audio={{ enabled: audioEnabled, muted, onToggleMute: toggleMute }}
+        />
       </main>
     </>
   );

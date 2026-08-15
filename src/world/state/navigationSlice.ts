@@ -22,9 +22,14 @@ export interface NavigationSlice {
    * a six-chapter jump means the camera glides across the whole world in
    * view *after* the veil lifts, even though progress already teleported. */
   cameraSnapNonce: number;
+  /** Which chrome panel is open. Lifted out of KeyboardShortcuts' local
+   * state so the `/` key and the footer's help button drive the same one
+   * instead of each owning a separate copy. */
+  chromePanel: "help" | "bookmarks" | null;
 
   goToChapter: (chapter: ChapterId, opts?: { viaJump?: boolean }) => void;
   requestCameraSnap: () => void;
+  setChromePanel: (panel: "help" | "bookmarks" | null) => void;
   goToNextChapter: () => void;
   goToPreviousChapter: () => void;
   setPhase: (phase: NavigationPhase) => void;
@@ -36,12 +41,19 @@ export interface NavigationSlice {
 
 const SEGMENT = 1 / CHAPTER_ORDER.length;
 
-/** The progress value that centres the camera on a chapter — its segment
- * midpoint. Chapters own equal 1/7 slices of progress (worldLayout gives
- * each the same world-space depth), so the midpoint lands on the chapter's
- * key beat rather than its entry edge. */
+/**
+ * Where the camera lands for a chapter: its segment **start**, which is the
+ * entry waypoint cameraPath.ts was authored around ("two waypoints per
+ * chapter (entry beat + key beat)").
+ *
+ * Not the midpoint. Midpoint seemed like the better "centred" choice, but it
+ * put the Entrance camera *past* the torii archway — the site's hero shot,
+ * framed by the entry waypoint at z+6, was simply gone. Every chapter's
+ * opening framing is deliberate in the same way; the camera then eases on
+ * toward the key beat as it settles.
+ */
 export function progressForChapter(chapter: ChapterId): number {
-  return (CHAPTER_ORDER.indexOf(chapter) + 0.5) * SEGMENT;
+  return CHAPTER_ORDER.indexOf(chapter) * SEGMENT;
 }
 
 // Slices calling into each other needs the combined state type — see the
@@ -62,6 +74,7 @@ export const createNavigationSlice: StateCreator<
   targetJourneyProgress: progressForChapter("entrance"),
   deepDiveId: null,
   cameraSnapNonce: 0,
+  chromePanel: null,
 
   goToChapter: (chapter, opts) => {
     if (get().currentChapter === chapter) return;
@@ -88,6 +101,7 @@ export const createNavigationSlice: StateCreator<
   },
 
   requestCameraSnap: () => set((s) => ({ cameraSnapNonce: s.cameraSnapNonce + 1 })),
+  setChromePanel: (panel) => set({ chromePanel: panel }),
 
   setPhase: (phase) => set({ phase }),
   setChapterProgress: (progress) => set({ chapterProgress: progress }),
