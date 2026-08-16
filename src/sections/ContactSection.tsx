@@ -48,9 +48,15 @@ export function ContactSection() {
             );
           })}
           <li>
-            <a href={contactContent.resumeHref} className={CONTACT_LINK}>
+            <a
+              href={contactContent.resumeHref}
+              target="_blank"
+              rel="noreferrer"
+              className={CONTACT_LINK}
+            >
               <FileText aria-hidden className="h-4 w-4" />
               Resume
+              <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
             </a>
           </li>
         </ul>

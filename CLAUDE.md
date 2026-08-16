@@ -46,7 +46,8 @@ get out of its way.
 - `prefers-reduced-motion` is respected everywhere, *and* the in-app motion toggle must switch
   off the same animations (the media query cannot see it — see `[data-motion="off"]` in
   globals.css). Core content stays fully usable with every effect off.
-- Content is grounded in `resume/Ankit_Chaudhary_AI_ML_Resume.pdf`. No invented metrics,
+- Content is grounded in the PDF in `resume/`, and the Resume button serves **that exact file**
+  from `public/` — never a PDF generated from the content modules. No invented metrics,
   achievements, timelines or proficiency ratings; an empty `metrics` array is the honest
   representation of a project with no published numbers.
 - Target 60 FPS, Lighthouse 95+, SEO-first, accessibility-first, in both modes.
@@ -86,7 +87,8 @@ brand icons, so GitHub/LinkedIn are inlined in `components/shared/BrandIcons.tsx
 `systems/theme/palette.ts` so no colour library ships to the browser).
 
 **Removed, do not reintroduce:** `three`, `@react-three/fiber`, `@react-three/drei`, `maath`,
-`lenis`, `tw-animate-css`, `gsap`, `@anthropic-ai/sdk`.
+`lenis`, `tw-animate-css`, `gsap`, `@anthropic-ai/sdk`, `@react-pdf/renderer` (the resume is a
+static file, not a generated document).
 
 ## Architecture at a glance
 
@@ -101,7 +103,8 @@ brand icons, so GitHub/LinkedIn are inlined in `components/shared/BrandIcons.tsx
 - `src/systems/` — `theme/` (OKLCH → CSS variables), `scroll/` (observer + jump), `audio/`,
   `easter-egg/`.
 - `src/state/` — the Zustand store; only deliberate visitor choices are persisted.
-- `src/app/` — routing only. `/` (full), `/classic`, `/api/resume`.
+- `src/app/` — routing only. `/` (full) and `/classic`. Both static; the build has no dynamic
+  routes, so the whole site can be served from a CDN.
 - `src/components/` — shadcn primitives, shared chrome, `classic/ClassicHeader`.
 - **`/classic` renders the same section components as `/`**, with `data-plain` on `<main>`
   switching off the reveal. It is not a fork — an earlier version duplicated every section into

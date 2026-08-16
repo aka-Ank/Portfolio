@@ -30,7 +30,15 @@ There is no timeline, no blog, no "signals"/"achievements" section, and no live-
 
 ## Content rules
 
-The source of truth is `resume/Ankit_Chaudhary_AI_ML_Resume.pdf`.
+The source of truth is the PDF in `resume/`.
+
+**The Resume button serves that exact file**, copied to
+`public/Ankit-Chaudhary-Resume.pdf` and linked statically — not a PDF generated from these
+content modules. A generated resume is a second layout of the same facts that has to be kept
+looking right forever, and it is not the document that gets attached to an application, so a
+recruiter downloading from the site would receive something the applicant had never seen.
+To update: replace the file in `resume/`, copy it to `public/`, done. Removing the generator also
+made every route static — there is no longer a dynamic route in the build.
 
 - No invented metrics, dates, achievements, or proficiency ratings.
 - An empty `metrics` array is the correct representation of a project with no published numbers.

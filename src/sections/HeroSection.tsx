@@ -98,8 +98,13 @@ export function HeroSection() {
             {heroContent.secondaryCta.label}
           </SectionJumpButton>
 
+          {/* Opens rather than downloads: it is a PDF, and most people would
+              rather glance at it in the browser's viewer than fish a file out
+              of their downloads folder. */}
           <a
             href={heroContent.resumeHref}
+            target="_blank"
+            rel="noreferrer"
             className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-[15px] text-[var(--ink-muted)] transition-colors hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
           >
             <FileText aria-hidden className="h-4 w-4" />

@@ -15,8 +15,17 @@ export const resume: ResumeData = {
 export const contact = {
   github: "https://github.com/aka-Ank",
   linkedin: "https://linkedin.com/in/ankit-chaudhary-ba4762295",
-  /** Served by /api/resume as a generated PDF. */
-  resume: "/api/resume",
+  /**
+   * The real resume PDF, served statically from `public/`.
+   *
+   * Deliberately the actual document rather than one generated from the
+   * content modules. A generated resume is a second layout of the same facts
+   * that has to be kept looking right forever, and it is not the file that
+   * gets attached to an application — so a recruiter downloading from the site
+   * would get something the applicant had never actually seen. To update it,
+   * replace `public/Ankit-Chaudhary-Resume.pdf` (source lives in `resume/`).
+   */
+  resume: "/Ankit-Chaudhary-Resume.pdf",
 };
 
 /** The hero's status pill. Short by design — a pill that wraps stops being a
