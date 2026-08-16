@@ -7,9 +7,9 @@ import { buildPersonSchema } from "@/lib/person-schema";
 import "./globals.css";
 
 // Typography system — see docs/01-design-specification.md §2. The serif is
-// display/headline only, the sans is the workhorse, mono is reserved for
-// data-shaped content (Lab/Observatory/Campfire) — narrative complexity
-// shows up in the type system too, not just the visuals.
+// display/headline only, the sans is the workhorse, and mono is reserved for
+// data-shaped content — which is also how the AI/ML track signals that it is
+// the more instrumented of the two.
 const instrumentSerif = Instrument_Serif({
   variable: "--font-display",
   subsets: ["latin"],
@@ -30,9 +30,9 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const title = `${about.name} — an enchanted forest where AI and nature meet`;
+const title = `${about.name} — Software & AI/ML Engineer`;
 const description =
-  "A cinematic, narrative portfolio — an explorable journey through an enchanted forest where AI and nature coexist gently.";
+  "Portfolio of Ankit Chaudhary — full-stack systems and applied machine learning. B.Tech Computer Engineering at Pandit Deendayal Energy University, ML intern at Multitech Support & Development.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

@@ -4,20 +4,36 @@ Conventions for this project. Read this fully before starting any phase's work.
 
 ## What this is
 
-A cinematic, narrative portfolio site — an explorable enchanted forest where AI and nature
-coexist gently. Full mission, non-negotiable rules, and narrative structure are in the original
-brief; the working decisions derived from it live in `docs/`. Read
+A calm, premium, **2D-first** portfolio: an interactive storybook world where each section carries
+its own atmosphere. Studio Ghibli × Horizon Zero Dawn in *mood*, never a literal 3D imitation.
+The working decisions live in `docs/` — read
 [docs/00-research-and-stack.md](./docs/00-research-and-stack.md) through
-[docs/08-roadmap.md](./docs/08-roadmap.md) before touching code in any later phase — they are
-the actual spec, not background reading.
+[docs/08-roadmap.md](./docs/08-roadmap.md) before touching code; they are the actual spec.
+
+> **This project was rebooted from a 3D build.** An earlier version was a React Three Fiber
+> world with six 3D biome scenes and a Lenis-driven camera. It was deliberately deleted, not
+> deprecated. If you find a reference to Three.js, R3F, drei, `maath`, Lenis, `src/world/`, a
+> WebGL fallback, a preloader, voice navigation, or "chapters", it is stale — the git history
+> before `reboot/2d-portfolio` is the only place any of it still lives. Do not reintroduce it.
 
 **Non-negotiables (do not relitigate these mid-build):**
+- **2D only.** Layered SVG, CSS gradients and one small 2D canvas for ambient particles. No WebGL,
+  no 3D scene graph, no camera rig.
 - No generic scroll animations, pop-ins, spinning cards, cheap bounce effects, chaotic scroll
-  surprises, or random flying components.
-- Every scene must have narrative meaning; every component must justify its existence.
-- Motion follows physics — spring, inertia, damping — never jitter or randomness.
-- `prefers-reduced-motion` is respected everywhere; core content stays usable with effects off.
-- Target 60 FPS, Lighthouse 95+, SEO-first, accessibility-first, including in immersive mode.
+  surprises, or random flying components. No blinding light effects, no sudden transitions.
+- **Never move the page for the visitor.** Scrolling is native CSS scroll-snap; JS may only
+  *observe* scroll position, never drive it. The one exception is an explicit click or keypress
+  on a navigation control.
+- Every section must have narrative meaning; every component must justify its existence.
+- Motion is slow, damped and gradual — a transition should read as light changing, not as a
+  toggle flipping. Nothing jitters, nothing is random.
+- **No career timeline anywhere.** Education and the internship are two compact cards.
+- `prefers-reduced-motion` is respected everywhere, *and* the in-app motion toggle must switch
+  off the same animations (the media query cannot see it — see `[data-motion="off"]` in
+  globals.css). Core content stays fully usable with every effect off.
+- Content is grounded in the real resume. No invented metrics, achievements or timelines; an
+  empty `metrics` array is the honest representation of a project with no published numbers.
+- Target 60 FPS, Lighthouse 95+, SEO-first, accessibility-first, in both modes.
 - Research before deciding on any uncertain design/technical choice — compare real alternatives,
   don't default to the first idea.
 
@@ -42,36 +58,53 @@ the actual spec, not background reading.
 ## Confirmed stack (see docs/00 for full reasoning)
 
 Next.js 16 (App Router, TypeScript, `src/`) · Tailwind CSS v4 (CSS-first `@theme`, no
-`tailwind.config.js`) · shadcn/ui (`base-nova` preset, copy-in components) · Three.js + React
-Three Fiber v9 + drei · `maath` for damping/easing · GSAP (ScrollTrigger, Timeline, InertiaPlugin
-— scroll orchestration AND scene-transition sequencing) · Lenis (smooth scroll) · Motion
-(`motion/react`, formerly Framer Motion — DOM/UI micro-interactions) · Zustand (world state,
-slices pattern) · Howler.js (layered ambience + SFX).
+`tailwind.config.js`) · shadcn/ui (`base-nova` preset, copy-in components) · Motion
+(`motion/react` — DOM micro-interactions) · GSAP (available; currently unused after the reboot
+removed scroll orchestration — do not add it back for scrolling) · Zustand (preferences and
+navigation state, slices pattern) · Howler.js (opt-in ambient beds) · `culori` (dev-only, for the
+contrast audit — the runtime OKLCH lerp is hand-rolled in `systems/theme/palette.ts` so no colour
+library ships to the browser).
 
-**Theatre.js from the original brief was dropped** — it's been effectively unmaintained since
-2023. Scene-transition sequencing is a GSAP Timeline module instead. Don't reintroduce it without
-re-checking its status first.
+**Removed in the reboot, do not reintroduce:** `three`, `@react-three/fiber`, `@react-three/drei`,
+`maath`, `lenis`, `tw-animate-css`.
 
 ## Architecture at a glance (see docs/02 for full detail)
 
-- `src/world/` — the immersive 3D engine (engine, state, systems, scenes, shared primitives).
-  Framework-thin; `app/page.tsx` just mounts it.
-- `src/content/` — the single shared content layer. **Both** the immersive experience and
-  `/classic` read from here. Never duplicate content between the two modes.
-- `src/app/` — routing only. `/` (immersive), `/classic`, `/blog`, `/api/*`.
-- `src/components/` — shadcn primitives, shared chrome, classic-mode-only components.
-- `docs/` — this phase's planning deliverables; treat as the living spec, update it if a later
-  phase legitimately changes a decision (note the change and why, don't silently drift from it).
+- `src/content/` — the single shared content layer, including `sections.ts`: the section registry
+  (id, label, place, mood, time-of-day) that the navigator, the scroll observer, the theme driver
+  and `/classic`'s anchors all read from. **Both** modes read from here; never duplicate copy.
+- `src/scenes/atmosphere/` — the fixed backdrop. `AtmosphereStage` composes sky, key light, the
+  six hand-authored SVG moods (crossfaded), the haze band and `ParticleField`. Each mood renders
+  three depth planes (`far`/`mid`/`near`); a mood missing one reads flat and is not shipped.
+- `src/scenes/sections/` — the eight content sections plus `SectionShell` (the shared frame) and
+  `ProjectCard` (one card, two skins).
+- `src/systems/` — `theme/` (OKLCH → CSS variables), `scroll/` (observer + jump), `audio/`,
+  `easter-egg/`.
+- `src/state/` — the Zustand store; only deliberate visitor choices are persisted.
+- `src/app/` — routing only. `/` (immersive), `/classic`, `/api/*`.
+- `src/components/` — shadcn primitives, shared chrome, classic-mode components.
+- `docs/` — the living spec. If a later change legitimately supersedes a decision, update the doc
+  and say why; don't silently drift from it.
 
 ## Design system quick reference (see docs/01 for full detail)
 
 - Typography: Instrument Serif (display only) + Instrument Sans (body/UI) + JetBrains Mono
-  (data/metrics accents, Lab/Observatory/Campfire only).
-- Color: two separate token systems — **world tokens** (sky/fog/light/Aether accent) shift
-  continuously with time-of-day; **UI/chrome tokens** stay fixed for accessibility. Never merge
-  these two systems.
-- The "Aether" is the one recurring accent motif (teal→cyan life-force thread: river current,
-  creature markings, lab conduits, campfire embers) — it appears only where narratively earned.
+  (data-shaped content: metrics, eyebrows, the AI/ML track).
+- **Two token systems, and the split is structural, not a convention.**
+  - *Atmosphere* tokens (`--sky-*`, `--haze`, `--layer-*`, `--glow`, `--aether`) are decorative
+    and drift continuously in OKLCH. They must never be a text colour or sit behind text.
+  - *Surface* tokens (`--surface*`, `--ink*`, `--border-soft`, `--focus-ring`) are
+    contrast-critical, take exactly one of two discrete values, and are swapped atomically inside
+    a view transition. **Never interpolate them** — a light↔dark lerp passes through
+    mid-grey-on-mid-grey, which fails WCAG for the whole animation. `contrast-audit.test.ts`
+    enforces this and also asserts the CSS defaults match `palette.ts`.
+- Colour mode picks the palette *family*; time-of-day picks the position *within* it. That is what
+  lets light mode, dark mode and time-of-day all be real controls without fighting.
+- The "Aether" is the one recurring accent motif (teal→cyan: the river's current, the Jungle's
+  conduits, the Observatory's dome slit, the campfire's embers). It never changes hue, and
+  weather never borrows it — that is what keeps it reading as a symbol rather than as lighting.
+- Sections are *moods*, not places. Six moods across eight sections; SDE is organic (Ancient
+  Grove), AI/ML is instrumented (Mechanical Jungle) — same card, two skins.
 
 ## Phase status
 

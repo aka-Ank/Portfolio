@@ -1,104 +1,86 @@
-# Animation Bible
+# Motion Rules
 
-Every motion type below states the **feel** first (how it should read to the visitor) and the
-**technique** second (which tool, which parameters) — feel is the requirement, technique is the
-implementation detail. Every technique here uses physical motion (spring/damping/inertia) per
-the brief's non-negotiable rule; nothing below uses a raw linear or default-`ease` tween.
+The brief's standard: *smooth, slow enough to feel premium, gradual, cinematic, controlled.* The
+failure mode to design against is not "too little motion" — it is a page that feels restless.
 
-## Camera
+## The rules
 
-**Feel:** a patient, physically-grounded observer moving through the world — never a drone shot,
-never a snap-to-target. The visitor should feel *guided*, not *dragged*.
+1. **Nothing moves the page except the visitor.** Scroll position may only be set in direct
+   response to a click or keypress on a navigation control, via `scrollToSection`. Everything else
+   observes.
+2. **Ambient motion is slow and out of phase.** Nothing ambient cycles faster than ~5s, most run
+   6–17s, and anything repeated (conduit nodes, stars, embers) carries a per-element delay.
+   Elements pulsing in unison read as a blinking interface, not as a living place.
+3. **Reveals happen once.** `useReveal` unobserves on first intersection. Re-animating on every
+   scroll-back is the single biggest contributor to a page feeling cheap.
+4. **Opacity and small translation only.** No scale-in, no rotation, no bounce, no spring
+   overshoot, nothing entering from off-screen. The reveal is 18px of lift and a fade.
+5. **Colour changes ease; they never jump.** Atmosphere damps continuously; the light/dark swap
+   crossfades under a view transition.
+6. **Two or three concurrently animating things per view.** Ambient motion counts as one budget
+   item collectively, not per element.
+7. **Everything is switchable, twice.** `prefers-reduced-motion` for the OS setting,
+   `[data-motion="off"]` for the in-app toggle. Content never depends on an animation running.
 
-**Technique:** camera position/target are never set directly. Target values come from the
-scroll-camera system (Lenis progress → GSAP ScrollTrigger → per-chapter camera keyframes); the
-rendered camera transform is the *damped* pursuit of that target, computed every frame with
-`maath`'s `easing.damp3` (position) and `easing.dampE`/quaternion slerp-damp (rotation), each
-with its own time-constant tuned per chapter (slower/heavier in Entrance and Clearing, slightly
-quicker and more responsive by Lab/Observatory — mirroring the narrative's calm→complex
-progression). Fast scroll flicks never produce camera velocity spikes; the damping function
-inherently caps how fast the camera can catch up.
+## Timings
 
-## Scroll
+| Motion | Duration | Easing | Where |
+|---|---|---|---|
+| Mood crossfade | 1100ms | `ease-in-out` | `AtmosphereStage` |
+| Haze / weather change | 1400ms | default | `AtmosphereStage` |
+| Key-light travel | 1600ms | `ease-out` | `AtmosphereStage` |
+| Atmosphere damping | λ = 3.2/s | exponential | `ThemeDriver` |
+| Light ↔ dark crossfade | 620ms | `cubic-bezier(.4,0,.2,1)` | `::view-transition-*` |
+| Content reveal | 900ms | `cubic-bezier(.22,.61,.36,1)` | `.reveal` |
+| Card disclosure | 420ms | `cubic-bezier(.22,.61,.36,1)` | `::details-content` |
+| Navigator show/hide | 500ms | default | `SideNavigator` |
+| Navigator idle timeout | 2400ms | — | `SideNavigator` |
+| Ambience crossfade | 2200ms | linear | `audioManager` |
 
-**Feel:** buttery, weighted, like scrolling through something with real inertia — not the raw
-browser scrollbar, not a scroll-jacked "the page ignores your input" feeling.
+Under reduced motion, every duration collapses to ~1ms and `.reveal` renders at full opacity with
+no animation at all — the content is never trapped behind an effect that will not run.
 
-**Technique:** Lenis owns the virtual scroll (custom easing, wheel/touch normalization). GSAP
-ScrollTrigger reads Lenis's position as its source of truth (via `lenis.on('scroll', ScrollTrigger.update)`
-+ `gsap.ticker`) and drives both DOM reveals and the world-store's scroll-progress value. Scroll
-is **never fully hijacked** — the visitor's own scroll delta always maps to *some* forward
-progress; only the last-mile easing is smoothed, not the input itself.
+## Ambient catalogue
 
-## Hover / focus (micro-interactions)
+Defined once in `globals.css`, applied by class in the mood SVGs.
 
-**Feel:** a small, confident, springy response — an object that feels physically present and
-slightly reactive, not a color-swap or a linear scale-up.
+| Class | Period | Motion | Used by |
+|---|---|---|---|
+| `sway-slow` | 13s | ±0.55° rotate | the meadow's lone tree |
+| `sway-soft` | 9s | ±1.1° skew | grass, reeds, fern fronds |
+| `sway-canopy` | 17s | 6px drop + ±0.25° | the Grove's canopy arch |
+| `drift-slow` | 11s | ±6px translate | the river's inner current |
+| `pulse-node` | 6s | opacity + radius | the Jungle's Aether nodes |
+| `twinkle` | 5s | opacity 0.25→0.85 | the Observatory's stars |
+| `ember` | 7s | rise 90px, fade out | the campfire's embers |
+| `breathe` | 8s | opacity 0.82→1 | the campfire's light pool |
 
-**Technique:** Motion (`motion/react`) spring transitions (`type: "spring"`, tuned
-`stiffness`/`damping`/`mass` per element size — smaller UI elements get snappier/higher-stiffness
-springs, larger surfaces get softer/lower-stiffness ones so nothing overshoots visibly).
-Keyboard `:focus-visible` uses the same spring on the fixed `--focus-ring` token (see
-[01-design-specification.md](./01-design-specification.md) §3.2) — focus feedback must never be
-weaker than hover feedback.
+`breathe` is the one place a glow is allowed to change strength, because that is what fire
+actually does. Anywhere else it would be a pulsing UI element.
 
-## Scene transition (between chapters)
+## Parallax
 
-**Feel:** a held breath, then a clean cut into the next chapter's mood — crossfade, light sweep,
-or fog movement, chosen per chapter-pair to match the narrative beat (e.g. Entrance→Clearing is
-a literal "pass through" camera move; Lab→Observatory is a rising light sweep as the canopy opens
-to sky).
+Three planes, translated by a fraction of total page scroll: far 0.35, mid 0.7, near 1.15 — of a
+**130px total range across the entire page**. That is a depth cue, not a ride. Beyond roughly
+1.3× base, parallax stops reading as depth and starts reading as a web effect.
 
-**Technique:** a single reusable GSAP Timeline orchestration module (per
-[00-research-and-stack.md](./00-research-and-stack.md) §6 — this is the layer that replaces
-Theatre.js). Each chapter-pair registers a timeline with named phases (`exit`, `hold`, `enter`)
-so the module stays declarative and inspectable rather than copy-pasted per scene. Triggered by
-the navigation state machine entering `Transitioning` (see
-[04-state-machines.md](./04-state-machines.md) §2).
+Driven by a single rAF-coalesced scroll listener writing one `--parallax` variable; the three
+planes are pure CSS `translate3d` off it.
 
-## Object motion (idle/ambient — foliage sway, creature breathing, river current, embers)
+## Particles
 
-**Feel:** alive but unhurried — the kind of motion you'd only consciously notice if you stared
-at it, present enough to read as "not a still image."
+One pass, one canvas, three variations on the same system — the world should read as the same
+place in different conditions, not as three effects.
 
-**Technique:** per-object sine/noise-driven offsets computed inside `useFrame` (no per-frame
-React state), amplitude and frequency kept small and tuned per the motion-budget rule
-([01-design-specification.md](./01-design-specification.md) §4: 2–3 concurrent ambient elements
-per view). Where an idle loop needs a directional "settle" (a creature finishing a glance, a
-branch recovering from wind), `maath`'s `easing.damp` handles the return-to-rest so it never
-looks robotically looped.
+| Weather | Size | Alpha | Speed | Token |
+|---|---|---|---|---|
+| Clear | 1–2.4px | 0.18–0.5 | 6 px/s | `--aether` |
+| Mist | 90–220px | 0.025–0.07 | 4 px/s | `--haze` |
+| Rain | streaks | 0.1–0.26 | 340 px/s | `--haze` |
 
-## Theme transition (time-of-day shift, including the Phase 4 manual dark/light control)
+Particles are stamped from a pre-rendered soft radial sprite, rebuilt only when the token colour
+actually changes. Hard-edged circles at mist's size read as floating bubbles — a real bug caught
+in a browser, not in review.
 
-**Feel:** the sky and light genuinely *change*, gradually, over on the order of tens of
-seconds to a couple of minutes for the automatic story-driven shift, or a few seconds for a
-manual override — never an instant palette swap, never feels like a CSS class toggling.
-
-**Technique:** see [04-state-machines.md](./04-state-machines.md) §1 — a single damped scalar
-(`timeOfDay`) drives every color/light/fog token in
-[01-design-specification.md](./01-design-specification.md) §3.1 simultaneously via
-`THREE.Color.lerpColors` + `maath` damping. Sky, shadow behavior, fog density, and ambient audio
-mix (Howler crossfade between time-of-day ambience layers) all key off the same scalar so nothing
-shifts out of sync with anything else.
-
-## UI motion (classic mode, chrome overlays, deep-dive panels)
-
-**Feel:** restrained, premium, editorial — motion confirms an action happened, it doesn't
-perform for its own sake. No bounce-for-bounce's-sake, no staggered pop-in grids.
-
-**Technique:** Motion spring transitions for enter/exit (short distance, moderate stiffness,
-critically-damped or slightly under-damped only — never a bouncy overshoot on content panels,
-reserved at most for tiny UI accents like a toggle). Panel enter/exit uses opacity + a small
-(≤12px) position delta, never a scale-from-zero "pop." Lists/grids (project list, cert wall)
-reveal via a very short, subtle stagger (40–60ms) driven by Motion's stagger children — kept
-short enough that it reads as "settling into place," not "items flying in one by one."
-
-## Reduced motion
-
-Every technique above has a defined reduced-motion behavior, not a blanket "disable everything":
-camera transitions become instant cuts with a brief cross-fade (no spring interpolation), ambient
-object motion drops to near-zero amplitude (not necessarily exactly zero — see the Campfire
-ember exception in [03-scene-graph.md](./03-scene-graph.md)), scene transitions become simple
-opacity crossfades (no camera move, no light sweep), theme transitions still occur but instantly
-per anchor rather than damped, and UI motion collapses to opacity-only. Full checklist in
-[07-accessibility-and-testing.md](./07-accessibility-and-testing.md).
+Only `clear` uses the Aether. It is the site's one recurring motif; weather does not get to borrow
+it. Count comes from device tier (`low` = 0), and the loop stops entirely on `visibilitychange`.

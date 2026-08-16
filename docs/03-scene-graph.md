@@ -1,126 +1,91 @@
-# Scene Graph — The Seven Locations
+# Section Map
 
-## Flow
+Eight sections, six moods, one continuous walk from dawn to deep night. Flat and shallow on
+purpose: the previous structure nested seven chapters inside six biomes inside a journey, and the
+nesting bought nothing a visitor could perceive.
 
-The primary path is linear and scroll-driven. A secondary, dashed set of edges represents free
-navigation (keyboard shortcuts / scene bookmarks from Phase 4) — always available, never the
-default expectation.
+The registry lives in [`src/content/sections.ts`](../src/content/sections.ts) and is the single
+source of truth — the navigator, the scroll observer, the theme driver and `/classic`'s anchors
+all read from it. Changing an order or a label means editing that file and nothing else.
 
-```mermaid
-graph LR
-    A[Entrance<br/>Gateway] -->|scroll: descend into the tree line| B[Clearing<br/>About]
-    B -->|scroll: follow the path downhill| C[Knowledge River<br/>Learning/Growth]
-    C -->|scroll: river widens into the grove| D[Animal Sanctuary<br/>Skills]
-    D -->|scroll: canopy opens onto stone| E[Lab / Project Chamber<br/>Projects]
-    E -->|scroll: ascend to open sky| F[Observatory<br/>Achievements]
-    F -->|scroll: descend to firelight| G[Campfire<br/>Contact]
+## The map
 
-    B -.jump.-> A
-    C -.jump.-> B
-    D -.jump.-> C
-    E -.jump.-> D
-    F -.jump.-> E
-    G -.jump.-> F
-    A -.bookmark jump.-> D
-    A -.bookmark jump.-> E
-    A -.bookmark jump.-> F
-    A -.bookmark jump.-> G
+| # | Section | Place (mood) | `timeOfDay` | Content |
+|---|---|---|---|---|
+| 1 | `hero` | Entrance Meadow | 0.04 | Name, identity line, the SDE/AIML split, two CTAs |
+| 2 | `about` | Moss River Valley | 0.16 | Three paragraphs, three themes |
+| 3 | `sde` | Ancient Grove | 0.30 | Hamro Vanshavali · Smart Hostel Management |
+| 4 | `aiml` | Mechanical Jungle | 0.44 | AML Detection · Flood STGCN · Smart Traffic · House Price |
+| 5 | `skills` | Mechanical Jungle | 0.56 | Four domain groups |
+| 6 | `education` | Moonlit Observatory | 0.68 | PDEU · Multitech internship |
+| 7 | `signals` | Moonlit Observatory | 0.82 | Certifications, writing, live GitHub/LeetCode |
+| 8 | `contact` | Campfire Terminal | 0.94 | Email, links, résumé |
 
-    style A fill:#fef3c7,stroke:#78716c
-    style B fill:#d9f99d,stroke:#78716c
-    style C fill:#a5f3fc,stroke:#78716c
-    style D fill:#bbf7d0,stroke:#78716c
-    style E fill:#e0e7ff,stroke:#78716c
-    style F fill:#c7d2fe,stroke:#78716c
-    style G fill:#fed7aa,stroke:#78716c
-```
+Two moods carry two beats each, so the palette drifts *within* a mood rather than resetting at
+every boundary. `timeOfDay` is monotonic across all eight: the progression is felt, never labelled.
 
-Bookmark jumps (Phase 4) always land at the *start* of a chapter and play a short settle
-transition (never a hard cut) so the world state (time-of-day, fog, audio) has somewhere to
-animate from — jumping never breaks continuity, it compresses it.
+## Why this order
 
-## Per-location spec
+It is the order a reader wants: who, then the work, then the evidence, then how to reach him. The
+projects sit third and fourth — early enough that a recruiter who reads two screens still sees
+them, which is the single most important thing this site has to do.
 
-### 1. Entrance — Gateway
-- **Narrative job:** first impression; a calm, confident invitation, not a spectacle dump.
-- **Complexity tier:** minimal. One focal point (a threshold — an arch of roots/stone), soft
-  volumetric light through a gap in the canopy.
-- **Time-of-day default:** dawn (the journey begins at first light).
-- **Foreground:** framing foliage, mostly still, gentle sway only.
-- **Midground:** the threshold itself — the single interactive/focal element (subtle Aether
-  glow tracing the arch, responds gently to scroll intent).
-- **Background:** distant tree line, heavy soft fog, sky.
-- **Exit:** scroll pulls the camera *through* the threshold into the Clearing — the one moment
-  in the whole journey with a genuine "passing through" camera move.
+Education and the internship come *after* the work rather than before it. Putting a student's
+degree first invites the reader to weigh the credential instead of the projects.
 
-### 2. Clearing — About
-- **Narrative job:** who I am, what drives me. Human-scale, unhurried.
-- **Complexity tier:** minimal-to-low. A single clearing, dappled light.
-- **Foreground:** grass/wildflowers, minimal parallax.
-- **Midground:** the "about" narrative surface — text integrated into the environment (carved
-  into a stone, grown into bark) rather than a floating card.
-- **Background:** forest wall, soft depth-of-field.
-- **Aether presence:** none, or barest hint — this chapter is pure nature, establishing the
-  baseline the rest of the journey will complicate.
+## The moods
 
-### 3. Knowledge River — Learning, iteration, growth
-- **Narrative job:** a flowing path motif for continuous learning; the river *is* the timeline.
-- **Complexity tier:** low-to-medium. Introduces motion as a first-class element (current,
-  reflection) but still calm.
-- **Foreground:** reeds/rocks at the bank, slow parallax.
-- **Midground:** the river itself — Aether now visibly present as the current's glow,
-  established as "the thing that flows through everything."
-  Milestones (courses, certs-in-progress, iteration moments) sit as stones/eddies along the bank,
-  revealed as the camera travels downstream.
-- **Background:** forest opening up, hills.
-- **Time-of-day progression begins here:** dawn → day crossfade starts around this chapter.
+Each is three depth planes in `src/scenes/atmosphere/moods/`. All draw into the same 1440×900 box
+and are cropped, never letterboxed — the horizon has to sit at a consistent height or a crossfade
+between two sections reads as a jump cut.
 
-### 4. Animal Sanctuary — Skills
-- **Narrative job:** skills as symbolic/mechanical creatures, one per domain, with believable
-  idle states and wildlife-choreographed movement paths — not static posed models.
-- **Complexity tier:** medium. First chapter with several simultaneously "alive" elements, still
-  bounded by the motion budget (§4 of design spec).
-- **Foreground:** undergrowth the creatures move through.
-- **Midground:** the creatures themselves — each a small idle loop (breathing, occasional
-  glance, patrol path along a fixed curve) with Aether-lit markings sized/intensity-mapped to
-  skill proficiency.
-- **Background:** denser grove, filtered light.
-- **Interaction:** hover/focus on a creature reveals its skill detail via the shared UI chrome,
-  without pulling it out of its environment (no card popping over the scene).
+**Entrance Meadow** — the widest, emptiest framing in the site. Rolling ridges, one lone tree on
+the right third, grass along the lower edge. It establishes the floor for restraint; everything
+after it is denser.
 
-### 5. Lab / Project Chamber — Projects
-- **Narrative job:** projects as artifacts/chambers/machines; this is the first chapter that
-  looks *built* rather than grown — nature and structure visibly merging (wood-grain circuitry,
-  stone consoles).
-- **Complexity tier:** medium-high. Structured, denser framing is allowed here per the design
-  spec's "later = denser" rule.
-- **Foreground:** chamber architecture framing the shot.
-- **Midground:** one artifact/machine per project; interacting opens the deep-dive view
-  (architecture, outcome, visuals) and a focused case-study mode for recruiters.
-- **Background:** the chamber recedes into structured dark, Aether conduits tracing the walls.
-- **Time-of-day:** sunset — the visual "weight" of the day.
+**Moss River Valley** — valley walls closing from both sides, leaving a channel down the middle.
+The first appearance of the Aether, as the river's current: the only saturated thing in frame.
 
-### 6. Observatory — Achievements, certs, blog, metrics
-- **Narrative job:** proof of work, presented as a ceremonial timeline/wall rather than a resume
-  table — a night-sky instrument reading the visitor's journey back at them.
-- **Complexity tier:** high — the most "instrumented" chapter (this is where JetBrains Mono
-  appears, per the typography system).
-- **Foreground:** observatory structure framing an open sky.
-- **Midground:** the certification wall/timeline, live metrics (GitHub activity, blog), each
-  presented with date/issuer/significance rather than a logo grid.
-- **Background:** night sky, stars standing in for the Aether at its most diffuse and expansive.
-- **Time-of-day:** night.
+**Ancient Grove** — the SDE track. Entirely organic: curved trunks that are never parallel, a
+canopy arch overhead, roots and fern fronds in the corners. No straight lines anywhere.
 
-### 7. Campfire — Contact
-- **Narrative job:** calm emotional close. Deliberately the simplest chapter after the Lab and
-  Observatory's density — the story exhales.
-- **Complexity tier:** minimal again, mirroring the Entrance (bookend structure).
-- **Foreground:** fire-lit ground, embers (the Aether's final form — literal warm light now,
-  closing the motif that began as a cool river current).
-  Reduced-motion mode: it's the one place where a slow ember drift is worth keeping even with
-  motion reduced, at very low amplitude — the calmest possible motion, not zero necessarily; see
-  [07-accessibility-and-testing.md](./07-accessibility-and-testing.md) for the exact rule.
-- **Midground:** the visitor's own vantage at the fire; contact links, socials, resume export
-  presented as calm, direct UI — no more environmental storytelling tricks at this point, the
-  journey has earned a direct ask.
-- **Background:** dark forest, fire glow falloff.
+**Mechanical Jungle** — the AI/ML track, and the Grove's deliberate counterpart. The same forest
+rebuilt from geometry: straight pylons on a regular rhythm, horizontal conduit bands, Aether nodes
+pulsing at the junctions on offset delays (never in unison — that reads as a blinking UI).
+
+**Moonlit Observatory** — the most open sky. A hand-placed star field (not random, so it is stable
+between renders and reads as a sky rather than as noise), a ridge line, and a dome on the left
+third with its slit lit from inside.
+
+**Campfire Terminal** — the only mood that closes in rather than opening out. A ring of rounded
+tree crowns seals the horizon, a pool of firelight breathes slowly, logs lie in a loose lean-to,
+and embers rise. The last thing a visitor sees, and the site's one moment of real warmth.
+
+## The SDE / AI-ML split
+
+The two tracks must read as different chapters of one body of work — not two portfolios, and not
+one undifferentiated list.
+
+They share `ProjectCard`, and differ only in skin:
+
+| | Ancient Grove (`organic`) | Mechanical Jungle (`instrumented`) |
+|---|---|---|
+| Corners | `rounded-2xl` | `rounded-md` |
+| Title face | Instrument Serif | Instrument Sans, medium, tight |
+| Metrics | inside, on expand | **on the closed card**, monospaced |
+| Stack chips | pills | square-cornered |
+
+The metric placement is the load-bearing difference. Grove projects are about structure — who may
+see what, what happens when the ordinary path doesn't apply — so their numbers are a detail. Jungle
+projects are about measurement, so the numbers are the headline. Where a project genuinely has no
+published figure, the array is empty and nothing is drawn; no placeholder is invented.
+
+## What is deliberately absent
+
+- **No timeline.** Two real entries strung along a vertical rule inflates a short, honest record
+  into a career narrative, and invites the reader to look for the gaps rather than at the work.
+- **No skill ratings.** `proficiency` exists in the content layer but is never drawn as a bar. The
+  resume states no self-ratings, so a filled meter would present a derived number as a measured
+  one. The evidence sentence under each skill says what it was derived from instead.
+- **No deep-dive route or modal.** A `<details>` disclosure on the card is enough, and it works
+  before hydration.
