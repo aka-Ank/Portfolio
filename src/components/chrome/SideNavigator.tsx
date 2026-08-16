@@ -56,7 +56,10 @@ export function SideNavigator() {
       onPointerLeave={() => setPinned(false)}
       className={[
         "fixed z-30 transition-opacity duration-500 motion-reduce:transition-none",
-        "inset-x-0 bottom-4 flex justify-center",
+        // Clears the fixed command strip on small screens, where both want the
+        // bottom edge. On desktop the navigator moves to the right rail and
+        // the collision disappears.
+        "inset-x-0 bottom-20 flex justify-center",
         "md:inset-x-auto md:bottom-auto md:right-6 md:top-1/2 md:block md:-translate-y-1/2",
         shown ? "opacity-100" : "opacity-0",
       ].join(" ")}

@@ -56,13 +56,16 @@ Partially done; the remainder is the live work.
 - [x] Both routes walked in a real browser at 1440×900; two visual defects found and fixed (the
       campfire's sawtooth horizon and logs drawn in their own ground colour; mist rendering as
       hard discs)
-- [ ] Full keyboard-only pass on both routes — every control reachable, visible focus, no trap
-- [ ] Mobile and tablet viewports walked (the navigator's bottom-edge layout is untested in a
-      real browser)
+- [x] Keyboard behaviour verified on `/`: focus pins the navigator visible, the control panel
+      traps Tab and restores focus to its trigger on `Escape`. A `/classic` Tab sweep and a
+      VoiceOver pass are still outstanding
+- [x] Mobile walked at 390×844; the navigator/command-strip collision found and fixed. Tablet
+      widths and a touch-target sweep still outstanding
 - [ ] Axe pass on both routes
 - [ ] Lighthouse on both routes, targeting 95+, with `three`/`lenis` confirmed absent from the
       production bundle
-- [ ] Metadata refresh — the root layout's title and description still describe the 3D world
+- [x] Metadata refreshed — the root title and description now describe the engineer, not a forest
+- [ ] A static OG image (there is currently no raster asset in the repo at all)
 - [ ] Real ambient audio to replace the four synthesized placeholder beds
 
 **Final gate (answer honestly, fix before calling it done)**

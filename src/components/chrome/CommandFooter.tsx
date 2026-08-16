@@ -29,7 +29,10 @@ export function CommandFooter({ variant }: { variant: "immersive" | "classic" })
           : "mt-24 border-t border-[var(--border-soft)] px-6 py-6",
       )}
     >
-      <span>
+      {/* Hidden on the narrowest screens: with the controls beside it the strip
+          wrapped to two lines, which is the one thing a "calm command strip"
+          must not do. */}
+      <span className={isImmersive ? "hidden sm:inline" : undefined}>
         © {new Date().getFullYear()} {about.name}
       </span>
 

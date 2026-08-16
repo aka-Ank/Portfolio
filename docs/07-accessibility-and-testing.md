@@ -26,7 +26,9 @@ Each item is a pass/fail gate for Phase 5, not a nice-to-have. `[x]` means verif
       focus is a trap in the making.
 - [x] `:focus-visible` is defined globally against `--focus-ring`, which is a **surface** token,
       never the drifting Aether. Focus visibility must not depend on the time of day.
-- [ ] Full keyboard-only pass on both routes, verified in a browser.
+- [x] Verified in a browser: focusing a navigator dot pins it visible; the control panel moves
+      focus in on open, traps Tab, closes on `Escape`, and returns focus to the trigger.
+- [ ] Remaining: a full Tab sweep of `/classic` and a VoiceOver pass.
 
 ### Screen reader / semantics
 - [x] The immersive route is ordinary semantic HTML — `<section aria-labelledby>` per section,
@@ -60,8 +62,10 @@ Each item is a pass/fail gate for Phase 5, not a nice-to-have. `[x]` means verif
       on them.
 - [x] `::details-content` easing and `interpolate-size` degrade to an instant, correct open where
       unsupported. View transitions degrade to an instant, still-WCAG-passing theme swap.
-- [ ] Tablet and mobile viewports walked in a real browser — the navigator's bottom-edge layout
-      and the ≥44px touch-target check are **not yet verified**.
+- [x] Walked at 390×844. Two collisions found and fixed: the bottom navigator and the fixed
+      command strip both wanted the bottom edge, and the strip wrapped to two lines once the
+      copyright sat beside the controls.
+- [ ] Remaining: tablet widths, and a ≥44px touch-target sweep.
 
 ## Testing plan
 

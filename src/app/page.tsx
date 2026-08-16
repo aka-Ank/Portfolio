@@ -35,7 +35,9 @@ export default function ImmersivePage() {
       <KeyboardShortcuts />
       <SideNavigator />
 
-      <main id="main-content" className="snap-y snap-mandatory pb-16">
+      {/* Bottom padding clears the fixed command strip, plus the navigator's
+          mobile position above it. */}
+      <main id="main-content" className="snap-y snap-mandatory pb-32 md:pb-16">
         <HeroSection />
         <AboutSection />
         <SdeSection />
