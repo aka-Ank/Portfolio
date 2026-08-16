@@ -7,7 +7,6 @@ import {
   formatOklch,
   resolveTheme,
   SURFACES,
-  VEIL_STRENGTH,
   type Atmosphere,
   type SurfaceFamily,
 } from "./palette";
@@ -23,6 +22,10 @@ function writeAtmosphere(root: HTMLElement, atmosphere: Atmosphere) {
   root.style.setProperty("--sky-horizon", formatOklch(atmosphere.skyHorizon));
   root.style.setProperty("--glow", formatOklch(atmosphere.glow));
   root.style.setProperty("--aether", formatOklch(atmosphere.aether));
+  root.style.setProperty("--layer-far", formatOklch(atmosphere.layerFar));
+  root.style.setProperty("--layer-mid", formatOklch(atmosphere.layerMid));
+  root.style.setProperty("--layer-near", formatOklch(atmosphere.layerNear));
+  root.style.setProperty("--layer-fore", formatOklch(atmosphere.layerFore));
 }
 
 function writeSurfaces(root: HTMLElement, family: SurfaceFamily) {
@@ -61,7 +64,7 @@ function startViewTransition(apply: () => void) {
 export function ThemeDriver() {
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
-  const ambience = useAppStore((s) => s.ambience);
+  const weather = useAppStore((s) => s.weather);
   const reducedMotion = useAppStore(selectReducedMotion);
 
   // Only `sync` and `auto` depend on wall-clock time; everything else is
@@ -77,11 +80,11 @@ export function ThemeDriver() {
   const currentT = useRef<number | null>(null);
   const currentFamily = useRef<SurfaceFamily | null>(null);
 
+  // The scene reads weather from the store directly; this only publishes it as
+  // a data attribute so CSS can hang on it without a class name.
   useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--veil-strength", String(VEIL_STRENGTH[ambience]));
-    root.dataset.ambience = ambience;
-  }, [ambience]);
+    document.documentElement.dataset.weather = weather;
+  }, [weather]);
 
   useEffect(() => {
     const root = document.documentElement;

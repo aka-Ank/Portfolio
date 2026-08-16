@@ -18,9 +18,20 @@ get out of its way.
 > still lives. Do not reintroduce it.
 
 **Non-negotiables (do not relitigate these mid-build):**
-- **2D only, and barely that.** The backdrop is a base gradient, two off-canvas radial glows, a
-  veil and a grain tile — see `src/backdrop/Backdrop.tsx`. No illustration, no canvas, no
-  particles, no WebGL.
+- **2D only.** The backdrop is a layered illustrated forest — sky, cloud band, four silhouette
+  depth planes, light shafts, animals, and one small canvas for particles. See `src/backdrop/`.
+  No WebGL, no 3D, no video, no Lottie.
+- **The forest is quiet or it is wrong.** Scene detail begins below `SCENE_HORIZON` (66% of the
+  frame); above that is open sky, which is where the content sits. Every animation is
+  `transform`/`opacity` only (compositor-only — nothing else may be animated here), amplitudes
+  are fractions of a degree, and loop durations are **coprime** so the scene never visibly
+  repeats. See `src/backdrop/scene.ts`.
+- **Artwork supplies shape, the palette supplies colour.** Planes render as flat fills of
+  `--layer-*`, so one silhouette serves all five times of day and both colour modes. Never bake
+  colour into a plane — see [docs/10-scene-assets.md](./docs/10-scene-assets.md).
+- **Persisted preferences are untrusted input.** They can have been written by an older build.
+  `useAppStore` versions and migrates them, and `resolveTheme`/`atmosphereAt` degrade rather than
+  throw — a stale `timeMode` once crashed ThemeDriver and left the whole site unstyled.
 - **Professional section names only.** Home, About, Experience, SDE Projects, AI/ML Projects,
   Skills, Education, Contact. No invented place names, no poetic headings ("Systems that have to
   hold" was one, and it is gone).
@@ -95,8 +106,9 @@ static file, not a generated document).
 - `src/content/` — the single shared content layer, including `sections.ts`: the section registry
   (id + label only) that the navigator, the scroll observer and `/classic`'s anchors read from.
   **Both** modes read from here; never duplicate copy.
-- `src/backdrop/Backdrop.tsx` — the whole fixed backdrop, as a server component with no state,
-  no effects and no scroll listener.
+- `src/backdrop/` — the forest. `scene.ts` is its one config file (depth planes, loop durations,
+  phase offsets, which animals belong to which time of day); `Layer.tsx` is the slot artwork
+  plugs into; `plates/` holds the authored silhouettes; `ParticleField.tsx` is the single canvas.
 - `src/sections/` — the eight content sections plus `SectionShell` (the shared frame) and
   `ProjectCard` (one card, one skin). All server components; interactivity is isolated into
   `components/shared/{Reveal,SectionJumpButton}.tsx`.
@@ -117,8 +129,9 @@ static file, not a generated document).
 - Typography: Instrument Serif (display only) + Instrument Sans (body/UI) + JetBrains Mono
   (data-shaped content: metrics, eyebrows, stack pills).
 - **Two token systems, and the split is structural, not a convention.**
-  - *Atmosphere* tokens (`--sky-*`, `--glow`, `--aether`) are decorative and drift continuously
-    in OKLCH. They must never be a text colour or sit behind text.
+  - *Atmosphere* tokens (`--sky-*`, `--glow`, `--aether`, `--layer-*`) are decorative and drift
+    continuously in OKLCH. They must never be a text colour. They *are* sampled by the contrast
+    audit, because the page scrolls and a panel genuinely passes over the forest planes.
   - *Surface* tokens (`--surface*`, `--ink*`, `--border-soft`, `--focus-ring`) are
     contrast-critical, take exactly one of two discrete values, and are swapped atomically inside
     a view transition. **Never interpolate them** — a light↔dark lerp passes through

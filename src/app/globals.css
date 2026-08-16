@@ -62,13 +62,17 @@
 :root {
   --radius: 0.75rem;
 
-  /* Atmosphere — light family, dawn. */
-  --sky-top: oklch(0.94 0.02 265);
-  --sky-mid: oklch(0.96 0.015 40);
-  --sky-horizon: oklch(0.98 0.015 60);
+  /* Atmosphere — light family, dawn. Must match LIGHT_STOPS[0] in palette.ts;
+     these are the first paint, palette.ts owns every frame after it. */
+  --sky-top: oklch(0.93 0.025 265);
+  --sky-mid: oklch(0.95 0.02 40);
+  --sky-horizon: oklch(0.97 0.02 60);
   --glow: oklch(0.97 0.05 70);
   --aether: oklch(0.72 0.1 195);
-  --veil-strength: 0;
+  --layer-far: oklch(0.88 0.018 250);
+  --layer-mid: oklch(0.84 0.022 220);
+  --layer-near: oklch(0.79 0.026 190);
+  --layer-fore: oklch(0.74 0.03 170);
 
   /* Surfaces — light. */
   --surface: oklch(0.99 0.004 90 / 0.88);
@@ -85,11 +89,15 @@
    sees a flash of the light palette. ThemeDriver takes over on mount. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-family="light"]) {
-    --sky-top: oklch(0.14 0.02 268);
-    --sky-mid: oklch(0.16 0.025 265);
-    --sky-horizon: oklch(0.19 0.028 258);
-    --glow: oklch(0.4 0.03 245);
+    --sky-top: oklch(0.12 0.018 265);
+    --sky-mid: oklch(0.14 0.02 262);
+    --sky-horizon: oklch(0.17 0.028 255);
+    --glow: oklch(0.38 0.03 245);
     --aether: oklch(0.74 0.15 205);
+    --layer-far: oklch(0.1 0.016 264);
+    --layer-mid: oklch(0.09 0.014 260);
+    --layer-near: oklch(0.075 0.012 254);
+    --layer-fore: oklch(0.06 0.01 250);
 
     --surface: oklch(0.2 0.018 262 / 0.82);
     --surface-solid: oklch(0.18 0.018 262);
@@ -141,6 +149,86 @@
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/*
+ * ── The forest's motion system ──────────────────────────────────────────
+ *
+ * Every animation below touches only `transform` and `opacity`. Those two are
+ * composited on the GPU without re-running layout or paint, which is what lets
+ * a dozen simultaneous loops cost effectively nothing. Animating `top`,
+ * `width` or `background-color` here instead would put the whole scene on the
+ * main thread every frame.
+ *
+ * Durations come from LOOP in scene.ts and are coprime, so the scene's
+ * combined cycle is longer than any visit. `--sway` is the weather's wind
+ * multiplier: `breeze` scales amplitude rather than adding an overlay, because
+ * that is what wind actually does to a wood.
+ *
+ * Amplitudes are in fractions of a degree. This is deliberate — the threshold
+ * where foliage motion stops reading as "alive" and starts reading as
+ * "wobbling" is far lower than it looks in isolation.
+ */
+
+@keyframes sway-canopy {
+  0%, 100% { transform: rotate(calc(-0.4deg * var(--sway, 1))); }
+  50%      { transform: rotate(calc(0.4deg * var(--sway, 1))); }
+}
+@keyframes sway-frond {
+  0%, 100% { transform: rotate(calc(-0.8deg * var(--sway, 1))); }
+  50%      { transform: rotate(calc(0.9deg * var(--sway, 1))); }
+}
+@keyframes drift-cloud {
+  from { transform: translate3d(-8%, 0, 0); }
+  to   { transform: translate3d(8%, 0, 0); }
+}
+@keyframes drift-mist {
+  0%, 100% { transform: translate3d(-4%, 0, 0); opacity: 0.75; }
+  50%      { transform: translate3d(4%, 0, 0); opacity: 1; }
+}
+@keyframes shaft-breathe {
+  0%, 100% { opacity: 0.28; transform: translate3d(0, 0, 0) skewX(-11deg); }
+  50%      { opacity: 0.5; transform: translate3d(1.5%, 0, 0) skewX(-9.5deg); }
+}
+@keyframes ripple {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.06); }
+}
+
+/* Animal idle. The gesture occupies a few percent of the cycle and the rest is
+   a hold at rest — so what is on screen almost all of the time is an animal
+   standing still, which is what a real one does. */
+@keyframes animal-graze {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  72%, 88%      { transform: rotate(15deg); }
+}
+@keyframes animal-ear {
+  0%, 88%, 100% { transform: rotate(0deg); }
+  91%           { transform: rotate(-17deg); }
+  94%           { transform: rotate(6deg); }
+}
+@keyframes animal-turn {
+  0%, 55%, 100% { transform: rotate(0deg); }
+  68%, 82%      { transform: rotate(-9deg); }
+}
+@keyframes birds-drift {
+  from { transform: translate3d(-6%, 2%, 0); opacity: 0; }
+  8%   { opacity: 0.55; }
+  92%  { opacity: 0.55; }
+  to   { transform: translate3d(70%, -8%, 0); opacity: 0; }
+}
+
+.sway-canopy-a { animation: sway-canopy 17s ease-in-out infinite; animation-delay: -4.3s; }
+.sway-canopy-b { animation: sway-canopy 23s ease-in-out infinite; animation-delay: -11.7s; }
+.sway-canopy-c { animation: sway-canopy 29s ease-in-out infinite; animation-delay: -19.1s; }
+.sway-frond    { animation: sway-frond 11s ease-in-out infinite; }
+.drift-cloud   { animation: drift-cloud 163s linear infinite alternate; }
+.drift-mist    { animation: drift-mist 97s ease-in-out infinite; }
+.shaft-breathe { animation: shaft-breathe 19s ease-in-out infinite; }
+.ripple        { animation: ripple 7s ease-in-out infinite; }
+.animal-graze  { animation: animal-graze 31s ease-in-out infinite; }
+.animal-ear    { animation: animal-ear 13s ease-in-out infinite; }
+.animal-turn   { animation: animal-turn 31s ease-in-out infinite; }
+.birds-drift   { animation: birds-drift 163s linear infinite; }
 
 /*
  * Grain. A single inlined SVG turbulence tile, so it costs one small data URI

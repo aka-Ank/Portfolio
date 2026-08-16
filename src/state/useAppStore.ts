@@ -1,11 +1,86 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { createUiSlice, type UiSlice } from "./uiSlice";
+import {
+  createUiSlice,
+  DEFAULT_VOLUME,
+  TIME_ANCHOR_VALUE,
+  type ColorMode,
+  type TimeMode,
+  type UiSlice,
+  type Weather,
+} from "./uiSlice";
 import { createNavSlice, type NavSlice } from "./navSlice";
 import { createDeviceSlice, type DeviceSlice } from "./deviceSlice";
 
 export type AppState = UiSlice & NavSlice & DeviceSlice;
 
+/** Exactly what `partialize` writes, and therefore exactly what `migrate` has
+ * to hand back — fully populated, not a partial. */
+interface PersistedPrefs {
+  colorMode: ColorMode;
+  timeMode: TimeMode;
+  weather: Weather;
+  soundEnabled: boolean;
+  volume: number;
+  manualReducedMotion: boolean | null;
+}
+
+const DEFAULTS: PersistedPrefs = {
+  colorMode: "auto",
+  timeMode: "sync",
+  weather: "clear",
+  soundEnabled: false,
+  volume: DEFAULT_VOLUME,
+  manualReducedMotion: null,
+};
+
+const COLOR_MODES: ColorMode[] = ["light", "dark", "auto"];
+const WEATHERS: Weather[] = ["clear", "cloudy", "misty", "rain", "breeze"];
+
+function isValidTimeMode(value: unknown): value is TimeMode {
+  return value === "sync" || (typeof value === "string" && value in TIME_ANCHOR_VALUE);
+}
+
+/** Coerce whatever is in storage into a valid preferences object, keeping
+ * every field that survives scrutiny and defaulting the rest. */
+function sanitise(raw: unknown): PersistedPrefs {
+  const value = (raw ?? {}) as Record<string, unknown>;
+  return {
+    colorMode: COLOR_MODES.includes(value.colorMode as ColorMode)
+      ? (value.colorMode as ColorMode)
+      : DEFAULTS.colorMode,
+    timeMode: isValidTimeMode(value.timeMode) ? value.timeMode : DEFAULTS.timeMode,
+    weather: WEATHERS.includes(value.weather as Weather)
+      ? (value.weather as Weather)
+      : DEFAULTS.weather,
+    soundEnabled:
+      typeof value.soundEnabled === "boolean" ? value.soundEnabled : DEFAULTS.soundEnabled,
+    volume:
+      typeof value.volume === "number" && Number.isFinite(value.volume)
+        ? Math.min(1, Math.max(0, value.volume))
+        : DEFAULTS.volume,
+    manualReducedMotion:
+      typeof value.manualReducedMotion === "boolean" || value.manualReducedMotion === null
+        ? (value.manualReducedMotion as boolean | null)
+        : DEFAULTS.manualReducedMotion,
+  };
+}
+
+/**
+ * Persisted preferences, version 2.
+ *
+ * The version matters. Persisted state is the one input that arrives from a
+ * *previous build* of the app: a visitor who set "Golden hour" before the five
+ * time-of-day states existed still has `timeMode: "golden"` in their browser,
+ * and a visitor from before the forest has `ambience: "soft"` instead of a
+ * weather. Restoring either unchecked used to reach `TIME_ANCHOR_VALUE[key]`
+ * → `undefined` → NaN → a TypeError in ThemeDriver, which aborted before
+ * writing any surface token and left the site rendering unstyled.
+ *
+ * `migrate` runs once per visitor whose stored version is older and repairs
+ * the shape; the field-level checks then catch anything `migrate` did not
+ * anticipate. Both layers are cheap and the failure they prevent is total.
+ */
 export const useAppStore = create<AppState>()(
   persist(
     (...a) => ({
@@ -15,17 +90,26 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "portfolio-preferences",
+      version: 2,
+      // v1 stored `ambience` and a different set of time names. There is no
+      // sensible mapping from "how muted is the backdrop" to a weather, so the
+      // old key is dropped rather than guessed at; `sanitise` handles the rest.
+      migrate: (persisted) => sanitise(persisted),
       // Only the visitor's deliberate choices survive a reload. Navigation
       // and device state must always reflect the current visit, never a
       // stale one.
       partialize: (state) => ({
         colorMode: state.colorMode,
         timeMode: state.timeMode,
-        ambience: state.ambience,
+        weather: state.weather,
         soundEnabled: state.soundEnabled,
         volume: state.volume,
         manualReducedMotion: state.manualReducedMotion,
       }),
+      // Belt and braces: `migrate` only runs when the stored version is *older*
+      // than the current one, so a hand-edited or partially-written entry
+      // already at version 2 would otherwise go straight through unchecked.
+      merge: (persisted, current) => ({ ...current, ...sanitise(persisted) }),
     },
   ),
 );

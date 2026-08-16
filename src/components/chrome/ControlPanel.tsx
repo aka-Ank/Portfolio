@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
-import type { Ambience, ColorMode, TimeMode } from "@/state/uiSlice";
+import type { ColorMode, TimeMode, Weather } from "@/state/uiSlice";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { VolumeSlider } from "./VolumeSlider";
 
@@ -19,15 +19,18 @@ const COLOR_MODES: Option<ColorMode>[] = [
 const TIME_MODES: Option<TimeMode>[] = [
   { value: "sync", label: "Live" },
   { value: "dawn", label: "Dawn" },
-  { value: "day", label: "Day" },
-  { value: "golden", label: "Golden" },
+  { value: "morning", label: "Morning" },
+  { value: "afternoon", label: "Afternoon" },
+  { value: "dusk", label: "Dusk" },
   { value: "night", label: "Night" },
 ];
 
-const AMBIENCES: Option<Ambience>[] = [
+const WEATHERS: Option<Weather>[] = [
   { value: "clear", label: "Clear" },
-  { value: "soft", label: "Soft" },
-  { value: "muted", label: "Muted" },
+  { value: "cloudy", label: "Cloudy" },
+  { value: "misty", label: "Misty" },
+  { value: "rain", label: "Rain" },
+  { value: "breeze", label: "Breeze" },
 ];
 
 /**
@@ -40,7 +43,7 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
 
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
-  const ambience = useAppStore((s) => s.ambience);
+  const weather = useAppStore((s) => s.weather);
   const soundEnabled = useAppStore((s) => s.soundEnabled);
   const manualReducedMotion = useAppStore((s) => s.manualReducedMotion);
   const systemReducedMotion = useAppStore((s) => s.systemReducedMotion);
@@ -48,7 +51,7 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
 
   const setColorMode = useAppStore((s) => s.setColorMode);
   const setTimeMode = useAppStore((s) => s.setTimeMode);
-  const setAmbience = useAppStore((s) => s.setAmbience);
+  const setWeather = useAppStore((s) => s.setWeather);
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled);
   const setManualReducedMotion = useAppStore((s) => s.setManualReducedMotion);
 
@@ -99,11 +102,15 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
             hint={timeMode === "sync" ? "Follows your local clock." : undefined}
           />
           <Segmented
-            label="Atmosphere"
-            options={AMBIENCES}
-            value={ambience}
-            onChange={setAmbience}
-            hint="How strongly the backdrop is muted behind the content."
+            label="Weather"
+            options={WEATHERS}
+            value={weather}
+            onChange={setWeather}
+            hint={
+              weather === "breeze"
+                ? "Adds no overlay — only moves the forest more."
+                : "Changes the forest's mood, never its colour."
+            }
           />
 
           <div className="space-y-3 border-t border-[var(--border-soft)] pt-5">

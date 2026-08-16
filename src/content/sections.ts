@@ -68,6 +68,16 @@ export const aboutContent = {
   bio: about.bio,
 };
 
+/** The About section's sidebar. Every row restates a fact that already appears
+ * elsewhere on this page — it is a shortcut for a skimming reader, never a
+ * place to introduce a claim the resume does not support. */
+export const glanceContent = [
+  { label: "Based in", value: resume.location },
+  { label: "Studying", value: `${education.degree}, ${education.institution}` },
+  { label: "Graduating", value: education.period.split("–")[1].trim() },
+  { label: "Tracks", value: "Software engineering · Applied machine learning" },
+];
+
 export const experienceContent = {
   heading: "Experience",
   experience,

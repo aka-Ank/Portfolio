@@ -1,5 +1,5 @@
 import { experienceContent } from "@/content/sections";
-import { SectionShell, Panel, PROSE_MEASURE } from "./SectionShell";
+import { SectionShell, Panel } from "./SectionShell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,14 +12,17 @@ export function ExperienceSection() {
 
   return (
     <SectionShell id="experience" heading={experienceContent.heading}>
-      <Panel as="article" className={PROSE_MEASURE}>
+      {/* Full grid width with the bullets in two columns, rather than a narrow
+          card leaving a third of the row empty. One role does not need a
+          timeline, but it does need to not look like an afterthought. */}
+      <Panel as="article">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h3 className="text-xl font-medium text-[var(--ink)]">{experience.role}</h3>
           <span className="font-mono text-xs text-[var(--ink-muted)]">{experience.period}</span>
         </div>
         <p className="mt-1 text-[15px] text-[var(--accent-ink)]">{experience.company}</p>
 
-        <ul className="mt-4 space-y-2 border-t border-[var(--border-soft)] pt-4">
+        <ul className="mt-4 grid gap-x-8 gap-y-2.5 border-t border-[var(--border-soft)] pt-4 sm:grid-cols-3">
           {experience.highlights.map((highlight) => (
             <li
               key={highlight}

@@ -29,7 +29,10 @@ for (const [path, family] of targets) {
   await ctx.addInitScript((mode) => {
     localStorage.setItem(
       'portfolio-preferences',
-      JSON.stringify({ state: { colorMode: mode, timeMode: 'day', ambience: 'clear' }, version: 0 }),
+      JSON.stringify({
+        state: { colorMode: mode, timeMode: 'afternoon', weather: 'clear' },
+        version: 2,
+      }),
     );
   }, family);
   const page = await ctx.newPage();

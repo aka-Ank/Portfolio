@@ -46,24 +46,46 @@ made every route static — there is no longer a dynamic route in the build.
 - The two SDE projects are not in the AI/ML resume PDF; their detail comes from the repositories.
   If an SDE resume is added to `resume/`, reconcile against it.
 
-## Backdrop
+## Backdrop — the living forest
 
-`src/backdrop/Backdrop.tsx`. Four painted layers, no illustration, no canvas, no scroll listener:
+`src/backdrop/`. Composed back to front: sky wash, key light, cloud band, four silhouette depth
+planes (`far`/`mid`/`near`/`fore`), light shafts, animals, one particle canvas, haze, grain.
 
-1. Base linear gradient, `--sky-top` → `--sky-mid` → `--sky-horizon`.
-2. Warm glow, anchored off the top-left corner, `--glow`, heavily blurred.
-3. Cool glow, anchored off the bottom-right, `--aether`, heavily blurred.
-4. A veil (`--veil-strength`, the Atmosphere setting) and a grain tile.
+**Technique.** Hybrid SVG + one canvas. SVG is retained-mode — every node stays in memory — which
+is right for a handful of large shapes and wrong for sixty drifting motes; canvas is the reverse.
+So the structure is SVG (server-rendered, themeable by CSS variable, crisp at any size) and only
+the particles are canvas. Lottie was rejected outright: a baked animation cannot be recoloured by
+`--layer-*`, so time-of-day would need five exports per layer.
 
-The veil only ever *mutes* what is behind it, so the strongest setting is the calmest picture.
-The dark family's `glow` lightness stays around 0.4 — a bright bloom on a dark page is the
-blinding-light failure mode this design rules out.
+**Readability.** Two mechanisms, and they do different jobs:
+- `SCENE_HORIZON` (0.66) keeps detail out of the upper two-thirds — a *composition* rule.
+- `contrast-audit.test.ts` samples ink against `--surface` composited over **every plane colour**
+  at eleven points around both rings — the actual *guarantee*. It has to be, because the page
+  scrolls and cards genuinely travel over the foreground plane.
+
+**Motion.** Every animation is `transform`/`opacity` only, so it runs on the compositor without
+layout or paint. Durations are coprime (7/11/13/17/19/23/29/31/97/163s) so the combined cycle
+never visibly repeats, and each element carries a negative `animation-delay` so nothing starts in
+phase on load. Budget: ≤24 animated nodes (currently 12–16), ≤60 particles desktop / 25 mobile.
+
+**Weather** is four scalars (`veil`, `cloud`, `sway`, `drops`), never a separate scene — so it
+crossfades and can never introduce a shape the clear scene lacked. `breeze` adds no overlay at
+all; it only raises `--sway`, which is what wind actually is.
+
+**Artwork** plugs into `Layer` as an alpha mask, tinted by the plane's palette token — one file
+per plane rather than one per plane per time of day. See
+[10-scene-assets.md](./10-scene-assets.md).
 
 ## Theme
 
 - `ColorMode` = `light | dark | auto`. `auto` follows the clock (sunrise 06:00, sunset 18:30).
-- `TimeMode` = `sync | dawn | day | golden | night`. **Never derived from scroll position.**
-- `Ambience` = `clear | soft | muted` → `--veil-strength`.
+- `TimeMode` = `sync | dawn | morning | afternoon | dusk | night`. **Never derived from scroll.**
+  Five stops per family, so each named time lands exactly on a stop rather than between two.
+- `Weather` = `clear | cloudy | misty | rain | breeze`.
+- **Persisted preferences are untrusted.** They may come from an older build, so the store is
+  versioned with a `migrate`, and `resolveTheme`/`atmosphereAt` degrade instead of throwing. A
+  stale `timeMode: "golden"` used to index `stops[NaN]`, throw inside ThemeDriver before it wrote
+  a single surface token, and leave the entire site unstyled.
 - Atmosphere tokens are damped continuously in OKLCH; surface tokens are swapped atomically
   inside a view transition. See `CLAUDE.md` for why the second must never be interpolated.
 

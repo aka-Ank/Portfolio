@@ -57,6 +57,15 @@ function backdropsFor(family: SurfaceFamily): string[] {
       // transparent radial gradient, so a panel never actually sits on the
       // pure colour. Sampling it undiluted keeps the check conservative.
       formatOklch(atmosphere.glow),
+      // The four forest planes. These matter more than they look: the scene
+      // keeps its detail out of the middle of the viewport, but the page
+      // *scrolls*, so a card genuinely does pass over the foreground plane on
+      // its way up. The content band is a composition rule; this is the part
+      // that actually guarantees the text stays legible while it does.
+      formatOklch(atmosphere.layerFar),
+      formatOklch(atmosphere.layerMid),
+      formatOklch(atmosphere.layerNear),
+      formatOklch(atmosphere.layerFore),
     );
   }
   return samples;
