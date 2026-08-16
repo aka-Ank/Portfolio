@@ -35,21 +35,28 @@ export function Observatory({ depth }: MoodProps) {
           fill={DEPTH_FILL.mid}
         />
         {/* The dome, set on the left third so it never sits behind the
-            content column. */}
+            content column.
+
+            Drawn in the *near* fill rather than the mid fill it stands on. At
+            the dark family's night stops the mid fill is within ~0.05 L of the
+            sky behind it, so the silhouette disappeared and left the lit slit
+            floating as a disconnected glowing shape. A built structure reading
+            darker than the ridge it sits on is also simply more correct. */}
         <g>
-          <path d="M300 646 L 476 646 L 464 566 L 312 566 Z" fill={DEPTH_FILL.mid} />
-          <path
-            d="M312 566 Q 388 470 464 566 Z"
-            fill={DEPTH_FILL.mid}
-          />
+          <path d="M300 646 L 476 646 L 464 566 L 312 566 Z" fill={DEPTH_FILL.near} />
+          <path d="M312 566 Q 388 470 464 566 Z" fill={DEPTH_FILL.near} />
           {/* The dome's open slit, lit from inside — the Aether, one more
-              time, in the one place it is earned here. */}
+              time, in the one place it is earned here.
+
+              Sits below y=524. The arch's control point is 470, but a
+              quadratic only reaches a quarter of the way to its control, so
+              the roofline's real apex is y≈518 — a slit drawn against the
+              control point poked out through the top of the dome. */}
           <path
-            d="M378 486 Q 396 476 400 492 L 404 566 L 372 566 Z"
+            d="M377 532 Q 390 524 401 534 L 405 566 L 373 566 Z"
             fill="var(--aether)"
-            opacity="0.5"
+            opacity="0.42"
           />
-          <rect x={382} y={470} width={4} height={26} fill="var(--aether)" opacity="0.32" />
         </g>
       </MoodSvg>
     );
