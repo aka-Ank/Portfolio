@@ -36,7 +36,7 @@ export function EasterEggController() {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-24 z-40 flex justify-center px-6">
       <p className="rounded-full border border-[var(--border-soft)] bg-[var(--surface)] px-5 py-2 text-sm text-[var(--ink)] backdrop-blur-md">
-        The forest remembers old code.
+        Konami accepted — night, briefly.
       </p>
     </div>
   );

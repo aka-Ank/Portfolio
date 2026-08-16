@@ -1,3 +1,11 @@
+> **SUPERSEDED — historical record only.**
+> Written for the illustrated-mood build (six SVG moods, fantasy place names, scroll-driven
+> time of day, scroll-snap). All of that was removed in the professional-portfolio overhaul.
+> The current spec is [09-current-spec.md](./09-current-spec.md) plus `CLAUDE.md`. Do not
+> implement from this file.
+
+---
+
 # State
 
 One Zustand store, three slices, in `src/state/`. The guiding rule: **state holds decisions, not

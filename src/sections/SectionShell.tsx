@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { sectionMeta, type SectionId } from "@/content/sections";
+import type { SectionId } from "@/content/sections";
 import { sectionElementId } from "@/systems/scroll/scrollToSection";
 import { Reveal } from "@/components/shared/Reveal";
 import { cn } from "@/lib/utils";
@@ -17,18 +17,17 @@ interface SectionShellProps {
 }
 
 /**
- * The standard frame every section sits in: snap point, consistent vertical
- * rhythm, the place name as an eyebrow, and a single one-shot reveal.
+ * The standard frame every section sits in: consistent vertical rhythm, a
+ * plain heading, and a single one-shot reveal.
  *
  * A **server** component — the only interactive part is the reveal, which is
- * isolated in `<Reveal>`. That keeps six of the eight sections out of the
- * client bundle entirely.
+ * isolated in `<Reveal>`. That keeps every content section out of the client
+ * bundle.
  *
- * `min-h-dvh` plus `snap-start` is the whole scroll model — the browser owns
- * the movement, so there is nothing here that can fight the visitor's input.
- * Sections are allowed to grow past the viewport rather than being forced to
- * fit it; a section that clipped its own content to preserve a snap point
- * would be choosing the effect over the content.
+ * Sections are sized by their content rather than pinned to the viewport.
+ * A short section (Education, Contact) that was forced to `min-h-dvh` would be
+ * mostly empty space, and scroll-snap on top of that turns an ordinary read
+ * into a sequence of jumps the visitor did not ask for.
  */
 export function SectionShell({
   id,
@@ -38,29 +37,23 @@ export function SectionShell({
   width = "narrow",
   className,
 }: SectionShellProps) {
-  const meta = sectionMeta(id);
-
   return (
     <section
       id={sectionElementId(id)}
       aria-labelledby={`${id}-heading`}
-      className={cn(
-        "flex min-h-dvh snap-start flex-col justify-center px-6 py-28 sm:px-10",
-        className,
-      )}
+      className={cn("scroll-mt-24 px-6 py-20 sm:px-10 sm:py-28", className)}
     >
       <Reveal className={cn("mx-auto w-full", width === "wide" ? "max-w-5xl" : "max-w-2xl")}>
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent-ink)]">
-          {meta.place}
-        </p>
         <h2
           id={`${id}-heading`}
-          className="mt-3 font-[family-name:var(--font-display)] text-4xl leading-[1.1] text-[var(--ink)] sm:text-5xl"
+          className="font-[family-name:var(--font-display)] text-3xl leading-[1.15] tracking-[-0.01em] text-[var(--ink)] sm:text-4xl"
         >
           {heading}
         </h2>
         {blurb && (
-          <p className="mt-4 max-w-xl text-lg leading-relaxed text-[var(--ink-muted)]">{blurb}</p>
+          <p className="mt-3 max-w-xl text-[17px] leading-relaxed text-[var(--ink-muted)]">
+            {blurb}
+          </p>
         )}
         <div className="mt-10">{children}</div>
       </Reveal>

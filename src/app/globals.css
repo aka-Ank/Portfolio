@@ -4,10 +4,9 @@
 /*
  * Two token systems, kept apart on purpose.
  *
- * 1. ATMOSPHERE tokens (--sky-*, --haze, --layer-*, --glow, --aether) are
- *    decorative. They drift continuously with time-of-day and are never used
- *    as a text colour or as the background behind text, so they cannot make
- *    contrast fail.
+ * 1. ATMOSPHERE tokens (--sky-*, --glow, --aether) are decorative. They drift
+ *    continuously with time-of-day and are never used as a text colour or as
+ *    the background behind text, so they cannot make contrast fail.
  * 2. SURFACE tokens (--surface*, --ink*, --border-soft, --focus-ring) are
  *    contrast-critical. They only ever take one of two discrete values —
  *    light or dark — and are swapped atomically inside a view transition, so
@@ -64,16 +63,12 @@
   --radius: 0.75rem;
 
   /* Atmosphere — light family, dawn. */
-  --sky-top: oklch(0.72 0.06 265);
-  --sky-mid: oklch(0.83 0.05 40);
-  --sky-horizon: oklch(0.91 0.06 60);
-  --haze: oklch(0.93 0.025 55);
-  --haze-strength: 0.28;
-  --layer-far: oklch(0.78 0.03 250);
-  --layer-mid: oklch(0.62 0.05 190);
-  --layer-near: oklch(0.42 0.05 165);
-  --glow: oklch(0.95 0.08 75);
+  --sky-top: oklch(0.94 0.02 265);
+  --sky-mid: oklch(0.96 0.015 40);
+  --sky-horizon: oklch(0.98 0.015 60);
+  --glow: oklch(0.97 0.05 70);
   --aether: oklch(0.72 0.1 195);
+  --veil-strength: 0;
 
   /* Surfaces — light. */
   --surface: oklch(0.99 0.004 90 / 0.88);
@@ -90,15 +85,11 @@
    sees a flash of the light palette. ThemeDriver takes over on mount. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-family="light"]) {
-    --sky-top: oklch(0.15 0.035 268);
-    --sky-mid: oklch(0.19 0.04 265);
-    --sky-horizon: oklch(0.24 0.045 258);
-    --haze: oklch(0.22 0.03 262);
-    --layer-far: oklch(0.165 0.03 265);
-    --layer-mid: oklch(0.13 0.025 250);
-    --layer-near: oklch(0.095 0.02 235);
-    --glow: oklch(0.78 0.04 245);
-    --aether: oklch(0.76 0.16 205);
+    --sky-top: oklch(0.14 0.02 268);
+    --sky-mid: oklch(0.16 0.025 265);
+    --sky-horizon: oklch(0.19 0.028 258);
+    --glow: oklch(0.4 0.03 245);
+    --aether: oklch(0.74 0.15 205);
 
     --surface: oklch(0.2 0.018 262 / 0.82);
     --surface-solid: oklch(0.18 0.018 262);
@@ -146,52 +137,25 @@
  * never depends on any of it.
  */
 
-@keyframes sway-slow {
-  0%, 100% { transform: rotate(-0.55deg); }
-  50% { transform: rotate(0.55deg); }
-}
-@keyframes sway-soft {
-  0%, 100% { transform: skewX(-1.1deg); }
-  50% { transform: skewX(1.1deg); }
-}
-@keyframes sway-canopy {
-  0%, 100% { transform: translateY(0) rotate(-0.25deg); }
-  50% { transform: translateY(6px) rotate(0.25deg); }
-}
-@keyframes drift-slow {
-  0%, 100% { transform: translateX(-6px); }
-  50% { transform: translateX(6px); }
-}
-@keyframes pulse-node {
-  0%, 100% { opacity: 0.28; r: 5; }
-  50% { opacity: 0.72; r: 8; }
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 0.85; }
-}
-@keyframes ember {
-  0% { opacity: 0; transform: translateY(0) scale(0.7); }
-  20% { opacity: 0.75; }
-  100% { opacity: 0; transform: translateY(-90px) scale(0.35); }
-}
-@keyframes breathe {
-  0%, 100% { opacity: 0.82; }
-  50% { opacity: 1; }
-}
 @keyframes rise-in {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.sway-slow { animation: sway-slow 13s ease-in-out infinite; }
-.sway-soft { animation: sway-soft 9s ease-in-out infinite; }
-.sway-canopy { animation: sway-canopy 17s ease-in-out infinite; }
-.drift-slow { animation: drift-slow 11s ease-in-out infinite; }
-.pulse-node { animation: pulse-node 6s ease-in-out infinite; }
-.twinkle { animation: twinkle 5s ease-in-out infinite; }
-.ember { animation: ember 7s ease-out infinite; }
-.breathe { animation: breathe 8s ease-in-out infinite; }
+/*
+ * Grain. A single inlined SVG turbulence tile, so it costs one small data URI
+ * and no network request. It exists to stop the large gradients from banding
+ * on 8-bit displays, which is why it is this faint — at these values it reads
+ * as paper texture rather than as noise, and it never animates.
+ */
+.grain {
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+:root[data-family="dark"] .grain {
+  opacity: 0.05;
+}
 
 /* Content reveal. Opacity-and-lift only, once, on entry — never a slide from
    off-screen, never a bounce, never triggered twice.
@@ -230,6 +194,15 @@
 }
 [data-motion="off"] .reveal,
 [data-motion="off"] .reveal[data-revealed] {
+  opacity: 1 !important;
+  animation: none;
+}
+
+/* Classic mode. The sections are shared with the main route, so this one rule
+   — rather than a mode prop threaded through every component — is what makes
+   them plain. */
+[data-plain] .reveal,
+[data-plain] .reveal[data-revealed] {
   opacity: 1 !important;
   animation: none;
 }

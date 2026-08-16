@@ -5,7 +5,7 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 const SHORTCUTS = [
   { key: "J / ↓", label: "Next section" },
   { key: "K / ↑", label: "Previous section" },
-  { key: "T", label: "Open atmosphere controls" },
+  { key: "T", label: "Open settings" },
   { key: "M", label: "Toggle motion" },
   { key: "C", label: "Jump to contact" },
   { key: "/", label: "Toggle this help" },

@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useAppStore } from "@/state/useAppStore";
-import { sectionMeta } from "@/content/sections";
 import { resolveTheme } from "@/systems/theme/palette";
 import { crossfadeAmbienceTo, initAudio, setMuted, type AmbienceBed } from "./audioManager";
 
@@ -23,9 +22,8 @@ export function AmbienceBridge() {
   const soundEnabled = useAppStore((s) => s.soundEnabled);
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
-  const activeSection = useAppStore((s) => s.activeSection);
 
-  const { family, t } = resolveTheme(colorMode, timeMode, sectionMeta(activeSection).timeOfDay);
+  const { family, t } = resolveTheme(colorMode, timeMode);
   const bed = bedFor(family, t);
 
   useEffect(() => {

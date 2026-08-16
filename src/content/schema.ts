@@ -1,26 +1,22 @@
-// Shared content types — both the immersive world and /classic read only
-// from src/content/*, never duplicate copy between the two. See
-// docs/02-architecture.md "content/" and docs/08-roadmap.md Phase 3.
+// Shared content types. Both the main site and /classic read only from
+// src/content/*, never duplicate copy between the two.
 
 export interface AboutContent {
   name: string;
   role: string;
+  /** One line under the name in the hero. */
   tagline: string;
-  themes: string[];
+  /** Short professional summary — a few sentences, not an essay. */
   bio: string[];
 }
 
-export type SkillDomain = "frontend" | "backend" | "ai-ml" | "cloud-infra";
-
-export interface Skill {
+/** A named group of skills, mirroring how the resume itself groups them. No
+ * proficiency ratings: the resume states none, and inventing them would be an
+ * unearned claim. */
+export interface SkillGroup {
   id: string;
-  domain: SkillDomain;
-  name: string;
-  /** 0-1 — drives the Sanctuary creature's Aether-marking intensity/size. */
-  proficiency: number;
-  /** Symbolic creature representing this skill domain — see docs/03 §4. */
-  creature: string;
-  description: string;
+  label: string;
+  items: string[];
 }
 
 export interface ProjectMetric {
@@ -37,33 +33,28 @@ export interface Project {
   slug: string;
   title: string;
   track: ProjectTrack;
+  /** One line, shown directly under the title. */
   summary: string;
-  description: string;
-  role: string;
+  /** The problem the project solves — why it exists. */
+  problem: string;
+  /** What was actually built, in the first person. */
+  contribution: string;
   stack: string[];
   /** Only facts that appear in the resume. No invented numbers — several of
-   * these projects genuinely have no published metrics yet, and an empty
-   * list is the honest representation of that. */
+   * these projects genuinely have no published metrics, and an empty list is
+   * the honest representation of that. */
   metrics: ProjectMetric[];
   links: { label: string; href: string }[];
-  featured: boolean;
+  year: string;
 }
 
 export interface Certification {
   id: string;
   title: string;
   issuer: string;
-  date: string;
-  significance: string;
+  year: string;
+  detail: string;
   credentialUrl?: string;
-}
-
-export interface BlogPostMeta {
-  slug: string;
-  title: string;
-  summary: string;
-  date: string;
-  tags: string[];
 }
 
 export interface ResumeData {

@@ -1,4 +1,4 @@
-import type { ColorMode, TimeMode, Weather } from "@/state/uiSlice";
+import type { Ambience, ColorMode, TimeMode } from "@/state/uiSlice";
 import { TIME_ANCHOR_VALUE } from "@/state/uiSlice";
 
 /** An OKLCH colour as raw components, so it can be interpolated numerically
@@ -20,10 +20,6 @@ export interface Atmosphere {
   skyTop: Oklch;
   skyMid: Oklch;
   skyHorizon: Oklch;
-  haze: Oklch;
-  layerFar: Oklch;
-  layerMid: Oklch;
-  layerNear: Oklch;
   glow: Oklch;
   aether: Oklch;
 }
@@ -38,106 +34,74 @@ type Stops = [Atmosphere, Atmosphere, Atmosphere, Atmosphere];
  * and neither can land the visitor somewhere the other mode owns.
  */
 const LIGHT_STOPS: Stops = [
-  // Dawn — cool sky over a warm horizon.
+  // Dawn — the faintest warmth low in the frame.
   {
-    skyTop: k(0.72, 0.06, 265),
-    skyMid: k(0.83, 0.05, 40),
-    skyHorizon: k(0.91, 0.06, 60),
-    haze: k(0.93, 0.025, 55),
-    layerFar: k(0.78, 0.03, 250),
-    layerMid: k(0.62, 0.05, 190),
-    layerNear: k(0.42, 0.05, 165),
-    glow: k(0.95, 0.08, 75),
+    skyTop: k(0.94, 0.02, 265),
+    skyMid: k(0.96, 0.015, 40),
+    skyHorizon: k(0.98, 0.015, 60),
+    glow: k(0.97, 0.05, 70),
     aether: k(0.72, 0.1, 195),
   },
-  // Morning — clear and soft.
+  // Morning — clear and cool.
   {
-    skyTop: k(0.78, 0.07, 235),
-    skyMid: k(0.88, 0.05, 215),
-    skyHorizon: k(0.94, 0.03, 195),
-    haze: k(0.95, 0.015, 200),
-    layerFar: k(0.82, 0.03, 210),
-    layerMid: k(0.66, 0.06, 175),
-    layerNear: k(0.45, 0.07, 158),
-    glow: k(0.97, 0.05, 95),
-    aether: k(0.68, 0.12, 195),
+    skyTop: k(0.95, 0.018, 235),
+    skyMid: k(0.97, 0.012, 215),
+    skyHorizon: k(0.985, 0.008, 200),
+    glow: k(0.98, 0.035, 95),
+    aether: k(0.7, 0.11, 195),
   },
-  // Midday — high key, the brightest the site ever goes.
+  // Midday — the flattest and brightest the site ever goes.
   {
-    skyTop: k(0.8, 0.08, 230),
-    skyMid: k(0.9, 0.05, 210),
-    skyHorizon: k(0.96, 0.02, 150),
-    haze: k(0.96, 0.012, 160),
-    layerFar: k(0.84, 0.035, 200),
-    layerMid: k(0.68, 0.07, 165),
-    layerNear: k(0.47, 0.08, 150),
-    glow: k(0.98, 0.04, 100),
-    aether: k(0.66, 0.13, 190),
+    skyTop: k(0.96, 0.015, 230),
+    skyMid: k(0.98, 0.01, 210),
+    skyHorizon: k(0.99, 0.005, 160),
+    glow: k(0.99, 0.025, 100),
+    aether: k(0.68, 0.12, 190),
   },
-  // Golden hour — warm, low sun, long shadows.
+  // Golden hour — warm, still high-key.
   {
-    skyTop: k(0.7, 0.08, 255),
-    skyMid: k(0.84, 0.09, 65),
-    skyHorizon: k(0.9, 0.11, 55),
-    haze: k(0.92, 0.05, 55),
-    layerFar: k(0.76, 0.05, 250),
-    layerMid: k(0.58, 0.07, 145),
-    layerNear: k(0.38, 0.06, 130),
-    glow: k(0.93, 0.13, 60),
-    aether: k(0.7, 0.14, 185),
+    skyTop: k(0.93, 0.025, 255),
+    skyMid: k(0.96, 0.03, 65),
+    skyHorizon: k(0.97, 0.035, 55),
+    glow: k(0.96, 0.07, 60),
+    aether: k(0.7, 0.13, 185),
   },
 ];
 
 const DARK_STOPS: Stops = [
   // Dusk — the last warmth still on the horizon.
   {
-    skyTop: k(0.28, 0.06, 275),
-    skyMid: k(0.38, 0.08, 300),
-    skyHorizon: k(0.48, 0.11, 35),
-    haze: k(0.36, 0.05, 290),
-    layerFar: k(0.26, 0.04, 270),
-    layerMid: k(0.2, 0.04, 230),
-    layerNear: k(0.14, 0.03, 210),
-    glow: k(0.66, 0.15, 45),
-    aether: k(0.7, 0.14, 190),
+    skyTop: k(0.2, 0.03, 275),
+    skyMid: k(0.22, 0.035, 300),
+    skyHorizon: k(0.26, 0.045, 35),
+    glow: k(0.45, 0.08, 45),
+    aether: k(0.7, 0.13, 190),
   },
   // Early night.
   {
-    skyTop: k(0.2, 0.05, 270),
-    skyMid: k(0.26, 0.06, 268),
-    skyHorizon: k(0.33, 0.06, 255),
-    haze: k(0.28, 0.04, 265),
-    layerFar: k(0.2, 0.035, 265),
-    layerMid: k(0.155, 0.03, 245),
-    layerNear: k(0.11, 0.025, 230),
-    glow: k(0.72, 0.05, 250),
-    aether: k(0.74, 0.15, 200),
+    skyTop: k(0.17, 0.025, 270),
+    skyMid: k(0.19, 0.03, 268),
+    skyHorizon: k(0.22, 0.03, 255),
+    glow: k(0.42, 0.04, 250),
+    aether: k(0.72, 0.14, 200),
   },
-  // Night — moonlight, the Observatory's own light.
+  // Night.
   {
-    skyTop: k(0.15, 0.035, 268),
-    skyMid: k(0.19, 0.04, 265),
-    skyHorizon: k(0.24, 0.045, 258),
-    haze: k(0.22, 0.03, 262),
-    layerFar: k(0.165, 0.03, 265),
-    layerMid: k(0.13, 0.025, 250),
-    layerNear: k(0.095, 0.02, 235),
-    glow: k(0.78, 0.04, 245),
-    aether: k(0.76, 0.16, 205),
+    skyTop: k(0.14, 0.02, 268),
+    skyMid: k(0.16, 0.025, 265),
+    skyHorizon: k(0.19, 0.028, 258),
+    glow: k(0.4, 0.03, 245),
+    aether: k(0.74, 0.15, 205),
   },
-  // Deep night — the only warm light left is the fire itself. The Aether
-  // stays teal here on purpose: it is the one motif that never changes hue,
-  // which is what makes it read as a recurring symbol rather than lighting.
+  // Deep night — the warmest thing left is a trace on the horizon. The glow
+  // stays dim across this whole family on purpose: a bright bloom on a dark
+  // page is the "blinding light effect" this design rules out.
   {
-    skyTop: k(0.13, 0.03, 265),
-    skyMid: k(0.16, 0.035, 262),
-    skyHorizon: k(0.21, 0.05, 45),
-    haze: k(0.2, 0.035, 40),
-    layerFar: k(0.15, 0.025, 260),
-    layerMid: k(0.12, 0.025, 30),
-    layerNear: k(0.09, 0.02, 25),
-    glow: k(0.68, 0.14, 50),
-    aether: k(0.74, 0.15, 200),
+    skyTop: k(0.12, 0.018, 265),
+    skyMid: k(0.14, 0.02, 262),
+    skyHorizon: k(0.17, 0.03, 45),
+    glow: k(0.38, 0.07, 50),
+    aether: k(0.72, 0.14, 200),
   },
 ];
 
@@ -174,13 +138,13 @@ export const SURFACES = {
 
 export type SurfaceFamily = keyof typeof SURFACES;
 
-/** Weather modifies the haze band's strength and adds an overlay pass. It
- * never changes hue — mist and rain should read as the same world in
- * different conditions, not as a different palette. */
-export const WEATHER_HAZE: Record<Weather, number> = {
-  clear: 0.28,
-  mist: 0.62,
-  rain: 0.48,
+/** How opaque the backdrop's veil sits over the glows. Raising it only ever
+ * mutes what is already there — it never adds a layer of its own, so the
+ * strongest setting is also the quietest picture. */
+export const VEIL_STRENGTH: Record<Ambience, number> = {
+  clear: 0,
+  soft: 0.4,
+  muted: 0.72,
 };
 
 function lerp(a: number, b: number, t: number): number {
@@ -206,17 +170,7 @@ export function formatOklch({ l, c, h }: Oklch): string {
   return `oklch(${l.toFixed(4)} ${c.toFixed(4)} ${h.toFixed(2)})`;
 }
 
-const ATMOSPHERE_KEYS = [
-  "skyTop",
-  "skyMid",
-  "skyHorizon",
-  "haze",
-  "layerFar",
-  "layerMid",
-  "layerNear",
-  "glow",
-  "aether",
-] as const;
+const ATMOSPHERE_KEYS = ["skyTop", "skyMid", "skyHorizon", "glow", "aether"] as const;
 
 export function lerpAtmosphere(a: Atmosphere, b: Atmosphere, t: number): Atmosphere {
   const out = {} as Atmosphere;
@@ -251,20 +205,21 @@ export function clockToTime(date = new Date()): { t: number; family: SurfaceFami
 }
 
 /**
- * Resolve the three visitor-facing controls plus the current section into the
- * two things the renderer actually needs: which surface family is active, and
- * where on that family's ring the atmosphere sits.
+ * Resolve the visitor-facing controls into the two things the renderer
+ * actually needs: which surface family is active, and where on that family's
+ * ring the atmosphere sits.
+ *
+ * Note what is *not* an input here: scroll position. The palette depends only
+ * on settings and the clock, so it stays put while the visitor reads.
  */
 export function resolveTheme(
   colorMode: ColorMode,
   timeMode: TimeMode,
-  sectionTime: number,
   now = new Date(),
 ): { family: SurfaceFamily; t: number } {
   const clock = clockToTime(now);
   const family: SurfaceFamily = colorMode === "auto" ? clock.family : colorMode;
 
   if (timeMode === "sync") return { family, t: clock.t };
-  if (timeMode === "journey") return { family, t: sectionTime };
   return { family, t: TIME_ANCHOR_VALUE[timeMode] };
 }

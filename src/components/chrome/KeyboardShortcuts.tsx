@@ -18,7 +18,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 }
 
 /**
- * Global shortcuts, and the panels they open. Mounted once on the immersive
+ * Global shortcuts, and the panels they open. Mounted once on the main
  * route.
  *
  * The arrow/J/K bindings deliberately do **not** preventDefault on plain

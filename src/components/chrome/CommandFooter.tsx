@@ -1,75 +1,107 @@
 "use client";
 
 import Link from "next/link";
+import { Moon, Settings2, Sun, Volume2, VolumeX, Keyboard } from "lucide-react";
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
 import { about } from "@/content/about";
 import { cn } from "@/lib/utils";
 
 /**
- * The stable command strip. Both modes get the same controls, because after
- * the 2D rebuild every one of them does something in both: the palette, the
- * time of day, the weather and the motion setting are all plain CSS variables
- * that classic mode renders against too. Only ambient sound is immersive-only,
- * and that is a property of the control panel rather than of this strip.
+ * The stable command strip. Both modes get the same controls, because every
+ * one of them does something in both: the palette, the time of day and the
+ * motion setting are all plain CSS variables that classic mode renders against
+ * too.
+ *
+ * Light/dark and sound are here as one-tap toggles because they are the two a
+ * visitor actually reaches for; everything finer lives one click away in the
+ * settings panel, so the strip stays a strip.
  */
-export function CommandFooter({ variant }: { variant: "immersive" | "classic" }) {
+export function CommandFooter({ variant }: { variant: "full" | "classic" }) {
   const setChromePanel = useAppStore((s) => s.setChromePanel);
-  const weather = useAppStore((s) => s.weather);
   const colorMode = useAppStore((s) => s.colorMode);
+  const setColorMode = useAppStore((s) => s.setColorMode);
+  const soundEnabled = useAppStore((s) => s.soundEnabled);
+  const setSoundEnabled = useAppStore((s) => s.setSoundEnabled);
   const reducedMotion = useAppStore(selectReducedMotion);
-  const isImmersive = variant === "immersive";
+  const isFullMode = variant === "full";
+
+  // `auto` resolves to whichever family the clock implies, so the toggle has
+  // to pick the opposite of what is *rendered*, not of what is stored.
+  const rendered =
+    typeof document !== "undefined" ? document.documentElement.dataset.family : undefined;
+  const isDark = colorMode === "dark" || (colorMode === "auto" && rendered === "dark");
+
+  const iconButton =
+    "rounded-md p-2 transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
+  const textButton =
+    "rounded-md px-2.5 py-1.5 transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]";
 
   return (
     <footer
       aria-label="Site controls"
       className={cn(
         "z-30 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-xs text-[var(--ink-muted)]",
-        isImmersive
-          ? "fixed inset-x-0 bottom-0 border-t border-[var(--border-soft)] bg-[var(--surface)] px-5 py-3 backdrop-blur-md"
+        isFullMode
+          ? "fixed inset-x-0 bottom-0 border-t border-[var(--border-soft)] bg-[var(--surface)] px-5 py-2.5 backdrop-blur-md"
           : "mt-24 border-t border-[var(--border-soft)] px-6 py-6",
       )}
     >
       {/* Hidden on the narrowest screens: with the controls beside it the strip
-          wrapped to two lines, which is the one thing a "calm command strip"
+          wrapped to two lines, which is the one thing a calm command strip
           must not do. */}
-      <span className={isImmersive ? "hidden sm:inline" : undefined}>
+      <span className={isFullMode ? "hidden sm:inline" : undefined}>
         © {new Date().getFullYear()} {about.name}
       </span>
 
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex flex-wrap items-center gap-0.5">
+        <button
+          type="button"
+          onClick={() => setColorMode(isDark ? "light" : "dark")}
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          className={iconButton}
+        >
+          {isDark ? (
+            <Sun aria-hidden className="h-4 w-4" />
+          ) : (
+            <Moon aria-hidden className="h-4 w-4" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSoundEnabled(!soundEnabled)}
+          aria-label={soundEnabled ? "Turn ambient sound off" : "Turn ambient sound on"}
+          aria-pressed={soundEnabled}
+          className={iconButton}
+        >
+          {soundEnabled ? (
+            <Volume2 aria-hidden className="h-4 w-4" />
+          ) : (
+            <VolumeX aria-hidden className="h-4 w-4" />
+          )}
+        </button>
+
         <button
           type="button"
           onClick={() => setChromePanel("controls")}
-          className="rounded-md px-2.5 py-1.5 transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+          className={cn(textButton, "flex items-center gap-2")}
         >
-          Atmosphere
-          {/* A short state summary so the panel does not have to be opened
-              just to see what is currently set.
-
-              Full --ink-muted, not a faded variant: an earlier `/70` here
-              measured 3.57:1 and failed AA. The contrast audit works on token
-              *pairs*, so an opacity modifier applied in a className is exactly
-              the case it cannot see — this one was caught by axe instead. */}
-          <span className="ml-2 text-[var(--ink-muted)]">
-            {colorMode} · {weather}
-            {reducedMotion ? " · still" : ""}
-          </span>
+          <Settings2 aria-hidden className="h-4 w-4" />
+          Settings
+          {reducedMotion && <span className="text-[var(--ink-muted)]">· still</span>}
         </button>
 
-        <Link
-          href={isImmersive ? "/classic" : "/"}
-          prefetch={false}
-          className="rounded-md px-2.5 py-1.5 transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
-        >
-          {isImmersive ? "Classic mode" : "Immersive mode"}
+        <Link href={isFullMode ? "/classic" : "/"} prefetch={false} className={textButton}>
+          {isFullMode ? "Classic mode" : "Full mode"}
         </Link>
 
         <button
           type="button"
           onClick={() => setChromePanel("help")}
-          className="rounded-md px-2.5 py-1.5 transition-colors hover:bg-[var(--surface-raised)] hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+          aria-label="Keyboard shortcuts"
+          className={iconButton}
         >
-          Shortcuts
+          <Keyboard aria-hidden className="h-4 w-4" />
         </button>
       </div>
     </footer>

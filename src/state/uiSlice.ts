@@ -8,13 +8,19 @@ export type ColorMode = "light" | "dark" | "auto";
 export type TimeAnchor = "dawn" | "day" | "golden" | "night";
 
 /** Where the atmosphere's time value comes from.
- * - `journey`: each section's own `timeOfDay` (the default — the walk from
- *   the meadow at dawn to the campfire at night is the point).
- * - `sync`: the visitor's real local clock.
- * - a `TimeAnchor`: pinned manually. */
-export type TimeMode = "journey" | "sync" | TimeAnchor;
+ * - `sync`: the visitor's real local clock (the default).
+ * - a `TimeAnchor`: pinned manually.
+ *
+ * Deliberately *not* derived from scroll position. Driving the palette from
+ * how far down the page someone is means the site changes colour continuously
+ * while they are trying to read it. Time of day is a setting. */
+export type TimeMode = "sync" | TimeAnchor;
 
-export type Weather = "clear" | "mist" | "rain";
+/** How strongly the backdrop's veil mutes the glows behind it. Named for what
+ * the visitor sees rather than for weather, because nothing here simulates
+ * weather — there is no rain, and pretending otherwise would be decoration
+ * without meaning. */
+export type Ambience = "clear" | "soft" | "muted";
 
 export const TIME_ANCHOR_VALUE: Record<TimeAnchor, number> = {
   dawn: 0.05,
@@ -26,7 +32,7 @@ export const TIME_ANCHOR_VALUE: Record<TimeAnchor, number> = {
 export interface UiSlice {
   colorMode: ColorMode;
   timeMode: TimeMode;
-  weather: Weather;
+  ambience: Ambience;
   soundEnabled: boolean;
   /** null = follow the OS. true/false = explicit visitor override. */
   manualReducedMotion: boolean | null;
@@ -34,7 +40,7 @@ export interface UiSlice {
 
   setColorMode: (mode: ColorMode) => void;
   setTimeMode: (mode: TimeMode) => void;
-  setWeather: (weather: Weather) => void;
+  setAmbience: (ambience: Ambience) => void;
   setSoundEnabled: (enabled: boolean) => void;
   setManualReducedMotion: (value: boolean | null) => void;
   setControlPanelOpen: (open: boolean) => void;
@@ -42,8 +48,8 @@ export interface UiSlice {
 
 export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
   colorMode: "auto",
-  timeMode: "journey",
-  weather: "clear",
+  timeMode: "sync",
+  ambience: "clear",
   // Sound never starts on: browsers block unprompted audio, and a portfolio
   // that makes noise before being asked is the opposite of calm.
   soundEnabled: false,
@@ -52,7 +58,7 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
 
   setColorMode: (colorMode) => set({ colorMode }),
   setTimeMode: (timeMode) => set({ timeMode }),
-  setWeather: (weather) => set({ weather }),
+  setAmbience: (ambience) => set({ ambience }),
   setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
   setManualReducedMotion: (manualReducedMotion) => set({ manualReducedMotion }),
   setControlPanelOpen: (controlPanelOpen) => set({ controlPanelOpen }),

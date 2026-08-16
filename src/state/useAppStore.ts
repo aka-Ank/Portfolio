@@ -21,7 +21,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         colorMode: state.colorMode,
         timeMode: state.timeMode,
-        weather: state.weather,
+        ambience: state.ambience,
         soundEnabled: state.soundEnabled,
         manualReducedMotion: state.manualReducedMotion,
       }),

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Hero } from "@/components/classic/Hero";
-import { About } from "@/components/classic/About";
-import { Projects } from "@/components/classic/Projects";
-import { Skills } from "@/components/classic/Skills";
-import { Background } from "@/components/classic/Background";
-import { Achievements } from "@/components/classic/Achievements";
-import { Contact } from "@/components/classic/Contact";
+import { ClassicHeader } from "@/components/classic/ClassicHeader";
+import { HeroSection } from "@/sections/HeroSection";
+import { AboutSection } from "@/sections/AboutSection";
+import { ExperienceSection } from "@/sections/ExperienceSection";
+import { SdeSection, AimlSection } from "@/sections/ProjectsSection";
+import { SkillsSection } from "@/sections/SkillsSection";
+import { EducationSection } from "@/sections/EducationSection";
+import { ContactSection } from "@/sections/ContactSection";
 import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { about } from "@/content/about";
 import { SITE_URL } from "@/lib/site";
@@ -22,25 +23,35 @@ export const metadata: Metadata = {
 };
 
 /**
- * Classic mode. Server-rendered, no atmosphere, no snap points, no observers —
- * a plainly scrolling document.
+ * Classic mode. A plainly scrolling document: no backdrop, no reveals, no
+ * floating navigator, no observers, no audio.
  *
- * It is not a fallback: section order and copy match the immersive route
- * exactly (both read `src/content/sections.ts`), and it renders against the
- * same theme tokens, so a visitor's palette and weather choices carry across
- * the mode switch. What it drops is motion, not content.
+ * It renders the **same section components** as the main route rather than a
+ * parallel set of its own. An earlier version forked every section into a
+ * `components/classic/*` twin, which meant every content change had to be made
+ * twice and the two drifted — the classic hero had already lost the contact
+ * details the main one gained. Sharing the components makes parity structural
+ * instead of a promise.
+ *
+ * `data-plain` is what makes it classic: one CSS rule switches off the reveal
+ * animation for everything inside, so no component needs a mode prop and the
+ * sections all stay server components.
  */
 export default function ClassicPage() {
   return (
-    <main id="main-content">
-      <Hero />
-      <About />
-      <Projects />
-      <Skills />
-      <Background />
-      <Achievements />
-      <Contact />
+    <>
+      <ClassicHeader />
+      <main id="main-content" data-plain>
+        <HeroSection />
+        <AboutSection />
+        <ExperienceSection />
+        <SdeSection />
+        <AimlSection />
+        <SkillsSection />
+        <EducationSection />
+        <ContactSection />
+      </main>
       <CommandFooter variant="classic" />
-    </main>
+    </>
   );
 }

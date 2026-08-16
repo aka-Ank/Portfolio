@@ -1,123 +1,111 @@
 import type { Project, ProjectTrack } from "../schema";
 
-// Real projects, sourced from Ankit_Chaudhary_SDE_Resume.tex and
-// Ankit_Chaudhary_AI_ML_Resume.tex.
+// The AI/ML projects are sourced from resume/Ankit_Chaudhary_AI_ML_Resume.pdf
+// and stay within what that document actually claims. The two SDE projects are
+// not in that PDF; their details come from the project repositories.
 //
-// Two deliberate omissions, not oversights: the SDE resume carries its own
-// "[ADD REAL NUMBER IF AVAILABLE]" (Smart Traffic dataset size) and
-// "[ADD IF TRUE]" (Smart Hostel auth/deployment) markers. Those bullets are
-// left out entirely rather than guessed at — an empty `metrics` array is the
-// honest representation of a project whose numbers aren't published yet.
+// No invented numbers. Several of these have no published metrics, and an
+// empty `metrics` array is the honest representation of that.
 export const projects: Project[] = [
   // ---------- SDE track ----------
   {
     slug: "hamro-vanshavali",
     title: "Hamro Vanshavali",
     track: "sde",
-    summary: "A full-stack genealogy platform for multiple family trees under one shared user base.",
-    description:
-      "A genealogy platform supporting independent family trees for multiple clans under a shared user base. The interesting problem is access rather than storage: a Super Admin / Admin / User role hierarchy layered over an authentication flow, so separate clans stay isolated from each other while still living in one system.",
-    role: "Contributor",
-    stack: ["Full-stack", "Authentication", "RBAC"],
-    metrics: [
-      { label: "Status", value: "In progress" },
-      { label: "Access model", value: "3-tier RBAC" },
-    ],
+    summary: "A full-stack genealogy platform hosting many independent family trees on one user base.",
+    problem:
+      "Genealogy tools assume one family. Supporting several clans in one deployment makes access control the hard part — each tree has to stay private to its own members while the platform stays a single system.",
+    contribution:
+      "Built the platform around a Super Admin / Admin / User role hierarchy layered over the authentication flow, so trees remain isolated from one another without running separate deployments.",
+    stack: ["React", "Node.js", "Express", "MongoDB", "Authentication", "RBAC"],
+    metrics: [{ label: "Access model", value: "3-tier RBAC" }],
     links: [{ label: "GitHub", href: "https://github.com/aka-Ank/hamro-vanshavali" }],
-    featured: true,
+    year: "2025",
   },
   {
     slug: "smart-hostel-management",
     title: "Smart Hostel Management System",
     track: "sde",
-    summary: "A MERN-stack hostel system where wardens configure layouts and allocation runs both ways.",
-    description:
-      "A MERN-stack hostel management application built around the warden's actual workflow: configure the room layout first, then assign students through either automatic or manual allocation. Supporting both paths matters — automatic allocation handles the bulk intake, manual handles every real-world exception that follows.",
-    role: "Developer",
+    summary: "A MERN hostel system where wardens configure the layout and allocation runs both ways.",
+    problem:
+      "Hostel allocation is mostly bulk intake, but every real intake has exceptions — transfers, medical cases, roommate requests. A system that only automates the bulk case gets abandoned at the first exception.",
+    contribution:
+      "Built the warden's workflow end to end: configure the room layout first, then assign students through either automatic allocation for the bulk intake or manual allocation for everything that follows.",
     stack: ["MongoDB", "Express", "React", "Node.js"],
-    metrics: [
-      { label: "Stack", value: "MERN" },
-      { label: "Allocation", value: "Auto + manual" },
-    ],
+    metrics: [{ label: "Allocation", value: "Automatic + manual" }],
     links: [
       {
         label: "GitHub",
         href: "https://github.com/aka-Ank/Smart-Hostel-Management-System-using-MERN",
       },
     ],
-    featured: true,
+    year: "2025",
   },
 
   // ---------- AI/ML track ----------
   {
     slug: "aml-detection",
-    title: "Anti-Money Laundering Detection Pipeline",
+    title: "Anti-Money Laundering Detection",
     track: "aiml",
-    summary: "An end-to-end AML detection pipeline on the SAML-D dataset, XGBoost + FT-Transformer.",
-    description:
-      "An end-to-end pipeline — preprocessing, feature engineering, training, evaluation — built on the SAML-D dataset using an XGBoost + FT-Transformer ensemble. Training and evaluation are reusable modules with Stratified K-Fold cross-validation rather than a single notebook run, and the evaluation covers Precision, Recall, F1, ROC-AUC and PR-AUC. Also includes exploratory GNN-based transaction-graph analysis with PyTorch Geometric.",
-    role: "Developer",
-    stack: ["Python", "XGBoost", "Scikit-learn", "Pandas", "PyTorch Geometric"],
+    summary: "An end-to-end AML detection pipeline on the SAML-D dataset, evaluated across five metrics.",
+    problem:
+      "Money-laundering detection is a severe class-imbalance problem: flagging almost nothing scores well on accuracy and is useless. It has to be measured on the metrics that survive imbalance.",
+    contribution:
+      "Built the pipeline end to end — preprocessing, feature engineering, and an XGBoost classifier validated with 5-fold cross validation — then evaluated it on Precision, Recall, F1, ROC-AUC and PR-AUC rather than a single flattering number.",
+    stack: ["Python", "XGBoost", "Scikit-learn", "Pandas", "NumPy"],
     metrics: [
       { label: "Dataset", value: "SAML-D" },
-      { label: "Validation", value: "Stratified K-Fold" },
-      { label: "Year", value: "2026" },
+      { label: "Validation", value: "5-fold CV" },
     ],
     links: [{ label: "GitHub", href: "https://github.com/aka-Ank/AML-Detection" }],
-    featured: true,
+    year: "2026",
   },
   {
     slug: "flood-prediction-stgcn",
     title: "Flood Prediction with Spatio-Temporal GNNs",
     track: "aiml",
-    summary: "Spatio-temporal forecasting over a graph of meteorological and hydrological stations.",
-    description:
-      "Flood forecasting modelled as a graph problem: meteorological and hydrological stations become nodes, and a PyTorch spatio-temporal model learns over both the spatial relationships between stations and the temporal signal at each one. A large part of the work was upstream of the model — missing-value handling and temporal preprocessing on station data that is rarely complete.",
-    role: "Developer",
+    summary: "Forecasting over a graph of meteorological and hydrological monitoring stations.",
+    problem:
+      "Flooding at one station depends on what is happening upstream and on what happened hours ago. Treating each station as an independent time series discards the spatial half of the signal.",
+    contribution:
+      "Built graph representations from meteorological and hydrological station data and implemented PyTorch spatio-temporal forecasting models over them, with the upstream work — missing-value handling and temporal preprocessing — treated as part of the model.",
     stack: ["Python", "PyTorch", "STGCN"],
-    metrics: [
-      { label: "Approach", value: "Spatio-temporal GNN" },
-      { label: "Year", value: "2026" },
-    ],
+    metrics: [{ label: "Approach", value: "Spatio-temporal GNN" }],
     links: [],
-    featured: true,
+    year: "2026",
   },
   {
     slug: "smart-traffic-pyspark",
     title: "Smart Traffic Management with PySpark",
     track: "aiml",
-    summary: "Scalable ETL and distributed congestion analysis over large-scale traffic datasets.",
-    description:
-      "Scalable ETL pipelines built with Apache Spark to process large-scale traffic datasets, feeding distributed congestion analysis that turns raw traffic records into usable insight for traffic management.",
-    role: "Developer",
+    summary: "Distributed ETL and congestion analysis over large-scale traffic datasets.",
+    problem:
+      "Traffic datasets outgrow single-machine processing quickly, and congestion analysis needs the whole record set rather than a sample to be worth acting on.",
+    contribution:
+      "Designed scalable ETL pipelines on Apache Spark to process large-scale traffic datasets, then analysed congestion patterns across the processed data.",
     stack: ["PySpark", "Apache Spark", "Python"],
-    metrics: [
-      { label: "Engine", value: "Apache Spark" },
-      { label: "Year", value: "2025" },
-    ],
+    metrics: [{ label: "Engine", value: "Apache Spark" }],
     links: [
       {
         label: "GitHub",
         href: "https://github.com/aka-Ank/Smart-Traffic-Management-System-Using-PySpark",
       },
     ],
-    featured: false,
+    year: "2025",
   },
   {
     slug: "house-price-prediction",
-    title: "House Price Prediction with Neural Networks",
+    title: "House Price Prediction",
     track: "aiml",
     summary: "TensorFlow regression models with preprocessing and hyperparameter tuning.",
-    description:
-      "TensorFlow regression models for house price prediction, with the pipeline work — preprocessing and hyperparameter tuning — treated as part of the model rather than an afterthought.",
-    role: "Developer",
-    stack: ["Python", "TensorFlow"],
-    metrics: [
-      { label: "Framework", value: "TensorFlow" },
-      { label: "Year", value: "2025" },
-    ],
+    problem:
+      "Price regression is where an untuned baseline looks deceptively fine — most of the achievable error reduction sits in preprocessing and hyperparameters, not in the architecture.",
+    contribution:
+      "Built TensorFlow regression models and treated the pipeline work — preprocessing and hyperparameter tuning — as part of the model rather than an afterthought.",
+    stack: ["Python", "TensorFlow", "NumPy"],
+    metrics: [{ label: "Framework", value: "TensorFlow" }],
     links: [],
-    featured: false,
+    year: "2025",
   },
 ];
 

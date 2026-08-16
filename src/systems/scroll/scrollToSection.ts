@@ -12,11 +12,11 @@ export function sectionElementId(id: SectionId): string {
  * shortcuts all route through here.
  *
  * Deliberately native `scrollIntoView` rather than a tweened scroll library.
- * The page uses CSS scroll-snap, so the browser already owns the easing and
- * the final resting position; animating scrollTop ourselves would fight the
- * snap engine and reintroduce exactly the drift this rebuild removed. The
- * only thing worth overriding is honouring reduced motion, which
- * `scrollIntoView` does not do on its own in every engine.
+ * The browser already owns the easing and the resting position, and it yields
+ * the moment the visitor touches the wheel — a JS tween does not, which is how
+ * "smooth scrolling" ends up fighting the person using it. The only thing
+ * worth overriding is honouring reduced motion, which `scrollIntoView` does
+ * not do on its own in every engine.
  */
 export function scrollToSection(id: SectionId) {
   const element = document.getElementById(sectionElementId(id));

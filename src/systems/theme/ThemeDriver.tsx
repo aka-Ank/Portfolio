@@ -2,30 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
-import { sectionMeta } from "@/content/sections";
 import {
   atmosphereAt,
   formatOklch,
   resolveTheme,
   SURFACES,
-  WEATHER_HAZE,
+  VEIL_STRENGTH,
   type Atmosphere,
   type SurfaceFamily,
 } from "./palette";
 
-/** Seconds⁻¹. Chosen so a full-journey jump settles in a little over a
- * second — slow enough to read as a light change, fast enough that it has
- * finished by the time the visitor has read the new heading. */
+/** Seconds⁻¹. Chosen so a change of setting settles in a little over a second
+ * — slow enough to read as a light change, fast enough that it has finished
+ * before the visitor looks back. */
 const DAMPING = 3.2;
 
 function writeAtmosphere(root: HTMLElement, atmosphere: Atmosphere) {
   root.style.setProperty("--sky-top", formatOklch(atmosphere.skyTop));
   root.style.setProperty("--sky-mid", formatOklch(atmosphere.skyMid));
   root.style.setProperty("--sky-horizon", formatOklch(atmosphere.skyHorizon));
-  root.style.setProperty("--haze", formatOklch(atmosphere.haze));
-  root.style.setProperty("--layer-far", formatOklch(atmosphere.layerFar));
-  root.style.setProperty("--layer-mid", formatOklch(atmosphere.layerMid));
-  root.style.setProperty("--layer-near", formatOklch(atmosphere.layerNear));
   root.style.setProperty("--glow", formatOklch(atmosphere.glow));
   root.style.setProperty("--aether", formatOklch(atmosphere.aether));
 }
@@ -53,22 +48,20 @@ function startViewTransition(apply: () => void) {
 }
 
 /**
- * Owns every atmosphere CSS variable on `<html>`. Mounted once, renders
- * nothing.
+ * Owns every theme CSS variable on `<html>`. Mounted once, renders nothing.
  *
  * Two different mechanisms, on purpose. The decorative tokens are damped
  * continuously in OKLCH, because a gradual light change is the whole point.
  * The surface/ink pair is switched **atomically inside a view transition**,
  * because interpolating it would pass through a mid-grey-on-mid-grey state
  * that fails WCAG for the length of the animation. A view transition
- * crossfades two states that each pass, so no frame is ever unreadable —
- * and it still reads as a soft dissolve rather than a swap.
+ * crossfades two states that each pass, so no frame is ever unreadable — and
+ * it still reads as a soft dissolve rather than a swap.
  */
 export function ThemeDriver() {
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
-  const weather = useAppStore((s) => s.weather);
-  const activeSection = useAppStore((s) => s.activeSection);
+  const ambience = useAppStore((s) => s.ambience);
   const reducedMotion = useAppStore(selectReducedMotion);
 
   // Only `sync` and `auto` depend on wall-clock time; everything else is
@@ -83,17 +76,16 @@ export function ThemeDriver() {
 
   const currentT = useRef<number | null>(null);
   const currentFamily = useRef<SurfaceFamily | null>(null);
-  const sectionTime = sectionMeta(activeSection).timeOfDay;
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--haze-strength", String(WEATHER_HAZE[weather]));
-    root.dataset.weather = weather;
-  }, [weather]);
+    root.style.setProperty("--veil-strength", String(VEIL_STRENGTH[ambience]));
+    root.dataset.ambience = ambience;
+  }, [ambience]);
 
   useEffect(() => {
     const root = document.documentElement;
-    const target = resolveTheme(colorMode, timeMode, sectionTime);
+    const target = resolveTheme(colorMode, timeMode);
 
     if (currentFamily.current !== target.family) {
       const isFirstPaint = currentFamily.current === null;
@@ -140,7 +132,7 @@ export function ThemeDriver() {
 
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [colorMode, timeMode, sectionTime, reducedMotion, clockTick]);
+  }, [colorMode, timeMode, reducedMotion, clockTick]);
 
   return null;
 }

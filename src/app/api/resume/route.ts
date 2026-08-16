@@ -4,7 +4,7 @@ import { ResumeDocument } from "@/lib/resume-pdf";
 import { resume } from "@/content/resume";
 
 // Real PDF generation (not a print-this-page shortcut) — reachable from
-// both classic and immersive views per docs/08-roadmap.md Phase 4.
+// both classic and full views.
 export async function GET() {
   const buffer = await renderToBuffer(createElement(ResumeDocument));
   const filename = `${resume.name.replace(/\s+/g, "-")}-resume.pdf`;

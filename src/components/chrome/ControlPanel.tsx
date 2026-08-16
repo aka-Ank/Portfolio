@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
-import type { ColorMode, TimeMode, Weather } from "@/state/uiSlice";
+import type { Ambience, ColorMode, TimeMode } from "@/state/uiSlice";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 interface Option<T> {
@@ -16,7 +16,6 @@ const COLOR_MODES: Option<ColorMode>[] = [
 ];
 
 const TIME_MODES: Option<TimeMode>[] = [
-  { value: "journey", label: "Journey" },
   { value: "sync", label: "Live" },
   { value: "dawn", label: "Dawn" },
   { value: "day", label: "Day" },
@@ -24,10 +23,10 @@ const TIME_MODES: Option<TimeMode>[] = [
   { value: "night", label: "Night" },
 ];
 
-const WEATHERS: Option<Weather>[] = [
+const AMBIENCES: Option<Ambience>[] = [
   { value: "clear", label: "Clear" },
-  { value: "mist", label: "Mist" },
-  { value: "rain", label: "Rain" },
+  { value: "soft", label: "Soft" },
+  { value: "muted", label: "Muted" },
 ];
 
 /**
@@ -40,7 +39,7 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
 
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
-  const weather = useAppStore((s) => s.weather);
+  const ambience = useAppStore((s) => s.ambience);
   const soundEnabled = useAppStore((s) => s.soundEnabled);
   const manualReducedMotion = useAppStore((s) => s.manualReducedMotion);
   const systemReducedMotion = useAppStore((s) => s.systemReducedMotion);
@@ -48,7 +47,7 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
 
   const setColorMode = useAppStore((s) => s.setColorMode);
   const setTimeMode = useAppStore((s) => s.setTimeMode);
-  const setWeather = useAppStore((s) => s.setWeather);
+  const setAmbience = useAppStore((s) => s.setAmbience);
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled);
   const setManualReducedMotion = useAppStore((s) => s.setManualReducedMotion);
 
@@ -72,7 +71,7 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
             id="controls-title"
             className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]"
           >
-            Atmosphere
+            Settings
           </h2>
           <button
             type="button"
@@ -96,15 +95,15 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
             options={TIME_MODES}
             value={timeMode}
             onChange={setTimeMode}
-            hint={
-              timeMode === "journey"
-                ? "Follows the walk from the meadow to the campfire."
-                : timeMode === "sync"
-                  ? "Follows your local clock."
-                  : undefined
-            }
+            hint={timeMode === "sync" ? "Follows your local clock." : undefined}
           />
-          <Segmented label="Weather" options={WEATHERS} value={weather} onChange={setWeather} />
+          <Segmented
+            label="Atmosphere"
+            options={AMBIENCES}
+            value={ambience}
+            onChange={setAmbience}
+            hint="How strongly the backdrop is muted behind the content."
+          />
 
           <div className="space-y-3 border-t border-[var(--border-soft)] pt-5">
             <Toggle

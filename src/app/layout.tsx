@@ -6,10 +6,9 @@ import { SITE_URL } from "@/lib/site";
 import { buildPersonSchema } from "@/lib/person-schema";
 import "./globals.css";
 
-// Typography system — see docs/01-design-specification.md §2. The serif is
-// display/headline only, the sans is the workhorse, and mono is reserved for
-// data-shaped content — which is also how the AI/ML track signals that it is
-// the more instrumented of the two.
+// Typography system. The serif is display/headline only, the sans is the
+// workhorse, and mono is reserved for data-shaped content: metrics, eyebrows
+// and stack pills.
 const instrumentSerif = Instrument_Serif({
   variable: "--font-display",
   subsets: ["latin"],
@@ -65,9 +64,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildPersonSchema()) }}
         />
+        {/* --surface-solid, not --surface: the skip link sits over whatever the
+            page happens to be showing, and a translucent panel would let it
+            read through. An earlier version used --paper, which is defined
+            nowhere, so the link rendered transparent the moment it was
+            focused — invisible exactly when a keyboard visitor needs it. */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-[var(--paper)] focus:px-4 focus:py-2 focus:text-[var(--ink)] focus:outline focus:outline-2 focus:outline-[var(--focus-ring)]"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:border focus:border-[var(--border-soft)] focus:bg-[var(--surface-solid)] focus:px-4 focus:py-2 focus:text-[var(--ink)] focus:outline focus:outline-2 focus:outline-[var(--focus-ring)]"
         >
           Skip to main content
         </a>

@@ -51,9 +51,12 @@ function backdropsFor(family: SurfaceFamily): string[] {
     const atmosphere = atmosphereAt(family, step / 10);
     samples.push(
       formatOklch(atmosphere.skyTop),
+      formatOklch(atmosphere.skyMid),
       formatOklch(atmosphere.skyHorizon),
-      formatOklch(atmosphere.layerNear),
-      formatOklch(atmosphere.haze),
+      // The glow only ever reaches the page through a heavily blurred, partly
+      // transparent radial gradient, so a panel never actually sits on the
+      // pure colour. Sampling it undiluted keeps the check conservative.
+      formatOklch(atmosphere.glow),
     );
   }
   return samples;

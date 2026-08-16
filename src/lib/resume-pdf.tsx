@@ -1,12 +1,11 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { resume, contact, education, experience } from "@/content/resume";
-import { skills } from "@/content/skills";
+import { skillGroups } from "@/content/skills";
 import { getProjectsByTrack } from "@/content/projects";
 import { certifications } from "@/content/certifications";
 
 // A one-page resume built entirely from the same content/ modules the site
-// itself reads from — no separate "resume data" fork to keep in sync. See
-// docs/08-roadmap.md Phase 4 "Resume export (clean PDF)."
+// itself reads from — no separate "resume data" fork to keep in sync.
 const styles = StyleSheet.create({
   page: { padding: 40, fontSize: 10, color: "#222222", fontFamily: "Helvetica" },
   name: { fontSize: 22, marginBottom: 2 },
@@ -51,7 +50,7 @@ export function ResumeDocument() {
         <Text style={styles.name}>{resume.name}</Text>
         <Text style={styles.role}>{resume.role}</Text>
         <Text style={styles.contact}>
-          {resume.email} · {contact.phone} · {resume.location}
+          {resume.email} · {resume.location}
         </Text>
         <Text style={styles.contact}>
           {contact.github} · {contact.linkedin}
@@ -91,9 +90,9 @@ export function ResumeDocument() {
               <View key={project.slug} style={styles.item}>
                 <View style={styles.itemTitleRow}>
                   <Text style={styles.itemTitle}>{project.title}</Text>
-                  <Text style={styles.itemMeta}>{project.role}</Text>
+                  <Text style={styles.itemMeta}>{project.year}</Text>
                 </View>
-                <Text style={styles.itemBody}>{project.summary}</Text>
+                <Text style={styles.itemBody}>{project.contribution}</Text>
                 <Text style={styles.itemMeta}>{project.stack.join(" · ")}</Text>
               </View>
             ))}
@@ -101,20 +100,19 @@ export function ResumeDocument() {
         ))}
 
         <Text style={styles.sectionTitle}>Skills</Text>
-        <View style={styles.skillRow}>
-          {skills.map((skill) => (
-            <Text key={skill.id} style={styles.skillPill}>
-              {skill.name}
-            </Text>
-          ))}
-        </View>
+        {skillGroups.map((group) => (
+          <View key={group.id} style={styles.item}>
+            <Text style={styles.itemTitle}>{group.label}</Text>
+            <Text style={styles.itemBody}>{group.items.join(" · ")}</Text>
+          </View>
+        ))}
 
         <Text style={styles.sectionTitle}>Certifications</Text>
         {certifications.map((cert) => (
           <View key={cert.id} style={styles.item}>
             <View style={styles.itemTitleRow}>
               <Text style={styles.itemTitle}>{cert.title}</Text>
-              <Text style={styles.itemMeta}>{new Date(cert.date).getFullYear()}</Text>
+              <Text style={styles.itemMeta}>{cert.year}</Text>
             </View>
             <Text style={styles.itemMeta}>{cert.issuer}</Text>
           </View>
