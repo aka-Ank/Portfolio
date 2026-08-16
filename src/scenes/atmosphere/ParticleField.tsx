@@ -14,14 +14,54 @@ interface Particle {
   alpha: number;
 }
 
-/** Per-weather behaviour. Deliberately three small variations on one system
- * rather than three effects: the world should read as the same place in
- * different conditions. */
-const BEHAVIOUR: Record<Weather, { speed: number; drift: number; size: [number, number]; streak: number }> = {
-  clear: { speed: 6, drift: 9, size: [0.8, 2.2], streak: 0 },
-  mist: { speed: 3, drift: 16, size: [14, 40], streak: 0 },
-  rain: { speed: 320, drift: 26, size: [0.7, 1.4], streak: 16 },
+interface Behaviour {
+  speed: number;
+  drift: number;
+  size: [number, number];
+  alpha: [number, number];
+  streak: number;
+  /** Which atmosphere token tints the pass. Only `clear` uses the Aether:
+   * its slow motes are the one ambient element the motif has earned. Mist and
+   * rain are weather, not life force, so they take the haze colour. */
+  token: "--aether" | "--haze";
+}
+
+/** Three small variations on one system rather than three effects — the world
+ * should read as the same place in different conditions. */
+const BEHAVIOUR: Record<Weather, Behaviour> = {
+  clear: { speed: 6, drift: 9, size: [1, 2.4], alpha: [0.18, 0.5], streak: 0, token: "--aether" },
+  // Very large, very faint, very slow. Mist that you can pick individual
+  // particles out of is not mist — it is bubbles.
+  mist: { speed: 4, drift: 14, size: [90, 220], alpha: [0.025, 0.07], streak: 0, token: "--haze" },
+  rain: { speed: 340, drift: 24, size: [0.7, 1.3], alpha: [0.1, 0.26], streak: 18, token: "--haze" },
 };
+
+/** A soft round sprite, drawn once and stamped per particle. Cheaper than
+ * building a radial gradient every frame, and it is what makes the large mist
+ * particles read as haze instead of as hard discs. */
+function buildSprite(colour: string): HTMLCanvasElement {
+  const size = 128;
+  const sprite = document.createElement("canvas");
+  sprite.width = size;
+  sprite.height = size;
+  const context = sprite.getContext("2d");
+  if (!context) return sprite;
+
+  const gradient = context.createRadialGradient(
+    size / 2,
+    size / 2,
+    0,
+    size / 2,
+    size / 2,
+    size / 2,
+  );
+  gradient.addColorStop(0, colour);
+  gradient.addColorStop(0.45, `color-mix(in oklch, ${colour} 45%, transparent)`);
+  gradient.addColorStop(1, "transparent");
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, size, size);
+  return sprite;
+}
 
 /**
  * The single ambient motion pass, on a plain 2D canvas.
@@ -56,12 +96,15 @@ export function ParticleField() {
 
     const spawn = (initial: boolean): Particle => ({
       x: Math.random() * width,
-      y: initial ? Math.random() * height : -20,
+      // Respawns start a full particle-width above the top edge — with mist's
+      // very large radius, a fixed small offset would pop it into view.
+      y: initial ? Math.random() * height : -behaviour.size[1],
       vx: (Math.random() - 0.5) * behaviour.drift,
       vy: behaviour.speed * (0.5 + Math.random()),
       radius:
         behaviour.size[0] + Math.random() * (behaviour.size[1] - behaviour.size[0]),
-      alpha: 0.12 + Math.random() * 0.3,
+      alpha:
+        behaviour.alpha[0] + Math.random() * (behaviour.alpha[1] - behaviour.alpha[0]),
     });
 
     const resize = () => {
@@ -80,6 +123,8 @@ export function ParticleField() {
     let frame = 0;
     let last = performance.now();
     let running = true;
+    let sprite: HTMLCanvasElement | null = null;
+    let spriteColour = "";
 
     const render = (now: number) => {
       if (!running) return;
@@ -87,10 +132,17 @@ export function ParticleField() {
       last = now;
 
       context.clearRect(0, 0, width, height);
-      // The particles borrow the Aether accent so ambience and motif stay one
-      // system — never a separate decorative colour.
-      const style = getComputedStyle(document.documentElement);
-      const colour = style.getPropertyValue("--aether").trim() || "white";
+
+      // The palette drifts continuously, so the sprite is rebuilt whenever the
+      // token actually changes — not every frame, which would mean building a
+      // gradient 60 times a second for a colour that moves imperceptibly.
+      const colour =
+        getComputedStyle(document.documentElement).getPropertyValue(behaviour.token).trim() ||
+        "white";
+      if (colour !== spriteColour) {
+        spriteColour = colour;
+        sprite = buildSprite(colour);
+      }
 
       for (const particle of particles) {
         particle.x += particle.vx * dt;
@@ -109,11 +161,15 @@ export function ParticleField() {
           context.moveTo(particle.x, particle.y);
           context.lineTo(particle.x - particle.vx * 0.05, particle.y - behaviour.streak);
           context.stroke();
-        } else {
-          context.fillStyle = colour;
-          context.beginPath();
-          context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-          context.fill();
+        } else if (sprite) {
+          const diameter = particle.radius * 2;
+          context.drawImage(
+            sprite,
+            particle.x - particle.radius,
+            particle.y - particle.radius,
+            diameter,
+            diameter,
+          );
         }
       }
       context.globalAlpha = 1;
