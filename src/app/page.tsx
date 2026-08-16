@@ -1,5 +1,3 @@
-"use client";
-
 import { AtmosphereStage } from "@/scenes/atmosphere/AtmosphereStage";
 import { HeroSection } from "@/scenes/sections/HeroSection";
 import { AboutSection } from "@/scenes/sections/AboutSection";
@@ -13,23 +11,28 @@ import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
 import { AmbienceBridge } from "@/systems/audio/AmbienceBridge";
 import { EasterEggController } from "@/systems/easter-egg/EasterEggController";
-import { useSectionObserver } from "@/systems/scroll/useSectionObserver";
+import { SectionObserver } from "@/systems/scroll/SectionObserver";
 
 /**
  * The immersive route: eight sections over one fixed atmospheric backdrop.
  *
+ * Deliberately a **server** component. Only the pieces that genuinely need the
+ * browser are client components — the backdrop, the chrome, the hero's two
+ * scroll buttons and the observer. Everything else (About, both project
+ * sections, Skills, Education, Signals, Contact) is pure markup and is
+ * rendered on the server, which is most of the page's DOM.
+ *
  * The scroll model is entirely native — `snap-y snap-mandatory` on the
  * document, `snap-start` on each section. Nothing here listens to a wheel
  * event or moves the page itself, so the visitor's own scrolling always wins.
- * `useSectionObserver` only *reports* where they have arrived, which is what
+ * `SectionObserver` only *reports* where they have arrived, which is what
  * drives the atmosphere and the navigator.
  */
 export default function ImmersivePage() {
-  useSectionObserver();
-
   return (
     <>
       <AtmosphereStage />
+      <SectionObserver />
       <AmbienceBridge />
       <EasterEggController />
       <KeyboardShortcuts />

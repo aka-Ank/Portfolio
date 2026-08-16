@@ -194,8 +194,13 @@
 .breathe { animation: breathe 8s ease-in-out infinite; }
 
 /* Content reveal. Opacity-and-lift only, once, on entry — never a slide from
-   off-screen, never a bounce, never triggered twice. */
-.reveal {
+   off-screen, never a bounce, never triggered twice.
+
+   Note there is no bare `.reveal { opacity: 0 }` rule, and that is deliberate:
+   content must never be invisible until JS runs. useReveal applies
+   data-revealed="false" in a layout effect, and only to elements that start
+   off-screen. Without scripting, every section simply renders visible. */
+.reveal[data-revealed="false"] {
   opacity: 0;
 }
 .reveal[data-revealed="true"] {
@@ -210,7 +215,7 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal, .reveal[data-revealed="true"] { opacity: 1; animation: none; }
+  .reveal, .reveal[data-revealed] { opacity: 1 !important; animation: none; }
 }
 
 [data-motion="off"] {
@@ -224,8 +229,8 @@
   transition-duration: 0.001ms !important;
 }
 [data-motion="off"] .reveal,
-[data-motion="off"] .reveal[data-revealed="true"] {
-  opacity: 1;
+[data-motion="off"] .reveal[data-revealed] {
+  opacity: 1 !important;
   animation: none;
 }
 

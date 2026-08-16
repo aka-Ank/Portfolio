@@ -61,9 +61,23 @@ Partially done; the remainder is the live work.
       VoiceOver pass are still outstanding
 - [x] Mobile walked at 390×844; the navigator/command-strip collision found and fixed. Tablet
       widths and a touch-target sweep still outstanding
-- [ ] Axe pass on both routes
-- [ ] Lighthouse on both routes, targeting 95+, with `three`/`lenis` confirmed absent from the
-      production bundle
+- [x] Axe (via Lighthouse) on both routes: 100. One real failure found and fixed — the footer's
+      state summary used `text-[var(--ink-muted)]/70`, measuring 3.57:1. The contrast audit works
+      on token *pairs*, so an opacity modifier in a className is exactly what it cannot see
+- [x] Lighthouse against a production build. `three`/`lenis` confirmed absent from the bundle
+
+      | Route | Perf | A11y | Best practices | SEO | CLS | TBT |
+      |---|---|---|---|---|---|---|
+      | `/` | 92 | 100 | 100 | 100 | 0 | 170ms |
+      | `/classic` | 96 | 100 | 100 | 100 | 0 | 10ms |
+
+      `/` started at 80. Two structural fixes got it to 92: `page.tsx` was `"use client"`, which
+      pulled all eight sections into the client bundle even though six are pure markup — it is
+      now a server component with the observer isolated in `<SectionObserver>` and the reveal in
+      `<Reveal>`; and the chat widget (the only thing importing `motion/react`) is now lazy.
+      The remaining gap is `unused-javascript` in the framework chunks
+- [ ] Optional: reach 95 on `/` — the next lever is rendering only the moods that have been
+      visited rather than all six upfront
 - [x] Metadata refreshed — the root title and description now describe the engineer, not a forest
 - [ ] A static OG image (there is currently no raster asset in the repo at all)
 - [ ] Real ambient audio to replace the four synthesized placeholder beds

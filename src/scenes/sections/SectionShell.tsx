@@ -1,9 +1,7 @@
-"use client";
-
 import type { ReactNode } from "react";
 import { sectionMeta, type SectionId } from "@/content/sections";
 import { sectionElementId } from "@/systems/scroll/scrollToSection";
-import { useReveal } from "@/hooks/useReveal";
+import { Reveal } from "@/components/shared/Reveal";
 import { cn } from "@/lib/utils";
 
 interface SectionShellProps {
@@ -13,7 +11,7 @@ interface SectionShellProps {
    * in the content, not in preamble. */
   blurb?: string;
   children: ReactNode;
-  /** `wide` for the two project sections, which need room for a grid. */
+  /** `wide` for the sections that need room for a grid. */
   width?: "narrow" | "wide";
   className?: string;
 }
@@ -22,11 +20,15 @@ interface SectionShellProps {
  * The standard frame every section sits in: snap point, consistent vertical
  * rhythm, the place name as an eyebrow, and a single one-shot reveal.
  *
+ * A **server** component — the only interactive part is the reveal, which is
+ * isolated in `<Reveal>`. That keeps six of the eight sections out of the
+ * client bundle entirely.
+ *
  * `min-h-dvh` plus `snap-start` is the whole scroll model — the browser owns
  * the movement, so there is nothing here that can fight the visitor's input.
  * Sections are allowed to grow past the viewport rather than being forced to
- * fit it; a section that clips its own content to preserve a snap point would
- * be choosing the effect over the content.
+ * fit it; a section that clipped its own content to preserve a snap point
+ * would be choosing the effect over the content.
  */
 export function SectionShell({
   id,
@@ -37,7 +39,6 @@ export function SectionShell({
   className,
 }: SectionShellProps) {
   const meta = sectionMeta(id);
-  const revealRef = useReveal<HTMLDivElement>();
 
   return (
     <section
@@ -48,13 +49,7 @@ export function SectionShell({
         className,
       )}
     >
-      <div
-        ref={revealRef}
-        className={cn(
-          "reveal mx-auto w-full",
-          width === "wide" ? "max-w-5xl" : "max-w-2xl",
-        )}
-      >
+      <Reveal className={cn("mx-auto w-full", width === "wide" ? "max-w-5xl" : "max-w-2xl")}>
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent-ink)]">
           {meta.place}
         </p>
@@ -68,7 +63,7 @@ export function SectionShell({
           <p className="mt-4 max-w-xl text-lg leading-relaxed text-[var(--ink-muted)]">{blurb}</p>
         )}
         <div className="mt-10">{children}</div>
-      </div>
+      </Reveal>
     </section>
   );
 }

@@ -44,8 +44,13 @@ export function CommandFooter({ variant }: { variant: "immersive" | "classic" })
         >
           Atmosphere
           {/* A short state summary so the panel does not have to be opened
-              just to see what is currently set. */}
-          <span className="ml-2 text-[var(--ink-muted)]/70">
+              just to see what is currently set.
+
+              Full --ink-muted, not a faded variant: an earlier `/70` here
+              measured 3.57:1 and failed AA. The contrast audit works on token
+              *pairs*, so an opacity modifier applied in a className is exactly
+              the case it cannot see — this one was caught by axe instead. */}
+          <span className="ml-2 text-[var(--ink-muted)]">
             {colorMode} · {weather}
             {reducedMotion ? " · still" : ""}
           </span>
