@@ -4,6 +4,25 @@ import { sectionElementId } from "@/systems/scroll/scrollToSection";
 import { Reveal } from "@/components/shared/Reveal";
 import { cn } from "@/lib/utils";
 
+/**
+ * The one content column, shared by every section *and* the hero.
+ *
+ * This is a single constant on purpose. An earlier version let each section
+ * pick its own width — 768px for the hero, 672px for prose, 1024px for grids,
+ * each centred independently — which put the headings on three different left
+ * edges. Scrolling from Experience into SDE Projects moved the heading 176px
+ * sideways and then moved it back two sections later. One width means one
+ * left edge, all the way down.
+ */
+export const CONTENT_GRID = "mx-auto w-full max-w-5xl";
+
+/**
+ * The readable measure for running prose, applied *inside* the grid rather
+ * than instead of it. ~672px keeps a comfortable line length without
+ * re-centring the block and breaking the shared left edge.
+ */
+export const PROSE_MEASURE = "max-w-2xl";
+
 interface SectionShellProps {
   id: SectionId;
   heading: string;
@@ -11,8 +30,6 @@ interface SectionShellProps {
    * in the content, not in preamble. */
   blurb?: string;
   children: ReactNode;
-  /** `wide` for the sections that need room for a grid. */
-  width?: "narrow" | "wide";
   className?: string;
 }
 
@@ -24,26 +41,18 @@ interface SectionShellProps {
  * isolated in `<Reveal>`. That keeps every content section out of the client
  * bundle.
  *
- * Sections are sized by their content rather than pinned to the viewport.
- * A short section (Education, Contact) that was forced to `min-h-dvh` would be
- * mostly empty space, and scroll-snap on top of that turns an ordinary read
- * into a sequence of jumps the visitor did not ask for.
+ * Sections are sized by their content rather than pinned to the viewport, and
+ * the padding is deliberately modest: an earlier version left 224px of empty
+ * space between every section, which was 24% of the whole page.
  */
-export function SectionShell({
-  id,
-  heading,
-  blurb,
-  children,
-  width = "narrow",
-  className,
-}: SectionShellProps) {
+export function SectionShell({ id, heading, blurb, children, className }: SectionShellProps) {
   return (
     <section
       id={sectionElementId(id)}
       aria-labelledby={`${id}-heading`}
-      className={cn("scroll-mt-24 px-6 py-20 sm:px-10 sm:py-28", className)}
+      className={cn("scroll-mt-20 px-6 py-12 sm:px-10 sm:py-16", className)}
     >
-      <Reveal className={cn("mx-auto w-full", width === "wide" ? "max-w-5xl" : "max-w-2xl")}>
+      <Reveal className={CONTENT_GRID}>
         <h2
           id={`${id}-heading`}
           className="font-[family-name:var(--font-display)] text-3xl leading-[1.15] tracking-[-0.01em] text-[var(--ink)] sm:text-4xl"
@@ -51,11 +60,11 @@ export function SectionShell({
           {heading}
         </h2>
         {blurb && (
-          <p className="mt-3 max-w-xl text-[17px] leading-relaxed text-[var(--ink-muted)]">
+          <p className={cn("mt-3 text-[17px] leading-relaxed text-[var(--ink-muted)]", PROSE_MEASURE)}>
             {blurb}
           </p>
         )}
-        <div className="mt-10">{children}</div>
+        <div className="mt-8">{children}</div>
       </Reveal>
     </section>
   );

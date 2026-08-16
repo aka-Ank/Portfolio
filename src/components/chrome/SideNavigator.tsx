@@ -9,6 +9,13 @@ import { scrollToSection } from "@/systems/scroll/scrollToSection";
  * aim at, short enough that it is gone by the time the visitor is reading. */
 const IDLE_MS = 2400;
 
+/** How far down the page the navigator starts existing at all. At the top
+ * there is nothing to navigate back to and the hero is the whole point of the
+ * screen, so a rail hovering beside it is noise. Half a viewport means it
+ * arrives once the visitor has committed to reading rather than on the first
+ * flick of the wheel. */
+const REVEAL_AFTER = () => window.innerHeight * 0.5;
+
 /**
  * A hovering section navigator: appears on scroll or pointer movement, fades
  * out when idle, and never covers content.
@@ -22,16 +29,26 @@ const IDLE_MS = 2400;
 export function SideNavigator() {
   const activeSection = useAppStore((s) => s.activeSection);
   const [visible, setVisible] = useState(false);
+  const [past, setPast] = useState(false);
   const [pinned, setPinned] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    // Two separate conditions, and keeping them apart is the point. `past`
+    // answers "does this control exist yet"; `visible` answers "has the
+    // visitor touched anything recently". Collapsing them into one flag was
+    // what made the rail appear at the very top on a stray mouse move.
     const wake = () => {
+      const scrolled = window.scrollY > REVEAL_AFTER();
+      setPast(scrolled);
+      if (!scrolled) return;
+
       setVisible(true);
       window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setVisible(false), IDLE_MS);
     };
 
+    wake();
     window.addEventListener("scroll", wake, { passive: true });
     window.addEventListener("pointermove", wake, { passive: true });
     window.addEventListener("keydown", wake);
@@ -43,7 +60,10 @@ export function SideNavigator() {
     };
   }, []);
 
-  const shown = visible || pinned;
+  // `pinned` deliberately cannot override `past`: nothing can be hovered or
+  // focused while the rail is display-less, so there is no state where this
+  // hides something the visitor is interacting with.
+  const shown = past && (visible || pinned);
 
   return (
     <nav
@@ -55,13 +75,17 @@ export function SideNavigator() {
       onPointerEnter={() => setPinned(true)}
       onPointerLeave={() => setPinned(false)}
       className={[
-        "fixed z-30 transition-opacity duration-500 motion-reduce:transition-none",
+        "fixed z-30 transition-[opacity,visibility] duration-500 motion-reduce:transition-none",
         // Clears the fixed command strip on small screens, where both want the
         // bottom edge. On desktop the navigator moves to the right rail and
         // the collision disappears.
         "inset-x-0 bottom-20 flex justify-center",
         "md:inset-x-auto md:bottom-auto md:right-6 md:top-1/2 md:block md:-translate-y-1/2",
-        shown ? "opacity-100" : "opacity-0",
+        // `invisible`, not just `opacity-0`: a transparent element still takes
+        // focus, so tabbing through the page would land on eight buttons
+        // nobody can see. `visibility` holds `visible` for the length of the
+        // transition, so this still fades rather than blinking out.
+        shown ? "visible opacity-100" : "invisible opacity-0",
       ].join(" ")}
     >
       <ol

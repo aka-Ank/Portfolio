@@ -1,15 +1,15 @@
 import { educationContent } from "@/content/sections";
 import { SectionShell, Panel } from "./SectionShell";
 
-/** Education and the one real certification, as two compact cards. The
- * certification list stays at its true length rather than being padded to
- * fill the row. */
+/** Education and the one real certification, side by side. The certification
+ * list stays at its true length rather than being padded to fill the row —
+ * which is why it takes the narrower column. */
 export function EducationSection() {
   const { education, certifications } = educationContent;
 
   return (
     <SectionShell id="education" heading={educationContent.heading}>
-      <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
         <Panel as="article">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className="text-xl font-medium text-[var(--ink)]">{education.institution}</h3>
@@ -18,12 +18,10 @@ export function EducationSection() {
 
           <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4">
             <p className="text-[15px] text-[var(--ink-muted)]">{education.degree}</p>
-            <p className="font-mono text-[13px] text-[var(--accent-ink)]">
-              CGPA {education.cgpa}
-            </p>
+            <p className="font-mono text-[13px] text-[var(--accent-ink)]">CGPA {education.cgpa}</p>
           </div>
 
-          <div className="mt-5 border-t border-[var(--border-soft)] pt-5">
+          <div className="mt-4 border-t border-[var(--border-soft)] pt-4">
             <h4 className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)]">
               Relevant coursework
             </h4>
@@ -40,23 +38,25 @@ export function EducationSection() {
           </div>
         </Panel>
 
-        {certifications.map((certification) => (
-          <Panel key={certification.id} as="article">
-            <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent-ink)]">
-              Certification
-            </h3>
-            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <p className="text-[17px] text-[var(--ink)]">{certification.title}</p>
-              <span className="font-mono text-xs text-[var(--ink-muted)]">
-                {certification.year}
-              </span>
-            </div>
-            <p className="mt-1 text-[15px] text-[var(--ink-muted)]">{certification.issuer}</p>
-            <p className="mt-2 text-[15px] leading-relaxed text-[var(--ink-muted)]">
-              {certification.detail}
-            </p>
-          </Panel>
-        ))}
+        <div className="space-y-4">
+          {certifications.map((certification) => (
+            <Panel key={certification.id} as="article">
+              <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent-ink)]">
+                Certification
+              </h3>
+              <div className="mt-3 flex items-baseline justify-between gap-x-4">
+                <p className="text-[17px] leading-snug text-[var(--ink)]">{certification.title}</p>
+                <span className="shrink-0 font-mono text-xs text-[var(--ink-muted)]">
+                  {certification.year}
+                </span>
+              </div>
+              <p className="mt-1.5 text-[15px] text-[var(--ink-muted)]">{certification.issuer}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-[var(--ink-muted)]">
+                {certification.detail}
+              </p>
+            </Panel>
+          ))}
+        </div>
       </div>
     </SectionShell>
   );

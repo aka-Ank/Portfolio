@@ -3,7 +3,13 @@
 import { useEffect } from "react";
 import { useAppStore } from "@/state/useAppStore";
 import { resolveTheme } from "@/systems/theme/palette";
-import { crossfadeAmbienceTo, initAudio, setMuted, type AmbienceBed } from "./audioManager";
+import {
+  crossfadeAmbienceTo,
+  initAudio,
+  setMasterVolume,
+  setMuted,
+  type AmbienceBed,
+} from "./audioManager";
 
 /** Four beds across the ring — the ambience follows the same time value the
  * palette does, so what the visitor hears and what they see never disagree. */
@@ -20,6 +26,7 @@ function bedFor(family: "light" | "dark", t: number): AmbienceBed {
  */
 export function AmbienceBridge() {
   const soundEnabled = useAppStore((s) => s.soundEnabled);
+  const volume = useAppStore((s) => s.volume);
   const colorMode = useAppStore((s) => s.colorMode);
   const timeMode = useAppStore((s) => s.timeMode);
 
@@ -35,6 +42,14 @@ export function AmbienceBridge() {
     setMuted(false);
     crossfadeAmbienceTo(bed);
   }, [soundEnabled, bed]);
+
+  // Separate from the effect above so dragging the slider re-levels the bed
+  // without re-running `initAudio` or restarting the crossfade on every frame
+  // of the drag. `setMasterVolume` no-ops while muted and the level is kept,
+  // so unmuting restores whatever the visitor had set.
+  useEffect(() => {
+    setMasterVolume(volume);
+  }, [volume]);
 
   return null;
 }

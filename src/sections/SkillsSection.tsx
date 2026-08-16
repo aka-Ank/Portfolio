@@ -10,7 +10,7 @@ import { SectionShell, Panel } from "./SectionShell";
  */
 export function SkillsSection() {
   return (
-    <SectionShell id="skills" heading={skillsContent.heading} width="wide">
+    <SectionShell id="skills" heading={skillsContent.heading}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {skillsContent.groups.map((group) => (
           <Panel key={group.id} as="div">

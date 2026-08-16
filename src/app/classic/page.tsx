@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { ClassicHeader } from "@/components/classic/ClassicHeader";
 import { HeroSection } from "@/sections/HeroSection";
 import { AboutSection } from "@/sections/AboutSection";
 import { ExperienceSection } from "@/sections/ExperienceSection";
@@ -40,7 +39,9 @@ export const metadata: Metadata = {
 export default function ClassicPage() {
   return (
     <>
-      <ClassicHeader />
+      {/* The header comes from `classic/layout.tsx`, not from here. Rendering
+          it in both is how this route ended up with two stacked navigation
+          bars. */}
       <main id="main-content" data-plain>
         <HeroSection />
         <AboutSection />

@@ -29,11 +29,17 @@ export const TIME_ANCHOR_VALUE: Record<TimeAnchor, number> = {
   night: 0.9,
 };
 
+/** Ambient bed level, 0–1. Separate from `soundEnabled` on purpose: muting
+ * and turning the level down are different intents, and collapsing them means
+ * a visitor who mutes loses the level they had chosen. */
+export const DEFAULT_VOLUME = 0.5;
+
 export interface UiSlice {
   colorMode: ColorMode;
   timeMode: TimeMode;
   ambience: Ambience;
   soundEnabled: boolean;
+  volume: number;
   /** null = follow the OS. true/false = explicit visitor override. */
   manualReducedMotion: boolean | null;
   controlPanelOpen: boolean;
@@ -42,6 +48,7 @@ export interface UiSlice {
   setTimeMode: (mode: TimeMode) => void;
   setAmbience: (ambience: Ambience) => void;
   setSoundEnabled: (enabled: boolean) => void;
+  setVolume: (volume: number) => void;
   setManualReducedMotion: (value: boolean | null) => void;
   setControlPanelOpen: (open: boolean) => void;
 }
@@ -53,6 +60,7 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
   // Sound never starts on: browsers block unprompted audio, and a portfolio
   // that makes noise before being asked is the opposite of calm.
   soundEnabled: false,
+  volume: DEFAULT_VOLUME,
   manualReducedMotion: null,
   controlPanelOpen: false,
 
@@ -60,6 +68,7 @@ export const createUiSlice: StateCreator<UiSlice, [], [], UiSlice> = (set) => ({
   setTimeMode: (timeMode) => set({ timeMode }),
   setAmbience: (ambience) => set({ ambience }),
   setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
+  setVolume: (volume) => set({ volume: Math.min(1, Math.max(0, volume)) }),
   setManualReducedMotion: (manualReducedMotion) => set({ manualReducedMotion }),
   setControlPanelOpen: (controlPanelOpen) => set({ controlPanelOpen }),
 });

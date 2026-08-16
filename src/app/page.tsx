@@ -9,7 +9,6 @@ import { ContactSection } from "@/sections/ContactSection";
 import { SideNavigator } from "@/components/chrome/SideNavigator";
 import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
-import { AmbienceBridge } from "@/systems/audio/AmbienceBridge";
 import { EasterEggController } from "@/systems/easter-egg/EasterEggController";
 import { SectionObserver } from "@/systems/scroll/SectionObserver";
 
@@ -32,7 +31,6 @@ export default function HomePage() {
     <>
       <Backdrop />
       <SectionObserver />
-      <AmbienceBridge />
       <EasterEggController />
       <KeyboardShortcuts />
       <SideNavigator />

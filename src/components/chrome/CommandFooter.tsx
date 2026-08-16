@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Moon, Settings2, Sun, Volume2, VolumeX, Keyboard } from "lucide-react";
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
 import { about } from "@/content/about";
+import { VolumeSlider } from "./VolumeSlider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -67,19 +68,26 @@ export function CommandFooter({ variant }: { variant: "full" | "classic" }) {
           )}
         </button>
 
-        <button
-          type="button"
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          aria-label={soundEnabled ? "Turn ambient sound off" : "Turn ambient sound on"}
-          aria-pressed={soundEnabled}
-          className={iconButton}
-        >
-          {soundEnabled ? (
-            <Volume2 aria-hidden className="h-4 w-4" />
-          ) : (
-            <VolumeX aria-hidden className="h-4 w-4" />
-          )}
-        </button>
+        {/* The level only appears once sound is actually on. A slider sitting
+            next to a muted speaker is a control that does nothing, and on a
+            narrow strip it is also the thing that forces a second line. */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            aria-label={soundEnabled ? "Turn ambient sound off" : "Turn ambient sound on"}
+            aria-pressed={soundEnabled}
+            className={iconButton}
+          >
+            {soundEnabled ? (
+              <Volume2 aria-hidden className="h-4 w-4" />
+            ) : (
+              <VolumeX aria-hidden className="h-4 w-4" />
+            )}
+          </button>
+
+          {soundEnabled && <VolumeSlider id="footer-volume" className="hidden w-20 sm:block" />}
+        </div>
 
         <button
           type="button"

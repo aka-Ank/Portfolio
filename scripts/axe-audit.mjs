@@ -48,6 +48,24 @@ for (const [path, family] of targets) {
     console.log(`  [${v.impact}] ${v.id}: ${v.help}`);
     for (const n of v.nodes.slice(0, 3)) console.log(`      ${n.target.join(' ')}`);
   }
+
+  // Landmark uniqueness, checked separately because axe only flags duplicate
+  // landmarks under its `best-practice` tagset. /classic rendered two <header>
+  // elements for a while — once from its layout and once from its page — and
+  // nothing in the WCAG tagset noticed a whole second navigation bar.
+  const counts = await page.evaluate(() => ({
+    header: document.querySelectorAll('header').length,
+    main: document.querySelectorAll('main').length,
+    h1: document.querySelectorAll('h1').length,
+  }));
+  const expected = { header: path === '/classic' ? 1 : 0, main: 1, h1: 1 };
+  for (const [landmark, want] of Object.entries(expected)) {
+    if (counts[landmark] !== want) {
+      failed++;
+      console.log(`  [structure] expected ${want} <${landmark}>, found ${counts[landmark]}`);
+    }
+  }
+
   await ctx.close();
 }
 

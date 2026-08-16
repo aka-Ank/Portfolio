@@ -3,6 +3,7 @@
 import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
 import type { Ambience, ColorMode, TimeMode } from "@/state/uiSlice";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { VolumeSlider } from "./VolumeSlider";
 
 interface Option<T> {
   value: T;
@@ -111,6 +112,18 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
               checked={soundEnabled}
               onChange={setSoundEnabled}
             />
+
+            {/* The panel is where the level lives on mobile — the footer's
+                inline slider is desktop-only, so without this there would be
+                no way to set it on a phone. */}
+            {soundEnabled && (
+              <div className="flex items-center gap-3">
+                <label htmlFor="panel-volume" className="text-sm text-[var(--ink-muted)]">
+                  Volume
+                </label>
+                <VolumeSlider id="panel-volume" className="flex-1" />
+              </div>
+            )}
             <Toggle
               label="Motion"
               checked={!reducedMotion}

@@ -23,6 +23,7 @@ export const useAppStore = create<AppState>()(
         timeMode: state.timeMode,
         ambience: state.ambience,
         soundEnabled: state.soundEnabled,
+        volume: state.volume,
         manualReducedMotion: state.manualReducedMotion,
       }),
     },

@@ -31,8 +31,15 @@ get out of its way.
   navigation control. No scroll-snap — sections are sized by their content.
 - **The palette never depends on scroll position.** Time of day is a *setting*
   (`TimeMode`), not a function of how far down the page someone is.
-- **Everything on a project card is visible.** No disclosure widgets hiding the stack, the
-  problem or the links behind a click.
+- **A collapsed project card still shows the stack.** The cards are a native
+  `<details name="…">` exclusive accordion, and what is collapsed is the *detail* — problem,
+  contribution, metrics, links — never the title, year, summary or stack. The version that hid
+  the stack behind the toggle was unscannable and had to be flattened; the fix was promoting the
+  stack, not abandoning disclosure. Do not re-hide it, and do not replace the native `<details>`
+  with JS state.
+- **One content width, 1024px, for every section and the hero** — see `CONTENT_GRID`. Prose is
+  capped *inside* it, never by narrowing the grid. Three competing widths is what put the section
+  headings on three different left edges.
 - Motion is slow, damped and gradual — a transition should read as light changing, not as a
   toggle flipping. Nothing jitters, nothing is random.
 - **No career timeline anywhere.** Education and the internship are compact cards.

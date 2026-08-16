@@ -224,6 +224,78 @@ details[open]::details-content {
   block-size: auto;
 }
 
+/* `::details-content` is a pseudo-element the blanket `*, *::before, *::after`
+   reduced-motion rule above does not match, so it has to be named explicitly
+   or the card would keep easing open with motion switched off. */
+@media (prefers-reduced-motion: reduce) {
+  details::details-content {
+    transition: none;
+  }
+}
+[data-motion="off"] details::details-content {
+  transition: none;
+}
+
+/*
+ * Volume slider. A native range input, restyled — `appearance: none` drops the
+ * platform chrome, and the track is painted as a gradient stop at
+ * `--volume-pct` so the filled portion needs no second element.
+ *
+ * The thumb is 14px but the input is 24px tall, which keeps the hit target
+ * comfortable without drawing a 24px dot.
+ */
+.volume-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+}
+.volume-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent-ink) 0%,
+    var(--accent-ink) var(--volume-pct, 50%),
+    var(--border-soft) var(--volume-pct, 50%),
+    var(--border-soft) 100%
+  );
+}
+.volume-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--accent-ink) 0%,
+    var(--accent-ink) var(--volume-pct, 50%),
+    var(--border-soft) var(--volume-pct, 50%),
+    var(--border-soft) 100%
+  );
+}
+.volume-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 999px;
+  background: var(--accent-ink);
+  border: 2px solid var(--surface-solid);
+}
+.volume-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid var(--surface-solid);
+  background: var(--accent-ink);
+}
+.volume-slider:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
 /* The light↔dark crossfade. Slow enough to read as a dissolve rather than a
    swap; the browser falls back to an instant change where unsupported. */
 ::view-transition-old(root),

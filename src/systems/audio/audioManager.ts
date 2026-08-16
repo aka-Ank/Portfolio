@@ -4,19 +4,23 @@ import { Howl, Howler } from "howler";
  * section — the bed follows the same time-of-day value the palette does. */
 export type AmbienceBed = "dawn" | "day" | "sunset" | "night";
 
-// PLACEHOLDER SOURCES: synthesized in-house (see docs/05-asset-list.md) —
-// four distinct tones so the crossfade below is genuinely audible and
-// testable. Swap for real recorded ambience later; the crossfade mechanics
-// do not change.
+// PLACEHOLDER SOURCES: synthesized in-house — four distinct tones, so the
+// crossfade below is genuinely audible and testable. Swap the files for real
+// recorded ambience later; nothing in this module changes, because the paths
+// are the only thing that knows what a bed sounds like.
+//
+// AAC rather than WAV: the same four beds were 705KB each uncompressed, 2.7MB
+// for a feature nobody has switched on yet. At 64kbps they are ~42KB and the
+// difference is inaudible on ambience.
 const AMBIENCE_SRC: Record<AmbienceBed, string> = {
-  dawn: "/audio/ambience-dawn.wav",
-  day: "/audio/ambience-day.wav",
-  sunset: "/audio/ambience-sunset.wav",
-  night: "/audio/ambience-night.wav",
+  dawn: "/audio/ambience-dawn.m4a",
+  day: "/audio/ambience-day.m4a",
+  sunset: "/audio/ambience-sunset.m4a",
+  night: "/audio/ambience-night.m4a",
 };
 
 const SFX_SRC = {
-  confirm: "/audio/confirm-placeholder.wav",
+  confirm: "/audio/confirm-placeholder.m4a",
 } as const;
 
 const CROSSFADE_MS = 2200;
