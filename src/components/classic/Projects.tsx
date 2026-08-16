@@ -1,82 +1,146 @@
-import { labContent } from "@/world/scenes/lab/content";
+import { sdeContent, aimlContent } from "@/content/sections";
+import type { Project } from "@/content/schema";
 
-// Native <details>/<summary> for expand/collapse — zero JS needed, in
-// keeping with classic mode's "minimal JS" brief (docs/08-roadmap.md Phase 4).
+/**
+ * Two separate sections, not one "Projects" block — the SDE/AIML split is the
+ * point a visitor should leave with, and classic mode makes exactly the same
+ * point the immersive route does. Native `<details>` keeps it zero-JS.
+ */
 export function Projects() {
   return (
-    // One <section> per track, with the biome's own id: the two tracks are
-    // separate places in the immersive world (Ancient Grove / Mechanical
-    // Jungle), so classic mirrors that rather than collapsing them into one
-    // "Projects" block — and it keeps the cross-mode #anchor working for both.
     <>
-      {labContent.tracks.map((track) => (
-        <section
-          key={track.id}
-          id={track.id === "sde" ? "grove" : "jungle"}
-          aria-label={track.label}
-          className="mx-auto max-w-3xl px-6 py-24"
-        >
-          <h2 className="font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]">
-            {track.id === "sde" ? "Ancient Grove" : "Mechanical Jungle"}
-          </h2>
-          <p className="mt-1 font-[family-name:var(--font-mono)] text-xs tracking-wide text-[var(--primary)] uppercase">
-            {track.label}
-          </p>
-          <p className="mt-3 text-[var(--muted-foreground)]">{track.blurb}</p>
-          <div className="mt-8 flex flex-col gap-4">
-            {track.projects.map((project) => (
+      <TrackSection
+        id="sde"
+        heading={sdeContent.heading}
+        label="Software Engineering"
+        blurb={sdeContent.blurb}
+        projects={sdeContent.projects}
+        instrumented={false}
+      />
+      <TrackSection
+        id="aiml"
+        heading={aimlContent.heading}
+        label="AI / Machine Learning"
+        blurb={aimlContent.blurb}
+        projects={aimlContent.projects}
+        instrumented
+      />
+    </>
+  );
+}
+
+function TrackSection({
+  id,
+  heading,
+  label,
+  blurb,
+  projects,
+  instrumented,
+}: {
+  id: string;
+  heading: string;
+  label: string;
+  blurb: string;
+  projects: Project[];
+  instrumented: boolean;
+}) {
+  return (
+    <section id={id} aria-labelledby={`classic-${id}-heading`} className="mx-auto max-w-3xl px-6 py-16">
+      <p className="font-mono text-[11px] uppercase tracking-wider text-[var(--accent-ink)]">
+        {label}
+      </p>
+      <h2
+        id={`classic-${id}-heading`}
+        className="mt-3 font-[family-name:var(--font-display)] text-4xl text-[var(--ink)]"
+      >
+        {heading}
+      </h2>
+      <p className="mt-3 max-w-xl text-[var(--ink-muted)]">{blurb}</p>
+
+      <div className="mt-8 flex flex-col gap-4">
+        {projects.map((project) => (
           <details
             key={project.slug}
-            className="group rounded-lg border border-[var(--border)] p-5 open:bg-[var(--secondary)]"
+            className={`group border border-[var(--border-soft)] p-6 open:bg-[var(--surface-raised)] ${
+              instrumented ? "rounded-md" : "rounded-2xl"
+            }`}
           >
-            <summary className="cursor-pointer list-none rounded outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]">
-              <div className="flex items-center justify-between gap-4">
-                <span className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
+            <summary className="cursor-pointer list-none rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
+              <div className="flex items-start justify-between gap-6">
+                <h3
+                  className={`text-[var(--ink)] ${
+                    instrumented
+                      ? "text-xl font-medium tracking-tight"
+                      : "font-[family-name:var(--font-display)] text-2xl"
+                  }`}
+                >
                   {project.title}
-                </span>
+                </h3>
                 <span
                   aria-hidden
-                  className="text-[var(--muted-foreground)] transition-transform group-open:rotate-45"
+                  className="mt-1 shrink-0 text-xl leading-none text-[var(--ink-muted)] transition-transform group-open:rotate-45"
                 >
                   +
                 </span>
               </div>
-              <p className="mt-1 text-sm text-[var(--muted-foreground)]">{project.summary}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-[var(--ink-muted)]">
+                {project.summary}
+              </p>
             </summary>
 
-            <div className="mt-4 border-t border-[var(--border)] pt-4">
-              <p className="text-sm tracking-wide text-[var(--muted-foreground)] uppercase">
+            <div className="mt-5 border-t border-[var(--border-soft)] pt-5">
+              <p className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)]">
                 {project.role}
               </p>
-              <p className="mt-3 text-[var(--ink)]">{project.description}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <p className="mt-3 leading-relaxed text-[var(--ink)]">{project.description}</p>
+
+              <ul className="mt-5 flex flex-wrap gap-2">
                 {project.stack.map((tech) => (
-                  <span
+                  <li
                     key={tech}
-                    className="rounded-full bg-[var(--secondary)] px-3 py-1 font-[family-name:var(--font-mono)] text-xs text-[var(--secondary-foreground)]"
+                    className={`border border-[var(--border-soft)] px-3 py-1 font-mono text-xs text-[var(--ink-muted)] ${
+                      instrumented ? "rounded-sm" : "rounded-full"
+                    }`}
                   >
                     {tech}
-                  </span>
+                  </li>
                 ))}
-              </div>
-              <dl className="mt-4 grid grid-cols-3 gap-4">
-                {project.metrics.map((metric) => (
-                  <div key={metric.label}>
-                    <dt className="text-xs text-[var(--muted-foreground)]">{metric.label}</dt>
-                    {/* --primary, not --accent — see LearningJourney.tsx's
-                        comment (--accent on --paper is 2.2:1, fails AA). */}
-                    <dd className="font-[family-name:var(--font-mono)] text-lg text-[var(--primary)]">
-                      {metric.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              </ul>
+
+              {project.metrics.length > 0 && (
+                <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-3">
+                  {project.metrics.map((metric) => (
+                    <div key={metric.label}>
+                      <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)]">
+                        {metric.label}
+                      </dt>
+                      <dd className="mt-1 font-mono text-sm text-[var(--accent-ink)]">
+                        {metric.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+
+              {project.links.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-4">
+                  {project.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded text-sm text-[var(--accent-ink)] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+                    >
+                      {link.label} ↗
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </details>
-            ))}
-          </div>
-        </section>
-      ))}
-    </>
+        ))}
+      </div>
+    </section>
   );
 }

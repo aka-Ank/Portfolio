@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { about } from "@/content/about";
-import { useWorldStore } from "@/world/state/useWorldStore";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -18,9 +16,9 @@ type Status = "idle" | "streaming" | "error";
  * every other surface reads from (src/lib/chatbot-context.ts on the server
  * side), so it can never contradict what's on the page around it. Mounted
  * once in AppProviders so it's available in both immersive and classic
- * modes, per docs/08-roadmap.md Phase 4. KeyboardShortcuts already ignores
- * single-letter shortcuts while focus sits in an input/textarea, so this
- * widget's message box never fights the global hotkeys.
+ * modes. KeyboardShortcuts already ignores single-letter shortcuts while
+ * focus sits in an input or textarea, so this widget's message box never
+ * fights the global hotkeys.
  */
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -30,17 +28,6 @@ export function ChatWidget() {
   const [notConfigured, setNotConfigured] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const pathname = usePathname();
-  const phase = useWorldStore((s) => s.phase);
-  // The immersive route's Preloader is a full-screen, opaque, z-50 overlay
-  // that visually hides this widget (also z-50, but earlier in DOM order —
-  // see page.tsx) without blocking keyboard focus by itself. Without this,
-  // a Tab press can land on a completely invisible launcher button — a real
-  // bug a Tab-sequence test caught, not just a contrast-checker false
-  // positive. Classic mode has no Preloader/phase concept, so this only
-  // ever applies on "/".
-  const hiddenBehindPreloader = pathname === "/" && phase === "preloading";
-
   useEffect(() => {
     if (open) inputRef.current?.focus();
   }, [open]);
@@ -129,7 +116,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div inert={hiddenBehindPreloader}>
+    <div>
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}

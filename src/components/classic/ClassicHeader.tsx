@@ -1,54 +1,39 @@
 import Link from "next/link";
 import { about } from "@/content/about";
+import { SECTIONS } from "@/content/sections";
 
-// Anchors match the immersive biome ids wherever a biome exists, so the
-// mode switch (/classic#<currentChapter>) lands on the matching content.
-// Learning and Skills are sub-sections of the Valley biome, so they carry
-// in-page-only ids — the Valley's own anchor is About.
-const SECTIONS = [
-  { id: "valley", label: "About" },
-  { id: "learning", label: "Learning" },
-  { id: "skills", label: "Skills" },
-  { id: "grove", label: "SDE" },
-  { id: "jungle", label: "AI / ML" },
-  { id: "observatory", label: "Achievements" },
-  { id: "campfire", label: "Contact" },
-];
-
-// Plain anchor links, no JS — matches docs/08-roadmap.md Phase 4's "minimal
-// JS" brief for classic mode.
+/** Plain anchor links, no JS. Anchors are the shared section ids, so the mode
+ * switch (`/classic#<activeSection>`) always lands on matching content. */
 export function ClassicHeader() {
+  const navSections = SECTIONS.filter((section) => section.id !== "hero");
+
   return (
-    <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border)] bg-[var(--paper)]/90 px-6 py-3 backdrop-blur-sm">
+    <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-soft)] bg-[var(--surface)] px-6 py-3 backdrop-blur-md">
       <a
-        href="#entrance"
-        className="rounded font-[family-name:var(--font-display)] text-lg text-[var(--ink)] outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+        href="#hero"
+        className="rounded font-[family-name:var(--font-display)] text-lg text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
       >
         {about.name}
       </a>
+
       <nav aria-label="Sections" className="flex flex-wrap gap-4 text-sm">
-        {SECTIONS.map((section) => (
+        {navSections.map((section) => (
           <a
             key={section.id}
             href={`#${section.id}`}
-            className="rounded text-[var(--muted-foreground)] outline-offset-2 hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+            className="rounded text-[var(--ink-muted)] transition-colors hover:text-[var(--ink)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
           >
             {section.label}
           </a>
         ))}
       </nav>
-      {/* prefetch={false}: this Link sits in the initial viewport, so Next's
-          default viewport-triggered prefetch was silently downloading the
-          entire Three.js/R3F bundle for "/" in the background on every
-          /classic visit — a real, measured Lighthouse LCP regression (it
-          competes with /classic's own critical-path requests on a throttled
-          connection), not just a lab artifact. */}
+
       <Link
         href="/"
         prefetch={false}
-        className="rounded-md border border-[var(--border)] px-3 py-1.5 text-sm text-[var(--ink)] outline-offset-2 hover:bg-[var(--secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
+        className="rounded-md border border-[var(--border-soft)] px-3 py-1.5 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--surface-raised)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
       >
-        Enter immersive mode
+        Immersive mode
       </Link>
     </header>
   );

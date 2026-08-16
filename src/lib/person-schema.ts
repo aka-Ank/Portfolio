@@ -1,6 +1,6 @@
 import { about } from "@/content/about";
 import { resume } from "@/content/resume";
-import { campfireContent } from "@/world/scenes/campfire/content";
+import { contactContent } from "@/content/sections";
 import { SITE_URL } from "./site";
 
 /**
@@ -9,10 +9,10 @@ import { SITE_URL } from "./site";
  * site-wide, from the root layout (a Person represents site-wide identity,
  * not a single page). The `http`-prefix filter on sameAs stays as a guard:
  * the links are real profile URLs now, but a future in-page anchor added to
- * campfireContent would otherwise ship as a broken sameAs entry.
+ * contactContent would otherwise ship as a broken sameAs entry.
  */
 export function buildPersonSchema() {
-  const sameAs = campfireContent.links
+  const sameAs = contactContent.links
     .map((link) => link.href)
     .filter((href) => href.startsWith("http"));
 

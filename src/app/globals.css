@@ -1,165 +1,255 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * Two token systems, kept apart on purpose.
+ *
+ * 1. ATMOSPHERE tokens (--sky-*, --haze, --layer-*, --glow, --aether) are
+ *    decorative. They drift continuously with time-of-day and are never used
+ *    as a text colour or as the background behind text, so they cannot make
+ *    contrast fail.
+ * 2. SURFACE tokens (--surface*, --ink*, --border-soft, --focus-ring) are
+ *    contrast-critical. They only ever take one of two discrete values —
+ *    light or dark — and are swapped atomically inside a view transition, so
+ *    there is no intermediate state to fail an audit at.
+ *
+ * ThemeDriver writes both onto <html> at runtime. The values below are the
+ * first-paint defaults; they must stay in sync with src/systems/theme/palette.ts.
+ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--surface-solid);
+  --color-foreground: var(--ink);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
   --font-mono: var(--font-mono);
   --font-heading: var(--font-display);
+
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-surface-raised: var(--surface-raised);
   --color-ink: var(--ink);
-  --color-paper: var(--paper);
-  --color-ink-inverse: var(--ink-inverse);
-  --color-scrim: var(--scrim);
-  --color-focus-ring: var(--focus-ring);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --color-ink-muted: var(--ink-muted);
+  --color-accent-ink: var(--accent-ink);
+  --color-aether: var(--aether);
+
+  /* shadcn/base-ui primitives read these names. Mapped onto the two systems
+     above rather than kept as a third palette. */
+  --color-border: var(--border-soft);
+  --color-input: var(--border-soft);
+  --color-ring: var(--focus-ring);
+  --color-muted: var(--surface-raised);
+  --color-muted-foreground: var(--ink-muted);
+  --color-primary: var(--accent-ink);
+  --color-primary-foreground: var(--surface-solid);
+  --color-secondary: var(--surface-raised);
+  --color-secondary-foreground: var(--ink);
+  --color-accent: var(--surface-raised);
+  --color-accent-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface-solid);
+  --color-popover-foreground: var(--ink);
+  --color-destructive: oklch(0.58 0.22 27);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) * 1.4);
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/*
- * UI/chrome tokens — see docs/01-design-specification.md §3.2. Deliberately
- * FIXED, never time-of-day-driven: chrome text sits on an adaptive scrim
- * instead of chasing the world palette, so contrast can never silently fail
- * at some point in the day/night cycle. World tokens (sky/fog/light/Aether)
- * live in src/world/tokens.ts, consumed by the R3F engine directly — not
- * here, and not mixed with these.
- */
 :root {
-  --ink: oklch(0.16 0.01 260);
-  --paper: oklch(0.98 0.005 90);
-  --ink-inverse: oklch(0.97 0.005 90);
-  --scrim: oklch(0.1 0.02 260 / 55%);
-  --focus-ring: oklch(0.75 0.18 205);
+  --radius: 0.75rem;
 
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: var(--paper);
-  --card-foreground: var(--ink);
-  --popover: var(--paper);
-  --popover-foreground: var(--ink);
-  --primary: oklch(0.5 0.11 195);
-  --primary-foreground: oklch(0.98 0.01 195);
-  --secondary: oklch(0.94 0.01 90);
-  --secondary-foreground: var(--ink);
-  --muted: oklch(0.94 0.01 90);
-  --muted-foreground: oklch(0.45 0.01 90);
-  --accent: oklch(0.72 0.14 195);
-  --accent-foreground: oklch(0.12 0.02 195);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.01 90);
-  --input: oklch(0.88 0.01 90);
-  --ring: var(--focus-ring);
-  --chart-1: oklch(0.72 0.14 195);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.97 0.005 90);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--secondary);
-  --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--focus-ring);
+  /* Atmosphere — light family, dawn. */
+  --sky-top: oklch(0.72 0.06 265);
+  --sky-mid: oklch(0.83 0.05 40);
+  --sky-horizon: oklch(0.91 0.06 60);
+  --haze: oklch(0.93 0.025 55);
+  --haze-strength: 0.28;
+  --layer-far: oklch(0.78 0.03 250);
+  --layer-mid: oklch(0.62 0.05 190);
+  --layer-near: oklch(0.42 0.05 165);
+  --glow: oklch(0.95 0.08 75);
+  --aether: oklch(0.72 0.1 195);
+
+  /* Surfaces — light. */
+  --surface: oklch(0.99 0.004 90 / 0.88);
+  --surface-solid: oklch(0.99 0.004 90);
+  --surface-raised: oklch(0.97 0.006 90 / 0.94);
+  --border-soft: oklch(0.86 0.012 90);
+  --ink: oklch(0.18 0.012 260);
+  --ink-muted: oklch(0.44 0.012 250);
+  --accent-ink: oklch(0.45 0.11 195);
+  --focus-ring: oklch(0.45 0.14 205);
 }
 
-.dark {
-  --ink: oklch(0.97 0.005 90);
-  --paper: oklch(0.16 0.012 260);
-  /* --ink-inverse and --scrim are NOT part of the light/dark UI theme pair
-     — every real usage (grep for both) is chrome text sitting over the
-     immersive 3D world, which is never a controlled dark UI surface. The
-     mechanical light/dark inversion shadcn's scaffold applied to every
-     token broke this pair specifically: dark ink-inverse text composited
-     over a translucent dark scrim, sitting on top of a bright world
-     background, fails WCAG AA badly (contrast-audit.test.ts caught ratios
-     as low as ~1.0). Kept identical to :root's values, which the audit
-     verifies pass at every time-of-day anchor. */
-  --ink-inverse: oklch(0.97 0.005 90);
-  --scrim: oklch(0.1 0.02 260 / 55%);
-  --focus-ring: oklch(0.78 0.18 205);
+/* Honours the OS preference before any JS runs, so a dark-mode visitor never
+   sees a flash of the light palette. ThemeDriver takes over on mount. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-family="light"]) {
+    --sky-top: oklch(0.15 0.035 268);
+    --sky-mid: oklch(0.19 0.04 265);
+    --sky-horizon: oklch(0.24 0.045 258);
+    --haze: oklch(0.22 0.03 262);
+    --layer-far: oklch(0.165 0.03 265);
+    --layer-mid: oklch(0.13 0.025 250);
+    --layer-near: oklch(0.095 0.02 235);
+    --glow: oklch(0.78 0.04 245);
+    --aether: oklch(0.76 0.16 205);
 
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: oklch(0.21 0.012 260);
-  --card-foreground: var(--ink);
-  --popover: oklch(0.21 0.012 260);
-  --popover-foreground: var(--ink);
-  --primary: oklch(0.75 0.14 195);
-  --primary-foreground: oklch(0.12 0.02 195);
-  --secondary: oklch(0.27 0.012 260);
-  --secondary-foreground: var(--ink);
-  --muted: oklch(0.27 0.012 260);
-  --muted-foreground: oklch(0.7 0.01 90);
-  --accent: oklch(0.75 0.18 205);
-  --accent-foreground: oklch(0.1 0.02 205);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: var(--focus-ring);
-  --chart-1: oklch(0.75 0.18 205);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.21 0.012 260);
-  --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--secondary);
-  --sidebar-accent-foreground: var(--ink);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: var(--focus-ring);
+    --surface: oklch(0.2 0.018 262 / 0.82);
+    --surface-solid: oklch(0.18 0.018 262);
+    --surface-raised: oklch(0.24 0.02 262 / 0.9);
+    --border-soft: oklch(0.32 0.02 260);
+    --ink: oklch(0.96 0.006 90);
+    --ink-muted: oklch(0.74 0.012 250);
+    --accent-ink: oklch(0.8 0.12 200);
+    --focus-ring: oklch(0.82 0.14 205);
+  }
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
+    background-color: var(--surface-solid);
+    scroll-behavior: smooth;
   }
+
+  body {
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--aether) 35%, transparent);
+    color: var(--ink);
+  }
+}
+
+/*
+ * Motion.
+ *
+ * Every ambient animation is defined once here and gated twice: by the OS
+ * `prefers-reduced-motion` setting, and by [data-motion="off"], which the
+ * control panel sets when a visitor turns motion off explicitly. Core content
+ * never depends on any of it.
+ */
+
+@keyframes sway-slow {
+  0%, 100% { transform: rotate(-0.55deg); }
+  50% { transform: rotate(0.55deg); }
+}
+@keyframes sway-soft {
+  0%, 100% { transform: skewX(-1.1deg); }
+  50% { transform: skewX(1.1deg); }
+}
+@keyframes sway-canopy {
+  0%, 100% { transform: translateY(0) rotate(-0.25deg); }
+  50% { transform: translateY(6px) rotate(0.25deg); }
+}
+@keyframes drift-slow {
+  0%, 100% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+}
+@keyframes pulse-node {
+  0%, 100% { opacity: 0.28; r: 5; }
+  50% { opacity: 0.72; r: 8; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.85; }
+}
+@keyframes ember {
+  0% { opacity: 0; transform: translateY(0) scale(0.7); }
+  20% { opacity: 0.75; }
+  100% { opacity: 0; transform: translateY(-90px) scale(0.35); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.sway-slow { animation: sway-slow 13s ease-in-out infinite; }
+.sway-soft { animation: sway-soft 9s ease-in-out infinite; }
+.sway-canopy { animation: sway-canopy 17s ease-in-out infinite; }
+.drift-slow { animation: drift-slow 11s ease-in-out infinite; }
+.pulse-node { animation: pulse-node 6s ease-in-out infinite; }
+.twinkle { animation: twinkle 5s ease-in-out infinite; }
+.ember { animation: ember 7s ease-out infinite; }
+.breathe { animation: breathe 8s ease-in-out infinite; }
+
+/* Content reveal. Opacity-and-lift only, once, on entry — never a slide from
+   off-screen, never a bounce, never triggered twice. */
+.reveal {
+  opacity: 0;
+}
+.reveal[data-revealed="true"] {
+  animation: rise-in 900ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal, .reveal[data-revealed="true"] { opacity: 1; animation: none; }
+}
+
+[data-motion="off"] {
+  scroll-behavior: auto;
+}
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+[data-motion="off"] .reveal,
+[data-motion="off"] .reveal[data-revealed="true"] {
+  opacity: 1;
+  animation: none;
+}
+
+/* Disclosure easing for the project cards, with no JS involved. Where
+   `interpolate-size` is unsupported the card simply opens instantly — a
+   perfectly good outcome, and the reason this is worth doing in CSS. */
+:root {
+  interpolate-size: allow-keywords;
+}
+details::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 420ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    content-visibility 420ms allow-discrete;
+}
+details[open]::details-content {
+  block-size: auto;
+}
+
+/* The light↔dark crossfade. Slow enough to read as a dissolve rather than a
+   swap; the browser falls back to an instant change where unsupported. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 620ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

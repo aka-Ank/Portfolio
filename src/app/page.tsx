@@ -1,214 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { useWorldStore } from "@/world/state/useWorldStore";
-import { registerWorldTransitions } from "@/world/scenes/transitions";
-import { TransitionController } from "@/world/systems/transitions/TransitionController";
-import { EasterEggController } from "@/world/systems/easter-egg/EasterEggController";
-import { useChapterNavigation } from "@/world/systems/navigation/useChapterNavigation";
-import { ChapterOverlay } from "@/components/chrome/ChapterOverlay";
-import { DeepDiveLayer } from "@/components/chrome/DeepDiveLayer";
-import { Preloader } from "@/components/chrome/Preloader";
-import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
-import { ChapterNavigator } from "@/components/chrome/ChapterNavigator";
+import { AtmosphereStage } from "@/scenes/atmosphere/AtmosphereStage";
+import { HeroSection } from "@/scenes/sections/HeroSection";
+import { AboutSection } from "@/scenes/sections/AboutSection";
+import { SdeSection, AimlSection } from "@/scenes/sections/ProjectsSection";
+import { SkillsSection } from "@/scenes/sections/SkillsSection";
+import { EducationSection } from "@/scenes/sections/EducationSection";
+import { SignalsSection } from "@/scenes/sections/SignalsSection";
+import { ContactSection } from "@/scenes/sections/ContactSection";
+import { SideNavigator } from "@/components/chrome/SideNavigator";
 import { CommandFooter } from "@/components/chrome/CommandFooter";
-import { WebGLErrorBoundary } from "@/components/chrome/WebGLErrorBoundary";
-import { WebGLFallback } from "@/components/chrome/WebGLFallback";
-import { useWebGLSupport } from "@/hooks/useWebGLSupport";
-import { AmbientAudioBridge } from "@/world/systems/audio/AmbientAudioBridge";
-import { initAudio, setMuted } from "@/world/systems/audio/audioManager";
-import type { DeviceTier, TimeOfDayAnchor } from "@/types/world";
+import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
+import { AmbienceBridge } from "@/systems/audio/AmbienceBridge";
+import { EasterEggController } from "@/systems/easter-egg/EasterEggController";
+import { useSectionObserver } from "@/systems/scroll/useSectionObserver";
 
-// R3F/WebGL isn't SSR-safe — standard Next.js pattern for canvas content.
-const WorldCanvas = dynamic(
-  () => import("@/world/engine/WorldCanvas").then((m) => m.WorldCanvas),
-  { ssr: false },
-);
-const World = dynamic(() => import("@/world/scenes/World").then((m) => m.World), {
-  ssr: false,
-});
-
-const ANCHORS: TimeOfDayAnchor[] = ["dawn", "day", "sunset", "night"];
-const TIERS: DeviceTier[] = ["low", "mid", "high"];
-
-export default function Home() {
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [muted, setMutedState] = useState(false);
-  const [debugOpen, setDebugOpen] = useState(false);
-  // The canvas doesn't exist until the visitor enters. Mounting it behind the
-  // Preloader pre-warmed the scene, but it also meant every visitor paid for
-  // Three.js init, renderer creation and the whole scene graph *before* the
-  // page could finish painting — the dominant remaining cost in Lighthouse.
-  // Nobody sees that work, so nobody should wait for it.
-  const [worldMounted, setWorldMounted] = useState(false);
-  const phase = useWorldStore((s) => s.phase);
-  const currentChapter = useWorldStore((s) => s.currentChapter);
-  const journeyProgress = useWorldStore((s) => s.journeyProgress);
-  const targetAnchor = useWorldStore((s) => s.targetAnchor);
-  const tier = useWorldStore((s) => s.tier);
-  const reducedMotion = useWorldStore((s) => s.reducedMotion);
-  const manualReducedMotion = useWorldStore((s) => s.manualReducedMotion);
-  const loreFound = useWorldStore((s) => s.loreFound);
-  const setTargetAnchor = useWorldStore((s) => s.setTargetAnchor);
-  const setTier = useWorldStore((s) => s.setTier);
-  const setManualReducedMotion = useWorldStore((s) => s.setManualReducedMotion);
-  const goToChapter = useWorldStore((s) => s.goToChapter);
-  const setPhase = useWorldStore((s) => s.setPhase);
-  const webglSupported = useWebGLSupport();
-
-  // Wheel / swipe / arrow keys step one chapter at a time. Disabled until
-  // the visitor has entered, so a stray scroll behind the Preloader can't
-  // move the world before they've seen it.
-  useChapterNavigation(webglSupported && phase !== "preloading");
-
-  useEffect(() => {
-    registerWorldTransitions();
-  }, []);
-
-  function enter() {
-    initAudio();
-    setMuted(false);
-    setAudioEnabled(true);
-    setMutedState(false);
-    goToChapter("entrance");
-    setWorldMounted(true);
-    // Deliberately does NOT flip the phase here. The Preloader stays up until
-    // the renderer reports ready (onReady below), so the reveal is a fade from
-    // preloader into a live scene rather than a white gap while Three.js
-    // initialises. A timeout backstops it in case onCreated never fires.
-    window.setTimeout(() => setPhase("active"), 2000);
-  }
-
-  function toggleMute() {
-    const next = !muted;
-    setMutedState(next);
-    setMuted(next);
-  }
-
-  // No point mounting any of the scroll/chapter/3D machinery if WebGL
-  // isn't there to drive it — offer classic mode directly instead of a
-  // blank or broken canvas.
-  if (!webglSupported) {
-    return <WebGLFallback />;
-  }
+/**
+ * The immersive route: eight sections over one fixed atmospheric backdrop.
+ *
+ * The scroll model is entirely native — `snap-y snap-mandatory` on the
+ * document, `snap-start` on each section. Nothing here listens to a wheel
+ * event or moves the page itself, so the visitor's own scrolling always wins.
+ * `useSectionObserver` only *reports* where they have arrived, which is what
+ * drives the atmosphere and the navigator.
+ */
+export default function ImmersivePage() {
+  useSectionObserver();
 
   return (
-    // TransitionController + EasterEggController live here, not in the
-    // shared root AppProviders — they're immersive-route-only and were
-    // previously shipping GSAP to /classic's bundle for no benefit (see
-    // AppProviders.tsx's comment).
-    //
-    // There is no ScrollProvider and no scroll spacer any more: direct
-    // chapter switching means the immersive route is a fixed viewport driven
-    // by discrete navigation events, not a tall scrollable document.
-    // ChapterWatcher is gone with it — it derived currentChapter *from*
-    // scroll progress, and that relationship is now inverted.
     <>
-      <TransitionController />
+      <AtmosphereStage />
+      <AmbienceBridge />
       <EasterEggController />
-      <main id="main-content" className="relative h-dvh overflow-hidden">
-        <AmbientAudioBridge enabled={audioEnabled} />
-        <ChapterOverlay />
-        <DeepDiveLayer />
-        <KeyboardShortcuts audioEnabled={audioEnabled} onToggleMute={toggleMute} />
-        <ChapterNavigator />
+      <KeyboardShortcuts />
+      <SideNavigator />
 
-        <div
-          id="scene-transition-veil"
-          style={{ opacity: 0 }}
-          className="pointer-events-none fixed inset-0 z-40 bg-white"
-          aria-hidden
-        />
-
-        <div className="fixed inset-0 z-0">
-          <WebGLErrorBoundary>
-            {worldMounted && (
-              <WorldCanvas onReady={() => setPhase("active")}>
-                <World />
-              </WorldCanvas>
-            )}
-          </WebGLErrorBoundary>
-        </div>
-
-        {phase === "preloading" && <Preloader onEnter={enter} />}
-
-        {/* inert while the (opaque, full-screen, z-50) Preloader is showing —
-            this bar sits at z-30, fully hidden behind it, but without inert a
-            keyboard/screen-reader visitor can still Tab into completely
-            invisible controls (caught by a real Tab-sequence test, not just
-            Lighthouse's contrast audit — see ENGINEER_NOTES.md "Lighthouse
-            performance audit"). */}
-        <div
-          inert={phase === "preloading"}
-          className="pointer-events-none fixed inset-x-0 top-0 z-30 flex flex-wrap items-center gap-3 bg-[var(--scrim)] p-3 text-sm text-[var(--ink-inverse)]"
-        >
-          <button
-            onClick={() => setDebugOpen((v) => !v)}
-            className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-          >
-            Dev tools {debugOpen ? "▲" : "▼"}
-          </button>
-
-          {debugOpen && (
-            <>
-              <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-                <span className="opacity-70">Time of day:</span>
-                {ANCHORS.map((anchor) => (
-                  <button
-                    key={anchor}
-                    onClick={() => setTargetAnchor(anchor)}
-                    aria-pressed={targetAnchor === anchor}
-                    className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                      targetAnchor === anchor ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-                    }`}
-                  >
-                    {anchor}
-                  </button>
-                ))}
-              </div>
-
-              <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-                <span className="opacity-70">Device tier:</span>
-                {TIERS.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTier(t)}
-                    aria-pressed={tier === t}
-                    className={`rounded px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] ${
-                      tier === t ? "bg-[var(--accent)] text-[var(--accent-foreground)]" : "bg-white/10"
-                    }`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() =>
-                  setManualReducedMotion(manualReducedMotion === null ? !reducedMotion : null)
-                }
-                aria-pressed={reducedMotion}
-                className="pointer-events-auto rounded bg-white/10 px-2 py-1 outline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)]"
-              >
-                Reduced motion: {reducedMotion ? "on" : "off"}
-                {manualReducedMotion !== null ? " (manual)" : ""}
-              </button>
-            </>
-          )}
-
-          <div className="ml-auto pointer-events-none opacity-80">
-            {currentChapter} · {Math.round(journeyProgress * 100)}% · phase: {phase}
-            {loreFound.length > 0 ? ` · lore found: ${loreFound.length}` : ""}
-            <span className="ml-2 opacity-60">· press / for shortcuts</span>
-          </div>
-        </div>
-
-        <CommandFooter
-          variant="immersive"
-          audio={{ enabled: audioEnabled, muted, onToggleMute: toggleMute }}
-        />
+      <main id="main-content" className="snap-y snap-mandatory pb-16">
+        <HeroSection />
+        <AboutSection />
+        <SdeSection />
+        <AimlSection />
+        <SkillsSection />
+        <EducationSection />
+        <SignalsSection />
+        <ContactSection />
       </main>
+
+      <CommandFooter variant="immersive" />
     </>
   );
 }

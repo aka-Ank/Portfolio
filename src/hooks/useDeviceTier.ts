@@ -1,21 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useWorldStore } from "@/world/state/useWorldStore";
-import type { DeviceTier } from "@/types/world";
+import { useAppStore } from "@/state/useAppStore";
+import type { DeviceTier } from "@/state/deviceSlice";
 
 /**
- * One-time heuristic guess at device tier before the real signal
- * (drei's PerformanceMonitor, running inside the Canvas) has collected any
- * frames. GPU string sniffing is deliberately avoided — WEBGL_debug_renderer_info
- * is increasingly restricted/spoofed by browsers, so it's not a reliable
- * signal (see ENGINEER_NOTES.md "device-tier detection heuristic"). This
- * only sets a conservative starting point; PerformanceGovernor corrects it
- * upward or downward once real frame timing exists.
+ * A one-time, conservative guess at how much ambient decoration this device
+ * should be asked to draw. It only sets the particle budget — nothing about
+ * layout or content depends on it — so being wrong costs a slightly emptier
+ * or slightly busier backdrop and nothing else.
+ *
+ * GPU-string sniffing is deliberately avoided: `WEBGL_debug_renderer_info` is
+ * increasingly restricted and spoofed, and there is no WebGL context here to
+ * ask anyway.
  */
-function guessInitialTier(): DeviceTier {
-  if (typeof navigator === "undefined") return "mid";
-
+function guessTier(): DeviceTier {
   const cores = navigator.hardwareConcurrency ?? 4;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
   const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
@@ -25,16 +24,14 @@ function guessInitialTier(): DeviceTier {
   return "mid";
 }
 
-/** Mount once, high in the tree — seeds the store's device tier on load. */
+/** Mount once, high in the tree. */
 export function useDeviceTier(): DeviceTier {
-  const tier = useWorldStore((s) => s.tier);
-  const setTier = useWorldStore((s) => s.setTier);
+  const tier = useAppStore((s) => s.tier);
+  const setTier = useAppStore((s) => s.setTier);
 
   useEffect(() => {
-    setTier(guessInitialTier());
-    // Intentionally runs once — PerformanceGovernor takes over from here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setTier(guessTier());
+  }, [setTier]);
 
   return tier;
 }

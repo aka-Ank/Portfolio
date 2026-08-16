@@ -1,73 +1,83 @@
 "use client";
 
 import { useEffect } from "react";
-import { AnimatePresence } from "motion/react";
-import { getWorldState, useWorldStore } from "@/world/state/useWorldStore";
-import { scrollToChapter } from "@/world/systems/scroll-camera/scrollToChapter";
+import { SECTIONS } from "@/content/sections";
+import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
+import { scrollToSection } from "@/systems/scroll/scrollToSection";
 import { HelpOverlay } from "./HelpOverlay";
-import { SceneBookmarks } from "./SceneBookmarks";
+import { ControlPanel } from "./ControlPanel";
+
+/** True when the keypress belongs to something the visitor is typing into. */
+function isTypingTarget(target: EventTarget | null): boolean {
+  const element = target as HTMLElement | null;
+  if (!element) return false;
+  return (
+    element.isContentEditable ||
+    ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName)
+  );
+}
 
 /**
- * Global shortcut listener — P/R/G/C/? per docs/08-roadmap.md Phase 4.
- * Ignores keystrokes while typing in an input/textarea (e.g. the future
- * chatbot's message box) so shortcuts never fight normal text entry.
+ * Global shortcuts, and the panels they open. Mounted once on the immersive
+ * route.
+ *
+ * The arrow/J/K bindings deliberately do **not** preventDefault on plain
+ * arrow keys — native scrolling already works, and the CSS snap points give
+ * it the same landing position. They only step explicitly when the visitor
+ * uses J/K, which no browser has a default for.
  */
-export function KeyboardShortcuts({
-  audioEnabled,
-  onToggleMute,
-}: {
-  audioEnabled: boolean;
-  onToggleMute: () => void;
-}) {
-  const panel = useWorldStore((s) => s.chromePanel);
-  const setPanel = useWorldStore((s) => s.setChromePanel);
-  const setManualReducedMotion = useWorldStore((s) => s.setManualReducedMotion);
-  const reducedMotion = useWorldStore((s) => s.reducedMotion);
+export function KeyboardShortcuts() {
+  const chromePanel = useAppStore((s) => s.chromePanel);
+  const setChromePanel = useAppStore((s) => s.setChromePanel);
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const target = e.target as HTMLElement;
-      if (["INPUT", "TEXTAREA"].includes(target.tagName) || target.isContentEditable) return;
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (isTypingTarget(event.target)) return;
 
-      switch (e.key) {
-        case "/":
-        case "?":
-          e.preventDefault();
-          setPanel(getWorldState().chromePanel === "help" ? null : "help");
+      const state = useAppStore.getState();
+
+      if (event.key === "Escape") {
+        state.setChromePanel(null);
+        return;
+      }
+
+      const step = (delta: number) => {
+        const index = SECTIONS.findIndex((s) => s.id === state.activeSection);
+        const next = SECTIONS[Math.min(Math.max(index + delta, 0), SECTIONS.length - 1)];
+        if (next) scrollToSection(next.id);
+      };
+
+      switch (event.key.toLowerCase()) {
+        case "j":
+          step(1);
           break;
-        case "g":
-        case "G":
-          setPanel(getWorldState().chromePanel === "bookmarks" ? null : "bookmarks");
+        case "k":
+          step(-1);
+          break;
+        case "t":
+          state.setChromePanel(state.chromePanel === "controls" ? null : "controls");
           break;
         case "c":
-        case "C":
-          scrollToChapter("campfire");
-          setPanel(null);
+          scrollToSection("contact");
           break;
-        case "r":
-        case "R":
-          setManualReducedMotion(!reducedMotion);
+        case "m": {
+          const reduced = selectReducedMotion(state);
+          state.setManualReducedMotion(!reduced);
           break;
-        case "p":
-        case "P":
-          if (audioEnabled) onToggleMute();
-          break;
-        case "Escape":
-          setPanel(null);
+        }
+        case "/":
+          event.preventDefault();
+          state.setChromePanel(state.chromePanel === "help" ? null : "help");
           break;
       }
     }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [audioEnabled, onToggleMute, reducedMotion, setManualReducedMotion, setPanel]);
 
-  return (
-    <AnimatePresence>
-      {panel === "help" && <HelpOverlay key="help" onClose={() => setPanel(null)} />}
-      {panel === "bookmarks" && (
-        <SceneBookmarks key="bookmarks" onClose={() => setPanel(null)} />
-      )}
-    </AnimatePresence>
-  );
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  if (chromePanel === "help") return <HelpOverlay onClose={() => setChromePanel(null)} />;
+  if (chromePanel === "controls") return <ControlPanel onClose={() => setChromePanel(null)} />;
+  return null;
 }

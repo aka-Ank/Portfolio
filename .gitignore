@@ -43,3 +43,6 @@ next-env.d.ts
 # private working files — never commit or push
 SESSION.md
 ENGINEER_NOTES.md
+.playwright-mcp/
+
+.serena/
