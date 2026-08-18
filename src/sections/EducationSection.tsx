@@ -1,5 +1,5 @@
 import { educationContent } from "@/content/sections";
-import { SectionShell, Panel } from "./SectionShell";
+import { SectionShell, BentoGrid, Panel } from "./SectionShell";
 
 /** Education and the one real certification, side by side. The certification
  * list stays at its true length rather than being padded to fill the row —
@@ -9,8 +9,8 @@ export function EducationSection() {
 
   return (
     <SectionShell id="education" heading={educationContent.heading}>
-      <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <Panel as="article">
+      <BentoGrid>
+        <Panel as="article" className="lg:col-span-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className="text-xl font-medium text-[var(--ink)]">{education.institution}</h3>
             <span className="font-mono text-xs text-[var(--ink-muted)]">{education.period}</span>
@@ -38,9 +38,13 @@ export function EducationSection() {
           </div>
         </Panel>
 
-        <div className="space-y-4">
+        {/* A flex column with growing children rather than `space-y`, so the
+            certification card's bottom edge lines up with the degree card's
+            instead of stopping short of it. With more than one certification
+            they simply share the height. */}
+        <div className="flex flex-col gap-4 lg:col-span-2">
           {certifications.map((certification) => (
-            <Panel key={certification.id} as="article">
+            <Panel key={certification.id} as="article" className="flex-1">
               <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent-ink)]">
                 Certification
               </h3>
@@ -57,7 +61,7 @@ export function EducationSection() {
             </Panel>
           ))}
         </div>
-      </div>
+      </BentoGrid>
     </SectionShell>
   );
 }

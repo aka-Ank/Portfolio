@@ -21,18 +21,24 @@ const CONTACT_LINK =
  * project grid rather than floating at their own width.
  *
  * The two scroll CTAs are the only client-side code here.
+ *
+ * The minimum height is 70svh rather than 80: at 80 the card carried 292px of
+ * dead space around 428px of content, the largest empty block on the page. A
+ * minimum is kept at all because the About heading appearing just below the
+ * fold is what tells a visitor there is more, and a purely content-sized hero
+ * loses that on a tall display.
  */
 export function HeroSection() {
   return (
     <section
       id={sectionElementId("hero")}
       aria-labelledby="hero-heading"
-      className="flex min-h-[80svh] scroll-mt-20 items-center px-6 py-16 sm:px-10"
+      className="flex min-h-[62svh] scroll-mt-20 items-center px-5 py-8 sm:min-h-[70svh] sm:px-10 sm:py-14"
     >
       <div
         className={cn(
           CONTENT_GRID,
-          "rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] p-8 backdrop-blur-md sm:p-10",
+          "rounded-[1.5rem] border border-[var(--border-soft)] bg-[var(--surface)] p-6 shadow-[0_1px_2px_oklch(0_0_0/0.03),0_12px_36px_-16px_oklch(0_0_0/0.12)] backdrop-blur-md sm:p-9",
         )}
       >
         <p className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] bg-[var(--surface-raised)] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--ink-muted)]">
@@ -44,20 +50,20 @@ export function HeroSection() {
 
         <h1
           id="hero-heading"
-          className="mt-6 font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,4.5rem)] leading-[1] tracking-[-0.02em] text-[var(--ink)]"
+          className="mt-5 font-[family-name:var(--font-display)] text-[clamp(2.75rem,7vw,4.5rem)] leading-[1] tracking-[-0.02em] text-[var(--ink)]"
         >
           {heroContent.name}
         </h1>
 
-        <p className="mt-3 text-xl text-[var(--ink)] sm:text-2xl">{heroContent.role}</p>
+        <p className="mt-2.5 text-xl text-[var(--ink)] sm:text-2xl">{heroContent.role}</p>
 
-        <p className={cn("mt-3 text-[17px] leading-relaxed text-[var(--ink-muted)]", PROSE_MEASURE)}>
+        <p className={cn("mt-2.5 text-[17px] leading-relaxed text-[var(--ink-muted)]", PROSE_MEASURE)}>
           {heroContent.tagline}
         </p>
 
         {/* The full grid width is what lets all four of these sit on one line
             at desktop instead of wrapping LinkedIn onto a second row. */}
-        <ul className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-[var(--border-soft)] pt-5 text-[15px]">
+        <ul className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-[var(--border-soft)] pt-4 text-[15px]">
           <li className="flex items-center gap-2 text-[var(--ink-muted)]">
             <MapPin aria-hidden className="h-4 w-4 shrink-0" />
             {heroContent.location}
@@ -83,7 +89,7 @@ export function HeroSection() {
           })}
         </ul>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-2.5">
           <SectionJumpButton
             target={heroContent.primaryCta.target}
             className="rounded-lg bg-[var(--accent-ink)] px-5 py-2.5 text-[15px] font-medium text-[var(--surface-solid)] transition-opacity hover:opacity-90"

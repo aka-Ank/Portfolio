@@ -42,15 +42,19 @@ interface SectionShellProps {
  * bundle.
  *
  * Sections are sized by their content rather than pinned to the viewport, and
- * the padding is deliberately modest: an earlier version left 224px of empty
- * space between every section, which was 24% of the whole page.
+ * the padding is deliberately modest. This has been tightened twice, both times
+ * against a measurement rather than a feeling: an early version left 224px
+ * between sections (24% of the page), the next left 128px (27.5%, because the
+ * page had also got shorter), and this one leaves 96px. Below about 80px the
+ * headings stop reading as section breaks and the page becomes one long column,
+ * so this is close to the floor rather than a first cut.
  */
 export function SectionShell({ id, heading, blurb, children, className }: SectionShellProps) {
   return (
     <section
       id={sectionElementId(id)}
       aria-labelledby={`${id}-heading`}
-      className={cn("scroll-mt-20 px-6 py-12 sm:px-10 sm:py-16", className)}
+      className={cn("scroll-mt-20 px-5 py-8 sm:px-10 sm:py-12", className)}
     >
       <Reveal className={CONTENT_GRID}>
         <h2
@@ -60,13 +64,56 @@ export function SectionShell({ id, heading, blurb, children, className }: Sectio
           {heading}
         </h2>
         {blurb && (
-          <p className={cn("mt-3 text-[17px] leading-relaxed text-[var(--ink-muted)]", PROSE_MEASURE)}>
+          <p className={cn("mt-2.5 text-[17px] leading-relaxed text-[var(--ink-muted)]", PROSE_MEASURE)}>
             {blurb}
           </p>
         )}
-        <div className="mt-8">{children}</div>
+        <div className="mt-5 sm:mt-6">{children}</div>
       </Reveal>
     </section>
+  );
+}
+
+/**
+ * The one bento grid, shared by every section.
+ *
+ * Six columns at desktop, four at tablet, one on a phone. Tiles claim spans out
+ * of that — 4+2, 3+3, 6 — so the page has a single underlying rhythm while no
+ * two sections look identical. A six-up grid of equal boxes is a table with
+ * rounded corners; what makes a bento read as designed is that the spans follow
+ * the *content*, so the block with the most in it gets the most room.
+ *
+ * `stretch` is on by default, which levels every tile in a row so varying spans
+ * never leaves ragged bottoms. The project grids turn it **off**: their cards
+ * are disclosure widgets, and a stretched row would make opening one silently
+ * inflate the blank space beside it.
+ *
+ * **Levelling only applies from `sm:` up, and that is the whole point.** At one
+ * column every tile is its own row, so `auto-rows-fr` levels them against each
+ * other — the tallest card in the section sets the height of every card in it.
+ * Measured on a 390px screen that put 276px of dead space inside a card holding
+ * four words. Levelling is a fix for *side-by-side* tiles; with nothing
+ * alongside them there is nothing to level, only emptiness to add.
+ */
+export function BentoGrid({
+  children,
+  stretch = true,
+  className,
+}: {
+  children: ReactNode;
+  stretch?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6",
+        stretch ? "sm:auto-rows-fr" : "items-start",
+        className,
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -84,7 +131,7 @@ export function Panel({
   return (
     <Tag
       className={cn(
-        "rounded-xl border border-[var(--border-soft)] bg-[var(--surface)] p-6 backdrop-blur-md",
+        "rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] p-5 shadow-[0_1px_2px_oklch(0_0_0/0.03),0_8px_24px_-12px_oklch(0_0_0/0.10)] backdrop-blur-md sm:p-6",
         className,
       )}
     >

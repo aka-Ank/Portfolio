@@ -25,12 +25,16 @@ const TIME_MODES: Option<TimeMode>[] = [
   { value: "night", label: "Night" },
 ];
 
+/** Labels are the visitor's vocabulary, not the code's: `breeze` reads as
+ * "Windy" and `rain` as "Rainy". The identifiers stay as they are because they
+ * are persisted — see the note on `Weather`. */
 const WEATHERS: Option<Weather>[] = [
   { value: "clear", label: "Clear" },
-  { value: "cloudy", label: "Cloudy" },
+  { value: "breeze", label: "Windy" },
   { value: "misty", label: "Misty" },
-  { value: "rain", label: "Rain" },
-  { value: "breeze", label: "Breeze" },
+  { value: "rain", label: "Rainy" },
+  { value: "cloudy", label: "Cloudy" },
+  { value: "snowy", label: "Snowy" },
 ];
 
 /**
@@ -88,28 +92,49 @@ export function ControlPanel({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-6 space-y-5">
+          {/* These two are one setting seen from two sides, and the panel says
+              so rather than letting a visitor discover it by watching the other
+              control move on its own. Light is the sun's arc and dark is the
+              moon's, so choosing either end also chooses a time — which is what
+              makes a coherent sky possible at all. */}
           <Segmented
             label="Appearance"
             options={COLOR_MODES}
             value={colorMode}
             onChange={setColorMode}
+            hint={
+              colorMode === "auto"
+                ? "Follows your local clock."
+                : colorMode === "dark"
+                  ? "Dark is night — the moon's half of the day."
+                  : "Light runs dawn to dusk, with the sun up."
+            }
           />
           <Segmented
             label="Time of day"
             options={TIME_MODES}
             value={timeMode}
             onChange={setTimeMode}
-            hint={timeMode === "sync" ? "Follows your local clock." : undefined}
+            hint={
+              timeMode === "sync"
+                ? "Follows your local clock. The sun and moon track it."
+                : "Sets where the sun sits, and the light follows."
+            }
           />
+
           <Segmented
             label="Weather"
             options={WEATHERS}
             value={weather}
             onChange={setWeather}
             hint={
-              weather === "breeze"
-                ? "Adds no overlay — only moves the forest more."
-                : "Changes the forest's mood, never its colour."
+              weather === "clear"
+                ? "Changes the light, the wind, the water and the soundscape."
+                : weather === "snowy"
+                  ? "The calmest of the six: less wind than clear, and the stillest water."
+                  : weather === "breeze"
+                    ? "No overlay — it only moves what is already moving, which is what wind is."
+                    : "Changes the light, the wind, the water and the soundscape."
             }
           />
 

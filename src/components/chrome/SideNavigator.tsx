@@ -76,10 +76,12 @@ export function SideNavigator() {
       onPointerLeave={() => setPinned(false)}
       className={[
         "fixed z-30 transition-[opacity,visibility] duration-500 motion-reduce:transition-none",
-        // Clears the fixed command strip on small screens, where both want the
-        // bottom edge. On desktop the navigator moves to the right rail and
-        // the collision disappears.
-        "inset-x-0 bottom-20 flex justify-center",
+        // On phones it tucks directly onto the top edge of the command strip
+        // rather than floating a few centimetres above it. At `bottom-20` it
+        // hovered in the middle of whatever card happened to be there and its
+        // dots sat on top of the text — a translucent pill over body copy reads
+        // as a rendering fault, not as chrome.
+        "inset-x-0 bottom-[3.25rem] flex justify-center",
         "md:inset-x-auto md:bottom-auto md:right-6 md:top-1/2 md:block md:-translate-y-1/2",
         // `invisible`, not just `opacity-0`: a transparent element still takes
         // focus, so tabbing through the page would land on eight buttons
@@ -90,8 +92,11 @@ export function SideNavigator() {
     >
       <ol
         className={[
-          "flex items-center gap-1 rounded-full border border-[var(--border-soft)]",
-          "bg-[var(--surface)] px-2 py-2 backdrop-blur-md",
+          "flex items-center gap-0.5 rounded-full border border-[var(--border-soft)]",
+          // Opaque on mobile: the strip is small and sits over content, so it
+          // has to read as a solid object rather than as a smear.
+          "bg-[var(--surface-solid)] px-1.5 py-1.5 shadow-lg backdrop-blur-md",
+          "md:bg-[var(--surface)] md:px-2 md:py-3",
           "md:flex-col md:items-end md:gap-0 md:rounded-2xl md:px-2 md:py-3",
         ].join(" ")}
       >
@@ -103,7 +108,7 @@ export function SideNavigator() {
                 type="button"
                 onClick={() => scrollToSection(section.id)}
                 aria-current={isActive ? "true" : undefined}
-                className="group flex items-center gap-3 rounded-full p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)] md:w-full md:justify-end md:px-2"
+                className="group flex items-center gap-3 rounded-full p-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)] md:w-full md:justify-end md:px-2"
               >
                 <span
                   className={[

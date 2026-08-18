@@ -1,5 +1,5 @@
 import { skillsContent } from "@/content/sections";
-import { SectionShell, Panel } from "./SectionShell";
+import { SectionShell, BentoGrid, Panel } from "./SectionShell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -9,11 +9,9 @@ import { cn } from "@/lib/utils";
  * grouping is the information. What backs each of these up is the projects
  * section directly above.
  *
- * The tiles are deliberately *unequal*. A six-up grid of identical boxes is a
- * table with rounded corners — what makes a bento read as designed is that the
- * spans follow the content, so the two groups with the most entries get the
- * most room. `auto-rows-fr` then keeps every tile in a row the same height, so
- * varying the spans never produces ragged bottoms.
+ * The tiles are deliberately *unequal*: the spans follow the content, so the
+ * groups with the most entries get the most room. This is the section the whole
+ * page's bento grid was generalised from — see `BentoGrid`.
  */
 const SPAN: Record<string, string> = {
   languages: "sm:col-span-2 lg:col-span-2",
@@ -27,7 +25,7 @@ const SPAN: Record<string, string> = {
 export function SkillsSection() {
   return (
     <SectionShell id="skills" heading={skillsContent.heading}>
-      <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+      <BentoGrid>
         {skillsContent.groups.map((group) => (
           <Panel key={group.id} as="div" className={cn("flex flex-col", SPAN[group.id])}>
             <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[var(--accent-ink)]">
@@ -42,7 +40,7 @@ export function SkillsSection() {
             </ul>
           </Panel>
         ))}
-      </div>
+      </BentoGrid>
     </SectionShell>
   );
 }

@@ -8,6 +8,11 @@ export interface AboutContent {
   tagline: string;
   /** Short professional summary — a few sentences, not an essay. */
   bio: string[];
+  /** A personal principle, shown once at the very end of the page. Not a
+   * tagline and not a heading: `tagline` is the concrete line that says what he
+   * builds, and it is also the Person schema's description. This is the closing
+   * note after the facts are done. */
+  motto: string;
 }
 
 /** A named group of skills, mirroring how the resume itself groups them. No

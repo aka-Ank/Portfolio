@@ -5,11 +5,11 @@ import { useAppStore, selectReducedMotion } from "@/state/useAppStore";
 import {
   atmosphereAt,
   formatOklch,
-  resolveTheme,
   SURFACES,
   type Atmosphere,
   type SurfaceFamily,
 } from "./palette";
+import { resolveSky } from "./sky";
 
 /** Seconds⁻¹. Chosen so a change of setting settles in a little over a second
  * — slow enough to read as a light change, fast enough that it has finished
@@ -21,6 +21,7 @@ function writeAtmosphere(root: HTMLElement, atmosphere: Atmosphere) {
   root.style.setProperty("--sky-mid", formatOklch(atmosphere.skyMid));
   root.style.setProperty("--sky-horizon", formatOklch(atmosphere.skyHorizon));
   root.style.setProperty("--glow", formatOklch(atmosphere.glow));
+  root.style.setProperty("--celestial", formatOklch(atmosphere.celestial));
   root.style.setProperty("--aether", formatOklch(atmosphere.aether));
   root.style.setProperty("--layer-far", formatOklch(atmosphere.layerFar));
   root.style.setProperty("--layer-mid", formatOklch(atmosphere.layerMid));
@@ -88,7 +89,7 @@ export function ThemeDriver() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const target = resolveTheme(colorMode, timeMode);
+    const target = resolveSky(colorMode, timeMode);
 
     if (currentFamily.current !== target.family) {
       const isFirstPaint = currentFamily.current === null;

@@ -1,5 +1,5 @@
 import { experienceContent } from "@/content/sections";
-import { SectionShell, Panel } from "./SectionShell";
+import { SectionShell, BentoGrid, Panel } from "./SectionShell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -15,7 +15,8 @@ export function ExperienceSection() {
       {/* Full grid width with the bullets in two columns, rather than a narrow
           card leaving a third of the row empty. One role does not need a
           timeline, but it does need to not look like an afterthought. */}
-      <Panel as="article">
+      <BentoGrid>
+        <Panel as="article" className="lg:col-span-6">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h3 className="text-xl font-medium text-[var(--ink)]">{experience.role}</h3>
           <span className="font-mono text-xs text-[var(--ink-muted)]">{experience.period}</span>
@@ -33,7 +34,8 @@ export function ExperienceSection() {
             </li>
           ))}
         </ul>
-      </Panel>
+        </Panel>
+      </BentoGrid>
     </SectionShell>
   );
 }

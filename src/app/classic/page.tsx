@@ -6,6 +6,7 @@ import { SdeSection, AimlSection } from "@/sections/ProjectsSection";
 import { SkillsSection } from "@/sections/SkillsSection";
 import { EducationSection } from "@/sections/EducationSection";
 import { ContactSection } from "@/sections/ContactSection";
+import { Motto } from "@/sections/Motto";
 import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { about } from "@/content/about";
 import { SITE_URL } from "@/lib/site";
@@ -51,6 +52,7 @@ export default function ClassicPage() {
         <SkillsSection />
         <EducationSection />
         <ContactSection />
+        <Motto />
       </main>
       <CommandFooter variant="classic" />
     </>

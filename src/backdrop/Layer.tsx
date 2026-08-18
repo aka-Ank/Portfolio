@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { DEPTH_PARALLAX, type Depth } from "./scene";
+import { DEPTH_DRIFT, DEPTH_PARALLAX, type Depth } from "./scene";
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,6 +43,11 @@ export function Layer({
   opacity?: number;
 }) {
   const travel = `calc(var(--parallax, 0) * ${DEPTH_PARALLAX[depth]} * var(--parallax-range, 0px))`;
+  // Negative, so scrolling *down* slides the wood left — which reads as
+  // travelling rightwards through it. The direction is fixed rather than
+  // alternating: a backdrop that reverses at some point in the page is the
+  // thing that makes drift feel like a mechanism instead of like movement.
+  const drift = `calc(var(--parallax, 0) * ${-DEPTH_DRIFT[depth]} * var(--drift-range, 0px))`;
 
   const maskStyle: CSSProperties = plate
     ? {
@@ -69,12 +74,22 @@ export function Layer({
 
   return (
     <div
-      className={cn("absolute inset-0", className)}
+      className={cn("absolute", className)}
       style={{
-        // translate3d rather than `top`: transforms are composited, so the
-        // whole plane moves on the GPU without the browser re-running layout
-        // or paint for any of the artwork inside it.
-        transform: `translate3d(0, ${travel}, 0)`,
+        // Overscan on the right only, by exactly this plane's own drift
+        // distance. Drift is one-directional — the world slides left as the page
+        // scrolls down — so extending the left edge would pad artwork that never
+        // comes into frame. Sizing the box to `viewport + drift` also makes it
+        // the same length as the strip inside it, so one SVG user unit maps to
+        // one pixel and `preserveAspectRatio="none"` distorts nothing.
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: `calc(-1 * ${DEPTH_DRIFT[depth]} * var(--drift-range, 0px))`,
+        // translate3d rather than `top`/`left`: transforms are composited, so
+        // the whole plane moves on the GPU without the browser re-running
+        // layout or paint for any of the artwork inside it.
+        transform: `translate3d(${drift}, ${travel}, 0)`,
         opacity,
         ...maskStyle,
         ...imageStyle,

@@ -1,5 +1,6 @@
 import { ArrowUpRight, Plus } from "lucide-react";
 import type { Project } from "@/content/schema";
+import { cn } from "@/lib/utils";
 
 /**
  * One project, collapsed to what you skim for and expandable to the rest.
@@ -10,20 +11,37 @@ import type { Project } from "@/content/schema";
  * it was flattened; the fix was to promote the stack, not to abandon
  * disclosure.
  *
- * A native `<details>` with a shared `name`, which makes the group an
- * exclusive accordion — opening one closes the others — with **no JavaScript
- * at all**. It is keyboard- and screen-reader-correct for free, works before
- * hydration, and the open/close easing is the pure-CSS `::details-content`
- * transition in globals.css. Where `interpolate-size` is unsupported the card
- * simply opens instantly, which is a perfectly good outcome.
+ * A native `<details>`, and deliberately **without** a shared `name`.
+ *
+ * These used to be an exclusive accordion — one open per track — which the
+ * `name` attribute gives for free. That was reversed on request: the cards are
+ * independent panels now, any number open at once, and closing one leaves the
+ * rest alone. The only thing that changed is the absence of `name`; everything
+ * else about the element was already right.
+ *
+ * Still **no JavaScript** in the card itself. It is keyboard- and
+ * screen-reader-correct for free, works before hydration, and the open/close
+ * easing is the pure-CSS `::details-content` transition in globals.css. Where
+ * `interpolate-size` is unsupported the card simply opens instantly, which is a
+ * perfectly good outcome.
  */
-export function ProjectCard({ project, group }: { project: Project; group: string }) {
+export function ProjectCard({
+  project,
+  className,
+}: {
+  project: Project;
+  className?: string;
+}) {
   return (
     <details
-      name={group}
-      className="group rounded-xl border border-[var(--border-soft)] bg-[var(--surface)] backdrop-blur-md transition-colors duration-300 hover:border-[var(--accent-ink)] open:border-[var(--accent-ink)]"
+      className={cn(
+        // No `name`: with one, the browser closes every sibling when another
+        // opens. Independent panels are the requirement now.
+        "group rounded-2xl border border-[var(--border-soft)] bg-[var(--surface)] shadow-[0_1px_2px_oklch(0_0_0/0.03),0_8px_24px_-12px_oklch(0_0_0/0.10)] backdrop-blur-md transition-colors duration-300 hover:border-[var(--accent-ink)] open:border-[var(--accent-ink)]",
+        className,
+      )}
     >
-      <summary className="cursor-pointer list-none rounded-[inherit] p-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
+      <summary className="cursor-pointer list-none rounded-[inherit] p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
         <div className="flex items-baseline justify-between gap-4">
           <h3 className="font-[family-name:var(--font-display)] text-2xl leading-tight text-[var(--ink)]">
             {project.title}
@@ -61,7 +79,7 @@ export function ProjectCard({ project, group }: { project: Project; group: strin
       {/* No wrapper div for the animation: `::details-content` already targets
           everything after the <summary>, so the easing has nothing to hang on
           that this element would provide. */}
-      <div className="border-t border-[var(--border-soft)] px-6 pb-6 pt-5">
+      <div className="border-t border-[var(--border-soft)] px-5 pb-5 pt-4 sm:px-6 sm:pb-6 sm:pt-5">
           <dl className="space-y-3 text-[15px] leading-relaxed">
             <div>
               <dt className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-muted)]">

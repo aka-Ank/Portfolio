@@ -57,6 +57,16 @@ function backdropsFor(family: SurfaceFamily): string[] {
       // transparent radial gradient, so a panel never actually sits on the
       // pure colour. Sampling it undiluted keeps the check conservative.
       formatOklch(atmosphere.glow),
+      // The sun and moon's own disc. The bodies travel a real arc whose apex is
+      // at 14vh — the same part of the frame the hero card and every section
+      // heading occupy — so a panel genuinely does pass in front of the moon,
+      // and the disc has to be sampled rather than assumed harmless. It passes
+      // with margin at the palette's current values (the tightest pair is
+      // `inkMuted` over the night moon, at 6.2:1), which is worth knowing: the
+      // reason `--celestial` is held dim at night is the design's "no blinding
+      // light" rule, not this audit. The audit is what stops a future brighter
+      // moon from quietly crossing the line anyway.
+      formatOklch(atmosphere.celestial),
       // The four forest planes. These matter more than they look: the scene
       // keeps its detail out of the middle of the viewport, but the page
       // *scrolls*, so a card genuinely does pass over the foreground plane on
@@ -100,6 +110,30 @@ describe("surface/ink contrast", () => {
           }
         });
       }
+
+      /**
+       * Section headings are **bare `--ink` on the raw backdrop** — there is no
+       * panel behind them, so their effective background is whatever the
+       * atmosphere happens to be at that scroll position. That was fine while
+       * the only things up there were sky and distant planes, and stopped being
+       * fine when the sun and moon started crossing the same band: at lightness
+       * 0.62 the night moon put a heading at 3.24:1.
+       *
+       * Only `--ink` is asserted here, not `--ink-muted`. Muted text genuinely
+       * cannot clear 4.5:1 against a mid-tone disc at any lightness the disc
+       * could still read as a moon, so the rule is the other way round —
+       * running muted prose belongs on a surface, and every section now puts it
+       * on one.
+       */
+      it("ink passes on the raw backdrop, with no surface underneath", () => {
+        for (const backdrop of backdropsFor(family)) {
+          const ratio = wcagContrast(surface.ink, backdrop);
+          expect(
+            ratio,
+            `--ink directly on ${backdrop} was ${ratio.toFixed(2)}`,
+          ).toBeGreaterThanOrEqual(AA_BODY);
+        }
+      });
 
       it("accentInk passes as button text against its own fill", () => {
         // The primary CTA inverts the pair: accent fill, surface-solid text.

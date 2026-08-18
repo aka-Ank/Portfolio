@@ -68,14 +68,21 @@ export const aboutContent = {
   bio: about.bio,
 };
 
-/** The About section's sidebar. Every row restates a fact that already appears
- * elsewhere on this page — it is a shortcut for a skimming reader, never a
- * place to introduce a claim the resume does not support. */
+/**
+ * The About section's one meta line.
+ *
+ * Every entry restates a fact that already appears elsewhere on this page — it
+ * is a shortcut for a skimming reader, never a place to introduce a claim the
+ * resume does not support. That redundancy is exactly why it is a single line
+ * of text rather than the four-row panel it used to be: as a panel it was
+ * taller than the summary it sat beside, and none of it was new information.
+ *
+ * Each entry is self-describing, so the line needs no labels to be read.
+ */
 export const glanceContent = [
-  { label: "Based in", value: resume.location },
-  { label: "Studying", value: `${education.degree}, ${education.institution}` },
-  { label: "Graduating", value: education.period.split("–")[1].trim() },
-  { label: "Tracks", value: "Software engineering · Applied machine learning" },
+  resume.location,
+  `${education.degree}, ${education.institution}`,
+  `Graduating ${education.period.split("–")[1].trim()}`,
 ];
 
 export const experienceContent = {

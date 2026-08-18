@@ -6,6 +6,7 @@ import { SdeSection, AimlSection } from "@/sections/ProjectsSection";
 import { SkillsSection } from "@/sections/SkillsSection";
 import { EducationSection } from "@/sections/EducationSection";
 import { ContactSection } from "@/sections/ContactSection";
+import { Motto } from "@/sections/Motto";
 import { SideNavigator } from "@/components/chrome/SideNavigator";
 import { CommandFooter } from "@/components/chrome/CommandFooter";
 import { KeyboardShortcuts } from "@/components/chrome/KeyboardShortcuts";
@@ -36,8 +37,9 @@ export default function HomePage() {
       <SideNavigator />
 
       {/* Bottom padding clears the fixed command strip, plus the navigator's
-          mobile position above it. */}
-      <main id="main-content" className="pb-32 md:pb-20">
+          mobile position above it. Desktop needs far less than mobile, where
+          the navigator sits above the strip rather than in the right rail. */}
+      <main id="main-content" className="pb-24 md:pb-14">
         <HeroSection />
         <AboutSection />
         <ExperienceSection />
@@ -46,6 +48,7 @@ export default function HomePage() {
         <SkillsSection />
         <EducationSection />
         <ContactSection />
+        <Motto />
       </main>
 
       <CommandFooter variant="full" />

@@ -1,17 +1,19 @@
 import { aimlContent, sdeContent } from "@/content/sections";
-import { SectionShell } from "./SectionShell";
+import { SectionShell, BentoGrid } from "./SectionShell";
 import { ProjectCard } from "./ProjectCard";
+import { DisclosureToggle } from "@/components/shared/DisclosureToggle";
 
 /**
- * `items-start` matters here: without it a grid row stretches every card to
- * the height of the tallest, so expanding one card would silently inflate the
- * blank space beside it. With it, the opened card grows and its neighbour
- * stays the size of its own content.
+ * Three columns of the six-column bento grid per card, so the projects sit on
+ * the same rhythm as every other section while still reading as a pair.
  *
- * The `group` name is per-track, so the two sections are two independent
- * accordions — opening an AI/ML project does not close an SDE one.
+ * `stretch={false}` matters more than ever now that cards open independently: a
+ * stretched row levels every card to the height of the tallest, so opening one
+ * would inflate the blank space beside it. Unstretched, an opened card grows and
+ * its neighbours stay the size of their own content — which is what keeps the
+ * layout readable with four panels open at once.
  */
-const GRID = "grid items-start gap-5 lg:grid-cols-2";
+const SPAN = "lg:col-span-3";
 
 /** The two tracks get the same card and the same layout. The split is stated
  * by the headings; making the cards look different as well would suggest one
@@ -19,11 +21,16 @@ const GRID = "grid items-start gap-5 lg:grid-cols-2";
 export function SdeSection() {
   return (
     <SectionShell id="sde" heading={sdeContent.heading} blurb={sdeContent.blurb}>
-      <div className={GRID}>
+      <DisclosureToggle label="all" />
+      <BentoGrid stretch={false} className="mt-2">
         {sdeContent.projects.map((project) => (
-          <ProjectCard key={project.slug} project={project} group="sde-projects" />
+          <ProjectCard
+            key={project.slug}
+            project={project}
+            className={SPAN}
+          />
         ))}
-      </div>
+      </BentoGrid>
     </SectionShell>
   );
 }
@@ -31,11 +38,16 @@ export function SdeSection() {
 export function AimlSection() {
   return (
     <SectionShell id="aiml" heading={aimlContent.heading} blurb={aimlContent.blurb}>
-      <div className={GRID}>
+      <DisclosureToggle label="all" />
+      <BentoGrid stretch={false} className="mt-2">
         {aimlContent.projects.map((project) => (
-          <ProjectCard key={project.slug} project={project} group="aiml-projects" />
+          <ProjectCard
+            key={project.slug}
+            project={project}
+            className={SPAN}
+          />
         ))}
-      </div>
+      </BentoGrid>
     </SectionShell>
   );
 }
